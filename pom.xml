@@ -5,7 +5,7 @@
   <artifactId>wizard-backend</artifactId>
   <packaging>war</packaging>
   <version>0.0.0-SNAPSHOT</version>
-  <name>Compare Backend</name>
+  <name>Wizard Backend</name>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

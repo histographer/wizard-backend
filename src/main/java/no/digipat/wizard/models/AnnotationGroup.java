@@ -1,5 +1,7 @@
 package no.digipat.wizard.models;
 
+import java.util.List;
+
 /**
  * A representation of a group of annotations. All the setters of
  * this class return the instance on which they are called.
@@ -10,7 +12,7 @@ package no.digipat.wizard.models;
 public class AnnotationGroup {
     
     private String groupId;
-    private long[] annotationIds;
+    private List<Long> annotationIds;
     
     public String getGroupId() {
         return groupId;
@@ -21,11 +23,11 @@ public class AnnotationGroup {
         return this;
     }
     
-    public long[] getAnnotationIds() {
+    public List<Long> getAnnotationIds() {
         return annotationIds;
     }
     
-    public AnnotationGroup setAnnotationIds(long[] annotationIds) {
+    public AnnotationGroup setAnnotationIds(List<Long> annotationIds) {
         this.annotationIds = annotationIds;
         return this;
     }

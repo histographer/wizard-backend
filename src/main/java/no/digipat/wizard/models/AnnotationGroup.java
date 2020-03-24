@@ -10,7 +10,7 @@ package no.digipat.wizard.models;
 public class AnnotationGroup {
     
     private Integer groupId;
-    private Long[] annotationIds;
+    private long[] annotationIds;
     
     public Integer getGroupId() {
         return groupId;
@@ -21,11 +21,11 @@ public class AnnotationGroup {
         return this;
     }
     
-    public Long[] getAnnotationIds() {
+    public long[] getAnnotationIds() {
         return annotationIds;
     }
     
-    public AnnotationGroup setAnnotationIds(Long[] annotationIds) {
+    public AnnotationGroup setAnnotationIds(long[] annotationIds) {
         this.annotationIds = annotationIds;
         return this;
     }

@@ -64,7 +64,7 @@
         <version>3.0.0-M4</version>
         <configuration>
           <includes>
-            <!-- TODO -->
+            <include>DatabaseUnitTests.java</include>
           </includes>
           <skipTests>${skip.unit.tests}</skipTests>
         </configuration>

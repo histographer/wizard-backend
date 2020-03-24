@@ -9,14 +9,14 @@ package no.digipat.wizard.models;
  */
 public class AnnotationGroup {
     
-    private Integer groupId;
+    private String groupId;
     private long[] annotationIds;
     
-    public Integer getGroupId() {
+    public String getGroupId() {
         return groupId;
     }
     
-    public AnnotationGroup setGroupId(Integer groupId) {
+    public AnnotationGroup setGroupId(String groupId) {
         this.groupId = groupId;
         return this;
     }

@@ -10,6 +10,7 @@ import com.mongodb.MongoClient;
 
 import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
+import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAOTest;
 
 /**
  * A suite of unit tests that require database connectivity.
@@ -21,7 +22,7 @@ import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    
+    MongoAnnotationGroupDAOTest.class
 })
 public class DatabaseUnitTests {
     

@@ -87,13 +87,15 @@ public class MongoAnnotationGroupDAO {
             throw new NullPointerException("List of annotation IDs cannot be null");
         }
         document.put("annotationIds", annotationIds);
+        document.put("creationDate", annotationGroup.getCreationDate());
         return document;
     }
     
     private static AnnotationGroup documentToAnnotationGroup(Document document) {
         return new AnnotationGroup()
                 .setGroupId(document.getObjectId("_id").toHexString())
-                .setAnnotationIds(document.getList("annotationIds", Long.class));
+                .setAnnotationIds(document.getList("annotationIds", Long.class))
+                .setCreationDate(document.getDate("creationDate"));
     }
     
 }

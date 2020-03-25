@@ -1,5 +1,6 @@
 package no.digipat.wizard.models;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -13,6 +14,7 @@ public class AnnotationGroup {
     
     private String groupId;
     private List<Long> annotationIds;
+    private Date creationDate;
     
     public String getGroupId() {
         return groupId;
@@ -29,6 +31,15 @@ public class AnnotationGroup {
     
     public AnnotationGroup setAnnotationIds(List<Long> annotationIds) {
         this.annotationIds = annotationIds;
+        return this;
+    }
+    
+    public Date getCreationDate() {
+        return creationDate;
+    }
+    
+    public AnnotationGroup setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
         return this;
     }
     

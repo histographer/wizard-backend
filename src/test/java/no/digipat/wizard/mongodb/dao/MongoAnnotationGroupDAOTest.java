@@ -3,6 +3,7 @@ package no.digipat.wizard.mongodb.dao;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.After;
@@ -66,24 +67,28 @@ public class MongoAnnotationGroupDAOTest {
     
     @Test
     public void testCreateAnnotationGroupWithSuppliedId() {
-        AnnotationGroup group = new AnnotationGroup().setAnnotationIds(list(1, 2)).setGroupId(hexId);
+        AnnotationGroup group = new AnnotationGroup().setAnnotationIds(list(1, 2))
+                .setGroupId(hexId).setCreationDate(new Date());
         String id = dao.createAnnotationGroup(group);
         AnnotationGroup createdGroup = dao.getAnnotationGroup(group.getGroupId());
         
         assertEquals(group.getGroupId(), id);
         assertEquals(group.getGroupId(), createdGroup.getGroupId());
         assertEquals(group.getAnnotationIds(), createdGroup.getAnnotationIds());
+        assertEquals(group.getCreationDate(), createdGroup.getCreationDate());
     }
     
     @Test
     public void testCreateAnnotationGroupWithNullId() {
-        AnnotationGroup group = new AnnotationGroup().setAnnotationIds(list(1, 2));
+        AnnotationGroup group = new AnnotationGroup().setAnnotationIds(list(1, 2))
+                .setCreationDate(new Date());
         String id = dao.createAnnotationGroup(group);
         AnnotationGroup createdGroup = dao.getAnnotationGroup(id);
         
         assertNotNull(id);
         assertEquals(id, createdGroup.getGroupId());
         assertEquals(group.getAnnotationIds(), createdGroup.getAnnotationIds());
+        assertEquals(group.getCreationDate(), createdGroup.getCreationDate());
     }
     
     @Test

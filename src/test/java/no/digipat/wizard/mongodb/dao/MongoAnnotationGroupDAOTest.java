@@ -98,6 +98,20 @@ public class MongoAnnotationGroupDAOTest {
         assertNull(group);
     }
     
+    @Test(expected=IllegalArgumentException.class)
+    @Parameters({
+        "abc", // Too short
+        "oooooooooooooooooooooooo" // 24 non-hexadecimal characters
+    })
+    public void testGetAnnotationGroupWithInvalidId(String id) {
+        dao.getAnnotationGroup(id);
+    }
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void testGetAnnotationGroupWithNullId() {
+        dao.getAnnotationGroup(null);
+    }
+    
     @After
     public void tearDown() {
         client.getDatabase(databaseName).drop();

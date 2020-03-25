@@ -65,9 +65,12 @@ public class MongoAnnotationGroupDAO {
      * Gets a specific annotation group.
      * 
      * @param id the ID of the group
+     * 
      * @return the group, or {@code null} if no group with the given ID exists
+     * 
+     * @throws IllegalArgumentException if {@code id} is not a 24-character hexadecimal string
      */
-    public AnnotationGroup getAnnotationGroup(String id) {
+    public AnnotationGroup getAnnotationGroup(String id) throws IllegalArgumentException {
         Document document = collection.find(eq("_id", new ObjectId(id))).first();
         if (document == null) {
             return null;

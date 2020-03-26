@@ -73,7 +73,7 @@ public class AnnotationGroupServletTest {
     @Test
     public void testCreateAnnotationGroup() throws Exception {
         JSONObject requestJson = new JSONObject();
-        List<Long> annotationIds = Arrays.asList(new Long[] {42L, 1337L});
+        List<Long> annotationIds = Arrays.asList(new Long[] {42L, 1337L, Long.MAX_VALUE});
         requestJson.put("annotations", annotationIds);
         WebRequest request = createPostRequest("annotationGroup", requestJson.toString(), "application/json");
         WebResponse response = conversation.getResponse(request);

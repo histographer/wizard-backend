@@ -66,7 +66,9 @@ public class AnnotationGroupServletTest {
                 "this is not JSON",
                 "{}",
                 "{\"annotations\": \"not an array\"}",
-                "{\"annotations\": [\"not a number\"]}"
+                "{\"annotations\": [\"not a number\"]}",
+                "{\"annotations\": null}",
+                "{\"annotations\": [null]}"
         };
     }
     

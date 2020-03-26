@@ -88,7 +88,7 @@
         <version>3.0.0-M4</version>
         <configuration>
           <includes>
-            <!-- TODO -->
+            <include>IntegrationTests.java</include>
           </includes>
         </configuration>
         <executions>

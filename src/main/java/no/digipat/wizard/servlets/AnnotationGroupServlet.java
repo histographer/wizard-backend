@@ -47,11 +47,18 @@ public class AnnotationGroupServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONArray annotationIds;
         try {
             JSONObject requestJson = new JSONObject(new JSONTokener(request.getInputStream()));
-            JSONArray annotationIds = requestJson.getJSONArray("annotations");
-            AnnotationGroup group = new AnnotationGroup();
-            Long[] idArray = annotationIds.toList().stream().<Long>map(id -> {
+            annotationIds = requestJson.getJSONArray("annotations");
+        } catch (JSONException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        AnnotationGroup group = new AnnotationGroup();
+        Long[] idArray;
+        try {
+            idArray = annotationIds.toList().stream().<Long>map(id -> {
                 // The JSON array will represent integers using the Integer class, unless they're too big, in which
                 // case it uses the Long class
                 if (id instanceof Long) {
@@ -60,21 +67,22 @@ public class AnnotationGroupServlet extends HttpServlet {
                     return (long) (int) id;
                 }
             }).toArray(Long[]::new);
-            group.setAnnotationIds(Arrays.asList(idArray));
-            
-            ServletContext context = getServletContext();
-            String databaseName = (String) context.getAttribute("MONGO_DATABASE");
-            MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
-            MongoAnnotationGroupDAO dao = new MongoAnnotationGroupDAO(client, databaseName);
-            String groupId = dao.createAnnotationGroup(group);
-            
-            JSONObject responseJson = new JSONObject();
-            responseJson.put("groupId", groupId);
-            response.setContentType("application/json");
-            response.getWriter().print(responseJson);
-        } catch (JSONException | ClassCastException | NullPointerException e) {
+        } catch (ClassCastException | NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
+        group.setAnnotationIds(Arrays.asList(idArray));
+        
+        ServletContext context = getServletContext();
+        String databaseName = (String) context.getAttribute("MONGO_DATABASE");
+        MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
+        MongoAnnotationGroupDAO dao = new MongoAnnotationGroupDAO(client, databaseName);
+        String groupId = dao.createAnnotationGroup(group);
+        
+        JSONObject responseJson = new JSONObject();
+        responseJson.put("groupId", groupId);
+        response.setContentType("application/json");
+        response.getWriter().print(responseJson);
     }
     
 }

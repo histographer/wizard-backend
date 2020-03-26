@@ -31,6 +31,11 @@
       <artifactId>mongo-java-driver</artifactId>
       <version>3.12.1</version>
     </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20190722</version>
+    </dependency>
     
     <!-- Test dependencies: -->
     <dependency>
@@ -51,6 +56,12 @@
       <version>1.24.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>pl.pragmatists</groupId>
+      <artifactId>JUnitParams</artifactId>
+      <version>1.1.1</version>
+      <scope>test</scope>
+    </dependency>
     
   </dependencies>
     
@@ -64,7 +75,7 @@
         <version>3.0.0-M4</version>
         <configuration>
           <includes>
-            <!-- TODO -->
+            <include>DatabaseUnitTests.java</include>
           </includes>
           <skipTests>${skip.unit.tests}</skipTests>
         </configuration>
@@ -77,7 +88,7 @@
         <version>3.0.0-M4</version>
         <configuration>
           <includes>
-            <!-- TODO -->
+            <include>IntegrationTests.java</include>
           </includes>
         </configuration>
         <executions>

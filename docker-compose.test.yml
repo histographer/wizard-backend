@@ -1,0 +1,33 @@
+version: '3.1'
+
+services:
+  
+  mongo:
+    image: mongo:latest
+    container_name: wizard_mongo_test
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${WIZARD_TEST_MONGODB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${WIZARD_TEST_MONGODB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: wizard
+    volumes:
+      - mongodata:/data/db
+    ports:
+      - ${WIZARD_TEST_MONGODB_PORT}:27017
+  
+  wizard_backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - ${WIZARD_TEST_TOMCAT_PORT}:8080
+    environment:
+      WIZARD_MONGODB_HOST: wizard_mongo_test
+      WIZARD_MONGODB_PORT: 27017
+      WIZARD_MONGODB_USERNAME: ${WIZARD_TEST_MONGODB_ROOT_USERNAME}
+      WIZARD_MONGODB_PASSWORD: ${WIZARD_TEST_MONGODB_ROOT_PASSWORD}
+      WIZARD_MONGODB_DATABASE: wizard
+  
+volumes:
+  mongodata:

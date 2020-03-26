@@ -72,7 +72,7 @@ public class AnnotationGroupServlet extends HttpServlet {
             responseJson.put("groupId", groupId);
             response.setContentType("application/json");
             response.getWriter().print(responseJson);
-        } catch (JSONException | ClassCastException e) {
+        } catch (JSONException | ClassCastException | NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }

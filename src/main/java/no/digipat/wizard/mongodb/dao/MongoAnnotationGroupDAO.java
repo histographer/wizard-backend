@@ -9,7 +9,7 @@ import com.mongodb.client.MongoCollection;
 import static com.mongodb.client.model.Filters.eq;
 
 import java.util.List;
-
+import java.util.ArrayList;
 import java.util.Date;
 
 import no.digipat.wizard.models.AnnotationGroup;
@@ -79,6 +79,21 @@ public class MongoAnnotationGroupDAO {
         } else {
             return documentToAnnotationGroup(document);
         }
+    }
+    
+    /**
+     * Gets all annotation groups belonging to a specific project.
+     * 
+     * @param projectId the project ID
+     * 
+     * @return a list containing every annotation group belonging to the project
+     */
+    public List<AnnotationGroup> getAnnotationGroups(long projectId) {
+        final List<AnnotationGroup> groups = new ArrayList<>();
+        for (Document document : collection.find(eq("projectId", projectId))) {
+            groups.add(documentToAnnotationGroup(document));
+        }
+        return groups;
     }
     
     private static Document annotationGroupToDocument(AnnotationGroup annotationGroup) {

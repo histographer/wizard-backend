@@ -9,6 +9,7 @@ import com.mongodb.client.MongoCollection;
 import static com.mongodb.client.model.Filters.eq;
 
 import java.util.List;
+import java.util.Date;
 
 import no.digipat.wizard.models.AnnotationGroup;
 
@@ -40,8 +41,8 @@ public class MongoAnnotationGroupDAO {
      * 
      * @return the ID of the newly created annotation group
      * 
-     * @throws NullPointerException if {@code annotationGroup} or {@code annotationGroup.getAnnotationIds()}
-     * is {@code null}
+     * @throws NullPointerException if {@code annotationGroup}, its list of annotation IDs,
+     * or its creation date is {@code null}
      * @throws IllegalStateException if there is already an annotation group with the same ID
      * as {@code annotationGroup}
      * @throws IllegalArgumentException if the group's ID is not either {@code null} or a 24-character
@@ -89,8 +90,12 @@ public class MongoAnnotationGroupDAO {
         if (annotationIds == null) {
             throw new NullPointerException("List of annotation IDs cannot be null");
         }
+        Date creationDate = annotationGroup.getCreationDate();
+        if (creationDate == null) {
+            throw new NullPointerException("Creation date cannot be null");
+        }
+        document.put("creationDate", creationDate);
         document.put("annotationIds", annotationIds);
-        document.put("creationDate", annotationGroup.getCreationDate());
         return document;
     }
     

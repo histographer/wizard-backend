@@ -45,7 +45,12 @@ public class MongoAnnotationGroupDAOTest {
     
     @Test(expected=NullPointerException.class)
     public void testCreateAnnotationGroupWithNullAnnotationIds() {
-        dao.createAnnotationGroup(new AnnotationGroup().setGroupId(hexId));
+        dao.createAnnotationGroup(new AnnotationGroup().setGroupId(hexId).setCreationDate(new Date()));
+    }
+    
+    @Test(expected=NullPointerException.class)
+    public void testCreateAnnotationGroupWithNullCreationDate() {
+        dao.createAnnotationGroup(new AnnotationGroup().setGroupId(hexId).setAnnotationIds(list(1)));
     }
     
     @Test(expected=IllegalArgumentException.class)
@@ -54,15 +59,15 @@ public class MongoAnnotationGroupDAOTest {
         "oooooooooooooooooooooooo" // 24 non-hexadecimal characters
     })
     public void testCreateAnnotationWithInvalidId(String id) {
-        dao.createAnnotationGroup(new AnnotationGroup().setGroupId(id).setAnnotationIds(list(1)));
+        dao.createAnnotationGroup(new AnnotationGroup().setGroupId(id).setAnnotationIds(list(1)).setCreationDate(new Date()));
     }
     
     @Test(expected=IllegalStateException.class)
     public void testCreateAnnotationGroupWithDuplicateId() {
         dao.createAnnotationGroup(new AnnotationGroup().setGroupId(hexId)
-                .setAnnotationIds(list(1, 2)));
+                .setAnnotationIds(list(1, 2)).setCreationDate(new Date()));
         dao.createAnnotationGroup(new AnnotationGroup().setGroupId(hexId)
-                .setAnnotationIds(list(3, 4)));
+                .setAnnotationIds(list(3, 4)).setCreationDate(new Date()));
     }
     
     @Test

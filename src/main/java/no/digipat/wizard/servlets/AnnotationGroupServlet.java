@@ -2,6 +2,7 @@ package no.digipat.wizard.servlets;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -72,6 +73,7 @@ public class AnnotationGroupServlet extends HttpServlet {
             return;
         }
         group.setAnnotationIds(Arrays.asList(idArray));
+        group.setCreationDate(new Date());
         
         ServletContext context = getServletContext();
         String databaseName = (String) context.getAttribute("MONGO_DATABASE");

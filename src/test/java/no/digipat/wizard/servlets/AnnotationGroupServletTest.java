@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -88,6 +89,15 @@ public class AnnotationGroupServletTest {
         AnnotationGroup group = dao.getAnnotationGroup(groupId);
         assertNotNull(group);
         assertEquals(annotationIds, group.getAnnotationIds());
+        Date now = new Date();
+        long nowMilliseconds = now.getTime();
+        long earliestMilliseconds = nowMilliseconds - 60*1000; // One minute ago
+        long latestMilliseconds = nowMilliseconds + 60*1000; // One minute into the future
+        long creationMilliseconds = group.getCreationDate().getTime();
+        // We can't really expect the creation time to be an exact value,
+        // but it certainly shouldn't be off by more than a minute
+        assertTrue("Creation time is too early", creationMilliseconds >= earliestMilliseconds);
+        assertTrue("Creation time is too late", creationMilliseconds <= latestMilliseconds);
     }
     
     @After

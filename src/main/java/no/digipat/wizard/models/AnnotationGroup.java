@@ -3,6 +3,8 @@ package no.digipat.wizard.models;
 import java.util.Date;
 import java.util.List;
 
+import lombok.EqualsAndHashCode;
+
 /**
  * A representation of a group of annotations. All the setters of
  * this class return the instance on which they are called.
@@ -10,6 +12,7 @@ import java.util.List;
  * @author Jon Wallem Anundsen
  *
  */
+@EqualsAndHashCode
 public class AnnotationGroup {
     
     private String groupId;

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -58,16 +59,62 @@ public class AnnotationGroupServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        ServletContext context = getServletContext();
-        String databaseName = (String) context.getAttribute("MONGO_DATABASE");
-        MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
-        MongoAnnotationGroupDAO dao = new MongoAnnotationGroupDAO(client, databaseName);
+        MongoAnnotationGroupDAO dao = getDao();
         String groupId = dao.createAnnotationGroup(group);
         
         JSONObject responseJson = new JSONObject();
         responseJson.put("groupId", groupId);
         response.setContentType("application/json");
         response.getWriter().print(responseJson);
+    }
+    
+    /**
+     * Gets information about all the annotation groups associated with a
+     * specific project, as determined by the query string parameter {@code projectId}.
+     * The response will contain a JSON object with the IDs and names of the annotation groups:
+     * 
+     * <pre>
+     *   {
+     *     "groups": [
+     *       {
+     *         "id": &lt;string&gt;,
+     *         "name": &lt;string&gt;
+     *       },
+     *       ...
+     *     ]
+     *   }
+     * </pre>
+     * 
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        MongoAnnotationGroupDAO dao = getDao();
+        long projectId;
+        try {
+            projectId = Long.parseLong(request.getParameter("projectId"));
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        List<AnnotationGroup> groups = dao.getAnnotationGroups(projectId);
+        JSONObject responseJson = new JSONObject();
+        JSONArray array = new JSONArray();
+        for (AnnotationGroup group : groups) {
+            JSONObject groupJson = new JSONObject()
+                    .put("id", group.getGroupId())
+                    .put("name", group.getName());
+            array.put(groupJson);
+        }
+        responseJson.put("groups", array);
+        response.setContentType("application/json");
+        response.getWriter().print(responseJson);
+    }
+    
+    private MongoAnnotationGroupDAO getDao() {
+        ServletContext context = getServletContext();
+        String databaseName = (String) context.getAttribute("MONGO_DATABASE");
+        MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
+        return new MongoAnnotationGroupDAO(client, databaseName);
     }
     
     private static AnnotationGroup inputToAnnotationGroup(InputStream inputStream)

@@ -3,6 +3,10 @@ package no.digipat.wizard.mongodb.dao;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+
 import java.util.Date;
 import java.util.List;
 
@@ -140,6 +144,36 @@ public class MongoAnnotationGroupDAOTest {
     @Test(expected=IllegalArgumentException.class)
     public void testGetAnnotationGroupWithNullId() {
         dao.getAnnotationGroup(null);
+    }
+    
+    @Test
+    public void testGetAnnotationGroups() {
+        AnnotationGroup group1 = new AnnotationGroup()
+                .setGroupId("aaaaaaaaaaaaaaaaaaaaaaaa")
+                .setAnnotationIds(list(1, 2))
+                .setCreationDate(new Date())
+                .setName("group 1")
+                .setProjectId(20L);
+        AnnotationGroup group2 = new AnnotationGroup()
+                .setGroupId("bbbbbbbbbbbbbbbbbbbbbbbb")
+                .setAnnotationIds(list(3))
+                .setCreationDate(new Date(0))
+                .setName("group 2")
+                .setProjectId(20L);
+        AnnotationGroup group3 = new AnnotationGroup()
+                .setGroupId("cccccccccccccccccccccccc")
+                .setAnnotationIds(list(4))
+                .setCreationDate(new Date(-100000000))
+                .setName("group 3")
+                .setProjectId(30L);
+        dao.createAnnotationGroup(group1);
+        dao.createAnnotationGroup(group2);
+        dao.createAnnotationGroup(group3);
+        
+        List<AnnotationGroup> retrievedGroups = dao.getAnnotationGroups(20L);
+        
+        Collections.sort(retrievedGroups, Comparator.comparing(group -> group.getGroupId()));
+        assertEquals(Arrays.asList(new AnnotationGroup[] {group1, group2}), retrievedGroups);
     }
     
     @After

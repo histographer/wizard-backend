@@ -5,9 +5,13 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
+import static java.util.Comparator.comparing;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -15,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.PostMethodWebRequest;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebRequest;
@@ -113,6 +118,61 @@ public class AnnotationGroupServletTest {
         assertTrue("Creation time is too late", creationMilliseconds <= latestMilliseconds);
         assertEquals("foo", group.getName());
         assertEquals((Long) 20L, group.getProjectId());
+    }
+    
+    @Test
+    public void testGetAnnotationGroups() throws Exception {
+        AnnotationGroup group1 = new AnnotationGroup()
+                .setGroupId("aaaaaaaaaaaaaaaaaaaaaaaa")
+                .setAnnotationIds(Arrays.asList(1L, 2L))
+                .setCreationDate(new Date())
+                .setName("group 1")
+                .setProjectId(20L);
+        AnnotationGroup group2 = new AnnotationGroup()
+                .setGroupId("bbbbbbbbbbbbbbbbbbbbbbbb")
+                .setAnnotationIds(Arrays.asList(3L))
+                .setCreationDate(new Date(0))
+                .setName("group 2")
+                .setProjectId(20L);
+        AnnotationGroup group3 = new AnnotationGroup()
+                .setGroupId("cccccccccccccccccccccccc")
+                .setAnnotationIds(Arrays.asList(4L))
+                .setCreationDate(new Date(-100000000))
+                .setName("group 3")
+                .setProjectId(30L);
+        dao.createAnnotationGroup(group1);
+        dao.createAnnotationGroup(group2);
+        dao.createAnnotationGroup(group3);
+        
+        WebRequest request = new GetMethodWebRequest(baseUrl, "annotationGroup?projectId=20");
+        WebResponse response = conversation.getResponse(request);
+        
+        assertEquals(200, response.getResponseCode());
+        assertEquals("application/json", response.getContentType());
+        JSONObject jsonObject = new JSONObject(response.getText());
+        JSONArray array = jsonObject.getJSONArray("groups");
+        List<Object> list = array.toList();
+        assertEquals(2, list.size());
+        Collections.sort(list, comparing(obj -> (String) ((Map) obj).get("id")));
+        Map<String, Object> map1 = (Map<String, Object>) list.get(0);
+        Map<String, Object> map2 = (Map<String, Object>) list.get(1);
+        assertEquals(group1.getGroupId(), map1.get("id"));
+        assertEquals(group1.getName(), map1.get("name"));
+        assertEquals(group2.getGroupId(), map2.get("id"));
+        assertEquals(group2.getName(), map2.get("name"));
+    }
+    
+    @Test
+    @Parameters({
+        "annotationGroup",
+        "annotationGroup?projectId=",
+        "annotationGroup?projectId=notANumber"
+    })
+    public void testStatusCode400OnGetAnnotationGroups(String path) throws Exception {
+        WebRequest request = new GetMethodWebRequest(baseUrl, path);
+        WebResponse response = conversation.getResponse(request);
+        
+        assertEquals(400, response.getResponseCode());
     }
     
     @After

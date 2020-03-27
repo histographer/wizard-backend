@@ -31,7 +31,8 @@ public class AnnotationGroupServlet extends HttpServlet {
      * 
      * <pre>
      *   {
-     *     "annotations": [&lt;long&gt;, &lt;long&gt;, ..., &lt;long&gt;]
+     *     "annotations": [&lt;long&gt;, &lt;long&gt;, ..., &lt;long&gt;],
+     *     "name": &lt;string&gt;
      *   }
      * </pre>
      * 

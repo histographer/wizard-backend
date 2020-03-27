@@ -16,6 +16,7 @@ public class AnnotationGroup {
     private List<Long> annotationIds;
     private Date creationDate;
     private String name;
+    private Long projectId;
     
     public String getGroupId() {
         return groupId;
@@ -50,6 +51,15 @@ public class AnnotationGroup {
     
     public AnnotationGroup setName(String name) {
         this.name = name;
+        return this;
+    }
+    
+    public Long getProjectId() {
+        return projectId;
+    }
+    
+    public AnnotationGroup setProjectId(Long projectId) {
+        this.projectId = projectId;
         return this;
     }
     

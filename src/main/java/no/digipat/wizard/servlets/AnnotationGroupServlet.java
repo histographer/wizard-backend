@@ -32,7 +32,8 @@ public class AnnotationGroupServlet extends HttpServlet {
      * <pre>
      *   {
      *     "annotations": [&lt;long&gt;, &lt;long&gt;, ..., &lt;long&gt;],
-     *     "name": &lt;string&gt;
+     *     "name": &lt;string&gt;,
+     *     "projectId": &lt;long&gt;
      *   }
      * </pre>
      * 
@@ -74,6 +75,7 @@ public class AnnotationGroupServlet extends HttpServlet {
         JSONObject requestJson = new JSONObject(new JSONTokener(inputStream));
         JSONArray annotationIds = requestJson.getJSONArray("annotations");
         String name = requestJson.getString("name");
+        Long projectId = requestJson.getLong("projectId");
         Long[] idArray = annotationIds.toList().stream().<Long>map(id -> {
             // The JSON array will represent integers using the Integer class, unless they're too big, in which
             // case it uses the Long class
@@ -83,8 +85,11 @@ public class AnnotationGroupServlet extends HttpServlet {
                 return (long) (int) id;
             }
         }).toArray(Long[]::new);
-        return new AnnotationGroup().setAnnotationIds(Arrays.asList(idArray))
-                .setCreationDate(new Date()).setName(name);
+        return new AnnotationGroup()
+                .setAnnotationIds(Arrays.asList(idArray))
+                .setCreationDate(new Date())
+                .setName(name)
+                .setProjectId(projectId);
     }
     
 }

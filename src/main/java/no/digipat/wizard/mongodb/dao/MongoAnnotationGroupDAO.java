@@ -99,9 +99,14 @@ public class MongoAnnotationGroupDAO {
         if (name == null) {
             throw new NullPointerException("Group name cannot be null");
         }
+        Long projectId = annotationGroup.getProjectId();
+        if (projectId == null) {
+            throw new NullPointerException("Project ID cannot be null");
+        }
         document.put("creationDate", creationDate);
         document.put("annotationIds", annotationIds);
         document.put("name", name);
+        document.put("projectId", annotationGroup.getProjectId());
         return document;
     }
     
@@ -110,7 +115,8 @@ public class MongoAnnotationGroupDAO {
                 .setGroupId(document.getObjectId("_id").toHexString())
                 .setAnnotationIds(document.getList("annotationIds", Long.class))
                 .setCreationDate(document.getDate("creationDate"))
-                .setName(document.getString("name"));
+                .setName(document.getString("name"))
+                .setProjectId(document.getLong("projectId"));
     }
     
 }

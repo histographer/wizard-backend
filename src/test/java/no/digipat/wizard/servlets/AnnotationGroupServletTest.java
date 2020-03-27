@@ -67,15 +67,19 @@ public class AnnotationGroupServletTest {
                 {"this is not JSON"},
                 {"{}"},
                 // Invalid or missing array of annotations:
-                {"{\"name\": \"group name\"}"},
-                {"{\"annotations\": \"not an array\", \"name\": \"group name\"}"},
-                {"{\"annotations\": [\"not a number\"], \"name\": \"group name\"}"},
-                {"{\"annotations\": null, \"name\": \"group name\"}"},
-                {"{\"annotations\": [null], \"name\": \"group name\"}"},
+                {"{\"name\": \"group name\", \"projectId\": 1}"},
+                {"{\"annotations\": \"not an array\", \"name\": \"group name\", \"projectId\": 1}"},
+                {"{\"annotations\": [\"not a number\"], \"name\": \"group name\", \"projectId\": 1}"},
+                {"{\"annotations\": null, \"name\": \"group name\"}, \"projectId\": 1"},
+                {"{\"annotations\": [null], \"name\": \"group name\"}, \"projectId\": 1"},
                 // Invalid or missing group name:
-                {"{\"annotations\": [1]}"},
-                {"{\"annotations\": [1], \"name\": null}"},
-                {"{\"annotations\": [1], \"name\": 1}"},
+                {"{\"annotations\": [1]}, \"projectId\": 1"},
+                {"{\"annotations\": [1], \"name\": null, \"projectId\": 1}"},
+                {"{\"annotations\": [1], \"name\": 1, \"projectId\": 1}"},
+                // Invalid or missing project name:
+                {"{\"annotations\": [1], \"name\": \"group name\"}"},
+                {"{\"annotations\": [1], \"name\": \"group name\", \"projectId\": null}"},
+                {"{\"annotations\": [1], \"name\": \"group name\", \"projectId\": \"this is a string\"}"}
         };
     }
     
@@ -85,6 +89,7 @@ public class AnnotationGroupServletTest {
         List<Long> annotationIds = Arrays.asList(new Long[] {42L, 1337L, Long.MAX_VALUE});
         requestJson.put("annotations", annotationIds);
         requestJson.put("name", "foo");
+        requestJson.put("projectId", 20);
         
         WebRequest request = createPostRequest("annotationGroup", requestJson.toString(), "application/json");
         WebResponse response = conversation.getResponse(request);
@@ -107,6 +112,7 @@ public class AnnotationGroupServletTest {
         assertTrue("Creation time is too early", creationMilliseconds >= earliestMilliseconds);
         assertTrue("Creation time is too late", creationMilliseconds <= latestMilliseconds);
         assertEquals("foo", group.getName());
+        assertEquals((Long) 20L, group.getProjectId());
     }
     
     @After

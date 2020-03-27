@@ -62,14 +62,20 @@ public class AnnotationGroupServletTest {
         assertEquals("Testing with message body: " + messageBody + ".", 400, response.getResponseCode());
     }
     
-    private static String[] getInvalidGroupCreationRequestBodies() {
-        return new String[] {
-                "this is not JSON",
-                "{}",
-                "{\"annotations\": \"not an array\"}",
-                "{\"annotations\": [\"not a number\"]}",
-                "{\"annotations\": null}",
-                "{\"annotations\": [null]}"
+    private static String[][] getInvalidGroupCreationRequestBodies() {
+        return new String[][] {
+                {"this is not JSON"},
+                {"{}"},
+                // Invalid or missing array of annotations:
+                {"{\"name\": \"group name\"}"},
+                {"{\"annotations\": \"not an array\", \"name\": \"group name\"}"},
+                {"{\"annotations\": [\"not a number\"], \"name\": \"group name\"}"},
+                {"{\"annotations\": null, \"name\": \"group name\"}"},
+                {"{\"annotations\": [null], \"name\": \"group name\"}"},
+                // Invalid or missing group name:
+                {"{\"annotations\": [1]}"},
+                {"{\"annotations\": [1], \"name\": null}"},
+                {"{\"annotations\": [1], \"name\": 1}"},
         };
     }
     
@@ -78,6 +84,8 @@ public class AnnotationGroupServletTest {
         JSONObject requestJson = new JSONObject();
         List<Long> annotationIds = Arrays.asList(new Long[] {42L, 1337L, Long.MAX_VALUE});
         requestJson.put("annotations", annotationIds);
+        requestJson.put("name", "foo");
+        
         WebRequest request = createPostRequest("annotationGroup", requestJson.toString(), "application/json");
         WebResponse response = conversation.getResponse(request);
         
@@ -98,6 +106,7 @@ public class AnnotationGroupServletTest {
         // but it certainly shouldn't be off by more than a minute
         assertTrue("Creation time is too early", creationMilliseconds >= earliestMilliseconds);
         assertTrue("Creation time is too late", creationMilliseconds <= latestMilliseconds);
+        assertEquals("foo", group.getName());
     }
     
     @After

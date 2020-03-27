@@ -45,12 +45,20 @@ public class MongoAnnotationGroupDAOTest {
     
     @Test(expected=NullPointerException.class)
     public void testCreateAnnotationGroupWithNullAnnotationIds() {
-        dao.createAnnotationGroup(new AnnotationGroup().setGroupId(hexId).setCreationDate(new Date()));
+        dao.createAnnotationGroup(new AnnotationGroup().setGroupId(hexId)
+                .setCreationDate(new Date()).setName("blah"));
     }
     
     @Test(expected=NullPointerException.class)
     public void testCreateAnnotationGroupWithNullCreationDate() {
-        dao.createAnnotationGroup(new AnnotationGroup().setGroupId(hexId).setAnnotationIds(list(1)));
+        dao.createAnnotationGroup(new AnnotationGroup().setGroupId(hexId)
+                .setAnnotationIds(list(1)).setName("bleh"));
+    }
+    
+    @Test(expected=NullPointerException.class)
+    public void testCreateAnnotationGroupWithNullName() {
+        dao.createAnnotationGroup(new AnnotationGroup().setGroupId(hexId)
+                .setAnnotationIds(list(1)).setCreationDate(new Date()));
     }
     
     @Test(expected=IllegalArgumentException.class)
@@ -59,21 +67,22 @@ public class MongoAnnotationGroupDAOTest {
         "oooooooooooooooooooooooo" // 24 non-hexadecimal characters
     })
     public void testCreateAnnotationWithInvalidId(String id) {
-        dao.createAnnotationGroup(new AnnotationGroup().setGroupId(id).setAnnotationIds(list(1)).setCreationDate(new Date()));
+        dao.createAnnotationGroup(new AnnotationGroup().setGroupId(id).setAnnotationIds(list(1))
+            .setCreationDate(new Date()).setName("blarg"));
     }
     
     @Test(expected=IllegalStateException.class)
     public void testCreateAnnotationGroupWithDuplicateId() {
         dao.createAnnotationGroup(new AnnotationGroup().setGroupId(hexId)
-                .setAnnotationIds(list(1, 2)).setCreationDate(new Date()));
+                .setAnnotationIds(list(1, 2)).setCreationDate(new Date()).setName("blah"));
         dao.createAnnotationGroup(new AnnotationGroup().setGroupId(hexId)
-                .setAnnotationIds(list(3, 4)).setCreationDate(new Date()));
+                .setAnnotationIds(list(3, 4)).setCreationDate(new Date()).setName("bleh"));
     }
     
     @Test
     public void testCreateAnnotationGroupWithSuppliedId() {
         AnnotationGroup group = new AnnotationGroup().setAnnotationIds(list(1, 2))
-                .setGroupId(hexId).setCreationDate(new Date());
+                .setGroupId(hexId).setCreationDate(new Date()).setName("my fun group");
         String id = dao.createAnnotationGroup(group);
         AnnotationGroup createdGroup = dao.getAnnotationGroup(group.getGroupId());
         
@@ -81,12 +90,13 @@ public class MongoAnnotationGroupDAOTest {
         assertEquals(group.getGroupId(), createdGroup.getGroupId());
         assertEquals(group.getAnnotationIds(), createdGroup.getAnnotationIds());
         assertEquals(group.getCreationDate(), createdGroup.getCreationDate());
+        assertEquals(group.getName(), createdGroup.getName());
     }
     
     @Test
     public void testCreateAnnotationGroupWithNullId() {
         AnnotationGroup group = new AnnotationGroup().setAnnotationIds(list(1, 2))
-                .setCreationDate(new Date());
+                .setCreationDate(new Date()).setName("my cool group");
         String id = dao.createAnnotationGroup(group);
         AnnotationGroup createdGroup = dao.getAnnotationGroup(id);
         
@@ -94,6 +104,7 @@ public class MongoAnnotationGroupDAOTest {
         assertEquals(id, createdGroup.getGroupId());
         assertEquals(group.getAnnotationIds(), createdGroup.getAnnotationIds());
         assertEquals(group.getCreationDate(), createdGroup.getCreationDate());
+        assertEquals(group.getName(), createdGroup.getName());
     }
     
     @Test

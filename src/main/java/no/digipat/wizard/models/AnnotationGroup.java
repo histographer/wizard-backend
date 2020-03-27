@@ -15,6 +15,7 @@ public class AnnotationGroup {
     private String groupId;
     private List<Long> annotationIds;
     private Date creationDate;
+    private String name;
     
     public String getGroupId() {
         return groupId;
@@ -40,6 +41,15 @@ public class AnnotationGroup {
     
     public AnnotationGroup setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+        return this;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public AnnotationGroup setName(String name) {
+        this.name = name;
         return this;
     }
     

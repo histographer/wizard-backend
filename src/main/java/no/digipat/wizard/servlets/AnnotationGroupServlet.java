@@ -49,9 +49,12 @@ public class AnnotationGroupServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONArray annotationIds;
+        JSONObject requestJson;
+        String name;
         try {
-            JSONObject requestJson = new JSONObject(new JSONTokener(request.getInputStream()));
+            requestJson = new JSONObject(new JSONTokener(request.getInputStream()));
             annotationIds = requestJson.getJSONArray("annotations");
+            name = requestJson.getString("name");
         } catch (JSONException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
@@ -74,6 +77,7 @@ public class AnnotationGroupServlet extends HttpServlet {
         }
         group.setAnnotationIds(Arrays.asList(idArray));
         group.setCreationDate(new Date());
+        group.setName(name);
         
         ServletContext context = getServletContext();
         String databaseName = (String) context.getAttribute("MONGO_DATABASE");

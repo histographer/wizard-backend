@@ -9,6 +9,7 @@ import com.mongodb.client.MongoCollection;
 import static com.mongodb.client.model.Filters.eq;
 
 import java.util.List;
+
 import java.util.Date;
 
 import no.digipat.wizard.models.AnnotationGroup;
@@ -41,8 +42,8 @@ public class MongoAnnotationGroupDAO {
      * 
      * @return the ID of the newly created annotation group
      * 
-     * @throws NullPointerException if {@code annotationGroup}, its list of annotation IDs,
-     * or its creation date is {@code null}
+     * @throws NullPointerException if {@code annotationGroup} or any of its properties
+     * is {@code null}
      * @throws IllegalStateException if there is already an annotation group with the same ID
      * as {@code annotationGroup}
      * @throws IllegalArgumentException if the group's ID is not either {@code null} or a 24-character
@@ -94,8 +95,13 @@ public class MongoAnnotationGroupDAO {
         if (creationDate == null) {
             throw new NullPointerException("Creation date cannot be null");
         }
+        String name = annotationGroup.getName();
+        if (name == null) {
+            throw new NullPointerException("Group name cannot be null");
+        }
         document.put("creationDate", creationDate);
         document.put("annotationIds", annotationIds);
+        document.put("name", name);
         return document;
     }
     
@@ -103,7 +109,8 @@ public class MongoAnnotationGroupDAO {
         return new AnnotationGroup()
                 .setGroupId(document.getObjectId("_id").toHexString())
                 .setAnnotationIds(document.getList("annotationIds", Long.class))
-                .setCreationDate(document.getDate("creationDate"));
+                .setCreationDate(document.getDate("creationDate"))
+                .setName(document.getString("name"));
     }
     
 }

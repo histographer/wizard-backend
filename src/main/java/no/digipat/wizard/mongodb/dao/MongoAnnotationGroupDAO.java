@@ -10,6 +10,8 @@ import static com.mongodb.client.model.Filters.eq;
 
 import java.util.List;
 
+import java.util.Date;
+
 import no.digipat.wizard.models.AnnotationGroup;
 
 /**
@@ -40,7 +42,7 @@ public class MongoAnnotationGroupDAO {
      * 
      * @return the ID of the newly created annotation group
      * 
-     * @throws NullPointerException if {@code annotationGroup} or {@code annotationGroup.getAnnotationIds()}
+     * @throws NullPointerException if {@code annotationGroup} or any of its properties
      * is {@code null}
      * @throws IllegalStateException if there is already an annotation group with the same ID
      * as {@code annotationGroup}
@@ -89,8 +91,22 @@ public class MongoAnnotationGroupDAO {
         if (annotationIds == null) {
             throw new NullPointerException("List of annotation IDs cannot be null");
         }
+        Date creationDate = annotationGroup.getCreationDate();
+        if (creationDate == null) {
+            throw new NullPointerException("Creation date cannot be null");
+        }
+        String name = annotationGroup.getName();
+        if (name == null) {
+            throw new NullPointerException("Group name cannot be null");
+        }
+        Long projectId = annotationGroup.getProjectId();
+        if (projectId == null) {
+            throw new NullPointerException("Project ID cannot be null");
+        }
+        document.put("creationDate", creationDate);
         document.put("annotationIds", annotationIds);
-        document.put("creationDate", annotationGroup.getCreationDate());
+        document.put("name", name);
+        document.put("projectId", annotationGroup.getProjectId());
         return document;
     }
     
@@ -98,7 +114,9 @@ public class MongoAnnotationGroupDAO {
         return new AnnotationGroup()
                 .setGroupId(document.getObjectId("_id").toHexString())
                 .setAnnotationIds(document.getList("annotationIds", Long.class))
-                .setCreationDate(document.getDate("creationDate"));
+                .setCreationDate(document.getDate("creationDate"))
+                .setName(document.getString("name"))
+                .setProjectId(document.getLong("projectId"));
     }
     
 }

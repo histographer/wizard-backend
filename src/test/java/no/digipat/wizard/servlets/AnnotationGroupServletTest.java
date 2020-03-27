@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -61,14 +62,24 @@ public class AnnotationGroupServletTest {
         assertEquals("Testing with message body: " + messageBody + ".", 400, response.getResponseCode());
     }
     
-    private static String[] getInvalidGroupCreationRequestBodies() {
-        return new String[] {
-                "this is not JSON",
-                "{}",
-                "{\"annotations\": \"not an array\"}",
-                "{\"annotations\": [\"not a number\"]}",
-                "{\"annotations\": null}",
-                "{\"annotations\": [null]}"
+    private static String[][] getInvalidGroupCreationRequestBodies() {
+        return new String[][] {
+                {"this is not JSON"},
+                {"{}"},
+                // Invalid or missing array of annotations:
+                {"{\"name\": \"group name\", \"projectId\": 1}"},
+                {"{\"annotations\": \"not an array\", \"name\": \"group name\", \"projectId\": 1}"},
+                {"{\"annotations\": [\"not a number\"], \"name\": \"group name\", \"projectId\": 1}"},
+                {"{\"annotations\": null, \"name\": \"group name\"}, \"projectId\": 1"},
+                {"{\"annotations\": [null], \"name\": \"group name\"}, \"projectId\": 1"},
+                // Invalid or missing group name:
+                {"{\"annotations\": [1]}, \"projectId\": 1"},
+                {"{\"annotations\": [1], \"name\": null, \"projectId\": 1}"},
+                {"{\"annotations\": [1], \"name\": 1, \"projectId\": 1}"},
+                // Invalid or missing project name:
+                {"{\"annotations\": [1], \"name\": \"group name\"}"},
+                {"{\"annotations\": [1], \"name\": \"group name\", \"projectId\": null}"},
+                {"{\"annotations\": [1], \"name\": \"group name\", \"projectId\": \"this is a string\"}"}
         };
     }
     
@@ -77,6 +88,9 @@ public class AnnotationGroupServletTest {
         JSONObject requestJson = new JSONObject();
         List<Long> annotationIds = Arrays.asList(new Long[] {42L, 1337L, Long.MAX_VALUE});
         requestJson.put("annotations", annotationIds);
+        requestJson.put("name", "foo");
+        requestJson.put("projectId", 20);
+        
         WebRequest request = createPostRequest("annotationGroup", requestJson.toString(), "application/json");
         WebResponse response = conversation.getResponse(request);
         
@@ -88,6 +102,17 @@ public class AnnotationGroupServletTest {
         AnnotationGroup group = dao.getAnnotationGroup(groupId);
         assertNotNull(group);
         assertEquals(annotationIds, group.getAnnotationIds());
+        Date now = new Date();
+        long nowMilliseconds = now.getTime();
+        long earliestMilliseconds = nowMilliseconds - 60*1000; // One minute ago
+        long latestMilliseconds = nowMilliseconds + 60*1000; // One minute into the future
+        long creationMilliseconds = group.getCreationDate().getTime();
+        // We can't really expect the creation time to be an exact value,
+        // but it certainly shouldn't be off by more than a minute
+        assertTrue("Creation time is too early", creationMilliseconds >= earliestMilliseconds);
+        assertTrue("Creation time is too late", creationMilliseconds <= latestMilliseconds);
+        assertEquals("foo", group.getName());
+        assertEquals((Long) 20L, group.getProjectId());
     }
     
     @After

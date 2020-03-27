@@ -1,6 +1,7 @@
 package no.digipat.wizard.servlets;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -48,37 +49,13 @@ public class AnnotationGroupServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        JSONArray annotationIds;
-        JSONObject requestJson;
-        String name;
+        AnnotationGroup group;
         try {
-            requestJson = new JSONObject(new JSONTokener(request.getInputStream()));
-            annotationIds = requestJson.getJSONArray("annotations");
-            name = requestJson.getString("name");
-        } catch (JSONException e) {
+            group = inputToAnnotationGroup(request.getInputStream());
+        } catch (JSONException | NullPointerException | ClassCastException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        AnnotationGroup group = new AnnotationGroup();
-        Long[] idArray;
-        try {
-            idArray = annotationIds.toList().stream().<Long>map(id -> {
-                // The JSON array will represent integers using the Integer class, unless they're too big, in which
-                // case it uses the Long class
-                if (id instanceof Long) {
-                    return (Long) id;
-                } else {
-                    return (long) (int) id;
-                }
-            }).toArray(Long[]::new);
-        } catch (ClassCastException | NullPointerException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-        group.setAnnotationIds(Arrays.asList(idArray));
-        group.setCreationDate(new Date());
-        group.setName(name);
-        
         ServletContext context = getServletContext();
         String databaseName = (String) context.getAttribute("MONGO_DATABASE");
         MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
@@ -89,6 +66,24 @@ public class AnnotationGroupServlet extends HttpServlet {
         responseJson.put("groupId", groupId);
         response.setContentType("application/json");
         response.getWriter().print(responseJson);
+    }
+    
+    private static AnnotationGroup inputToAnnotationGroup(InputStream inputStream)
+            throws JSONException, NullPointerException, ClassCastException {
+        JSONObject requestJson = new JSONObject(new JSONTokener(inputStream));
+        JSONArray annotationIds = requestJson.getJSONArray("annotations");
+        String name = requestJson.getString("name");
+        Long[] idArray = annotationIds.toList().stream().<Long>map(id -> {
+            // The JSON array will represent integers using the Integer class, unless they're too big, in which
+            // case it uses the Long class
+            if (id instanceof Long) {
+                return (Long) id;
+            } else {
+                return (long) (int) id;
+            }
+        }).toArray(Long[]::new);
+        return new AnnotationGroup().setAnnotationIds(Arrays.asList(idArray))
+                .setCreationDate(new Date()).setName(name);
     }
     
 }

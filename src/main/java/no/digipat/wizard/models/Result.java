@@ -3,13 +3,16 @@ package no.digipat.wizard.models;
 import java.util.Map;
 
 /**
- * A representation of a group of annotations. All the setters of
+ * A representation of a single result. All the setters of
  * this class return the instance on which they are called.
  *
  * @author Kent Are Torvik
  *
  */
 public class Result {
+    private String type;
+    private Map<String, Integer> values;
+
     public String getType() {
         return type;
     }
@@ -28,7 +31,5 @@ public class Result {
         return this;
     }
 
-    private String type;
-    private Map<String, Integer> values;
 
 }

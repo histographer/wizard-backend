@@ -10,6 +10,7 @@ import com.mongodb.MongoClient;
 
 import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
+import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAOTest;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAOTest;
 
 /**
@@ -22,7 +23,8 @@ import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAOTest;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    MongoAnnotationGroupDAOTest.class
+    MongoAnnotationGroupDAOTest.class,
+    MongoAnalysisStatusDAOTest.class
 })
 public class DatabaseUnitTests {
     

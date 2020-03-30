@@ -9,7 +9,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${WIZARD_TEST_MONGODB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${WIZARD_TEST_MONGODB_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: wizard
+      MONGO_INITDB_DATABASE: wizard_test
     volumes:
       - mongodata:/data/db
     ports:
@@ -19,6 +19,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: wizard_backend_test
     restart: always
     ports:
       - ${WIZARD_TEST_TOMCAT_PORT}:8080
@@ -27,7 +28,7 @@ services:
       WIZARD_MONGODB_PORT: 27017
       WIZARD_MONGODB_USERNAME: ${WIZARD_TEST_MONGODB_ROOT_USERNAME}
       WIZARD_MONGODB_PASSWORD: ${WIZARD_TEST_MONGODB_ROOT_PASSWORD}
-      WIZARD_MONGODB_DATABASE: wizard
+      WIZARD_MONGODB_DATABASE: wizard_test
   
 volumes:
   mongodata:

@@ -2,7 +2,7 @@
 
 ## Endpoints
 
-### GET /annotationGroup?project=id
+### GET /annotationGroup?projectId=id
 Gets an overview of the annotation groups belonging to a project.
 
 #### Response

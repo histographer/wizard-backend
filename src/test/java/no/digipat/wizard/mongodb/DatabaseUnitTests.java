@@ -1,9 +1,7 @@
 package no.digipat.wizard.mongodb;
 
 import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
-import no.digipat.wizard.mongodb.dao.MongoResultsDAOTest;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAOTest;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
@@ -17,6 +15,7 @@ import com.mongodb.MongoClient;
 
 import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
+import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAOTest;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAOTest;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
@@ -33,7 +32,8 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 @RunWith(Suite.class)
 @SuiteClasses({
     MongoAnnotationGroupDAOTest.class,
-        MongoResultsDAOTest.class
+    MongoAnalysisStatusDAOTest.class,
+    MongoResultsDAOTest.class
 })
 public class DatabaseUnitTests {
     

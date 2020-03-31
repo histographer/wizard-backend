@@ -24,7 +24,6 @@ import static com.mongodb.client.model.Filters.eq;
  * A data access object (DAO) for annotation group results.
  *
  * @author Kent Are Torvik
- *
  */
 public class MongoResultsDAO {
     private final MongoCollection<AnnotationGroupResults> collection;
@@ -33,7 +32,7 @@ public class MongoResultsDAO {
     /**
      * Constructs a DAO.
      *
-     * @param client the client used to connect to the database
+     * @param client       the client used to connect to the database
      * @param databaseName the name of the database
      */
     public MongoResultsDAO(MongoClient client, String databaseName) {
@@ -46,6 +45,11 @@ public class MongoResultsDAO {
         validator = factory.getValidator();
     }
 
+    /**
+     * Create annotation group results.
+     *
+     * @param annotationGroupResults the annotation group results
+     */
     public void createAnnotationGroupResults(AnnotationGroupResults annotationGroupResults) {
         try{
             validateAnnotationGroupResults(annotationGroupResults);
@@ -55,6 +59,12 @@ public class MongoResultsDAO {
         }
     }
 
+    /**
+     * Validate annotation group results data structure is valid.
+     *
+     * @param annotationGroupResults the annotation group results
+     * @throws IllegalArgumentException if it doesn't pass validation
+     */
     public void validateAnnotationGroupResults(AnnotationGroupResults annotationGroupResults) {
         List<String> validationsList = new ArrayList<String>();
        Set<ConstraintViolation<AnnotationGroupResults>> violations = validator.validate(annotationGroupResults);
@@ -90,6 +100,13 @@ public class MongoResultsDAO {
        }
     }
 
+    /**
+     * Gets a list of AnnotationGroupResults from the database.
+     * If none is found, empty list is returned
+     *
+     * @param groupId the group id
+     * @return the results
+     */
     public List<AnnotationGroupResults> getResults(String groupId) {
         List<AnnotationGroupResults> resultArray = new ArrayList<>();
         FindIterable annotationGroupResults = collection.find(eq("groupId", groupId));
@@ -99,6 +116,13 @@ public class MongoResultsDAO {
         return resultArray;
     }
 
+    /**
+     * Json to annotation group results annotation group results.
+     * @throws NullPointerException if {@code json} is null or not set
+     * @throws RuntimeException if {@code json} can not be cast to AnnotationGroupResults
+     * @param json the json string
+     * @return the annotationGroupResults object
+     */
     public AnnotationGroupResults jsonToAnnotationGroupResults(String json)  {
         if(json == null) {
             throw new NullPointerException("AnnotationGroupResults: Json is not set");
@@ -122,6 +146,12 @@ public class MongoResultsDAO {
         return annotationGroupResults;
     }
 
+    /**
+     * Annotation group results to json string.
+     *
+     * @param annotationGroupResults the annotation group results
+     * @return the string
+     */
     public String annotationGroupResultsToJson(AnnotationGroupResults annotationGroupResults) {
         Gson gson = new Gson();
         return gson.toJson(annotationGroupResults);

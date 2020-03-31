@@ -47,8 +47,8 @@ public class MongoResultsDAOTest {
     @Before
     public void setUp() {
         dao = new MongoResultsDAO(client, databaseName);
-        analysisResultJsonString = "{\"groupId\":\"testGroupdId\",\"results\":[{\"annotationId\":\"id\",\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
-        analysisResultJsonStringNoGroupId = "{\"results\":[{\"annotationId\":\"id\",\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
+        analysisResultJsonString = "{\"groupId\":\"testGroupdId\",\"annotations\":[{\"annotationId\":\"id\",\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
+        analysisResultJsonStringNoGroupId = "{\"annotations\":[{\"annotationId\":\"id\",\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
         analysisResultJsonStringNoResults = "{\"groupId\":\"testGroupdId\"";
         analysisResultJsonStringResultsNoLength = "{\"groupId\":\"testGroupdId\",\"results\":[]}]}";
         Result res1 = new Result().setType("he")

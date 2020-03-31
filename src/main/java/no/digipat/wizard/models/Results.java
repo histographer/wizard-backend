@@ -1,5 +1,7 @@
 package no.digipat.wizard.models;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
@@ -11,7 +13,9 @@ import java.util.List;
  *
  */
 public class Results {
+    @NotBlank(message = "Results: annotationId can not be null or empty")
     private String annotationId;
+    @NotEmpty(message = "Results: List can not be null or empty")
     private List<Result> results;
 
     public String getAnnotationId() {

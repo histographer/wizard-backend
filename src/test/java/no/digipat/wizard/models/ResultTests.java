@@ -75,8 +75,4 @@ public class ResultTests {
         assertEquals(violations.isEmpty(), true);
     }
 
-
-
-
-
 }

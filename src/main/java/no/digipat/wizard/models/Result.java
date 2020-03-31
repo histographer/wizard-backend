@@ -12,9 +12,9 @@ import java.util.Map;
  *
  */
 public class Result {
-    @NotBlank(message = "type can not be null or empty")
+    @NotBlank(message = "Result: Type can not be null or empty")
     private String type;
-    @NotEmpty(message = "values can not be null or empty")
+    @NotEmpty(message = "Result: Values can not be null or empty")
     private Map<String, Integer> values;
 
     public String getType() {

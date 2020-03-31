@@ -21,6 +21,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: wizard_backend_test
     restart: always
     ports:
       - ${WIZARD_TEST_TOMCAT_PORT}:8080

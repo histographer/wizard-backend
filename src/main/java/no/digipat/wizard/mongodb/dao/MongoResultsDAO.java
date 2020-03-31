@@ -108,12 +108,12 @@ public class MongoResultsDAO {
      * Gets a list of AnnotationGroupResults from the database.
      * If none is found, empty list is returned
      *
-     * @param groupId the group id
+     * @param analysisId the analysisId
      * @return the results
      */
-    public List<AnnotationGroupResults> getResults(String groupId) {
+    public List<AnnotationGroupResults> getResults(String analysisId) {
         List<AnnotationGroupResults> resultArray = new ArrayList<>();
-        FindIterable annotationGroupResults = collection.find(eq("groupId", groupId));
+        FindIterable annotationGroupResults = collection.find(eq("analysisId", analysisId));
         for(Object agr : annotationGroupResults) {
            resultArray.add((AnnotationGroupResults) agr);
         }
@@ -143,7 +143,7 @@ public class MongoResultsDAO {
             throw new RuntimeException("AnnotationGroupResults: Can not create AnnotationGroupResults from json string. Input: "+json+". Error: "+e);
         }
 
-        if(annotationGroupResults.getGroupId() == null) {
+        if(annotationGroupResults.getAnalysisId() == null) {
             throw new NullPointerException("AnnotationGroupResults: GroupId is empty. Input: "+json);
         }
 

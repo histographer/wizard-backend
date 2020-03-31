@@ -46,7 +46,7 @@ public class AnalysisResultsServletTest {
         resultDao = new MongoResultsDAO(client, databaseName);
         conversation = new WebConversation();
         analyzeBodyInvalid = "{\"annotations\":[\"1\",\"2\",\"3\"],\"analysis\":[\"he\",\"rgb\"]}";
-        analyzeBodyValid = "{\"groupId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"annotations\":[{\"annotationId\":2,\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
+        analyzeBodyValid = "{\"analysisId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"annotations\":[{\"annotationId\":2,\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
     }
     
     private static PostMethodWebRequest createPostRequest(String path, String messageBody, String contentType) throws Exception {

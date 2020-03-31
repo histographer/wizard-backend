@@ -74,7 +74,7 @@ public class StartAnalysisServletTest {
         dao.createAnnotationGroup(group1);
         WebRequest request = createPostRequest("startAnalysis",analyzeBodyValid, "application/json");
         WebResponse response = conversation.getResponse(request);
-        assertEquals("Testing with message body: " + analyzeBodyInvalid + ".", 202, response.getResponseCode());
+        assertEquals("Testing with message body: " + analyzeBodyValid + ".", 202, response.getResponseCode());
     }
 
     @After

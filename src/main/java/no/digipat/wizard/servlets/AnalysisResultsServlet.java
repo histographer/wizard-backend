@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.io.IOUtils;
 
 @WebServlet(urlPatterns = "/analysisResults")
@@ -29,7 +29,7 @@ public class AnalysisResultsServlet extends HttpServlet {
         try {
             String requestJson = IOUtils.toString(request.getReader());
             AnnotationGroupResults results = MongoResultsDAO.jsonToAnnotationGroupResults(requestJson);
-            AnnotationGroup annotationGroup = MAGdao.getAnnotationGroup(results.getGroupId());
+            AnnotationGroup annotationGroup = MAGdao.getAnnotationGroup(results.getAnalysisId());
             if(annotationGroup == null) {
                 throw new IllegalArgumentException("Annotation group does not exist in the database");
             }

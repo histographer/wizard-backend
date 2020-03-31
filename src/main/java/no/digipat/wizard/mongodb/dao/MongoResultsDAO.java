@@ -1,22 +1,22 @@
 package no.digipat.wizard.mongodb.dao;
 
-import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.util.JSON;
-import no.digipat.wizard.models.AnnotationGroup;
 import no.digipat.wizard.models.AnnotationGroupResults;
 import no.digipat.wizard.models.Result;
 import no.digipat.wizard.models.Results;
-import org.bson.Document;
-import org.json.JSONObject;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import com.google.gson.Gson;
 
-import java.rmi.NoSuchObjectException;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.util.ArrayList;
-import java.util.EmptyStackException;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -28,6 +28,7 @@ import static com.mongodb.client.model.Filters.eq;
  */
 public class MongoResultsDAO {
     private final MongoCollection<AnnotationGroupResults> collection;
+    private final Validator validator;
 
     /**
      * Constructs a DAO.
@@ -37,10 +38,51 @@ public class MongoResultsDAO {
      */
     public MongoResultsDAO(MongoClient client, String databaseName) {
         this.collection = client.getDatabase(databaseName).getCollection("AnnotationGroupResults", AnnotationGroupResults.class);
+        ValidatorFactory validatorFactory = Validation.byDefaultProvider()
+                .configure()
+                .messageInterpolator(new ParameterMessageInterpolator())
+                .buildValidatorFactory();
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
 
     public void createAnnotationGroupResults(AnnotationGroupResults annotationGroupResults) {
        collection.insertOne(annotationGroupResults);
+    }
+
+    public void validateAnnotationGroupResults(AnnotationGroupResults annotationGroupResults) {
+        List<String> validationsList = new ArrayList<String>();
+       Set<ConstraintViolation<AnnotationGroupResults>> violations = validator.validate(annotationGroupResults);
+       if(!violations.isEmpty()) {
+           violations.forEach(violation -> {
+               validationsList.add(violation.getMessage());
+           });
+           throw new IllegalArgumentException(String.join("Something went wrong with validating AnnotationGroupResults: ",validationsList));
+       }
+
+        AtomicReference<Integer> annotationGroupResultsListIndex = new AtomicReference<>(0);
+        annotationGroupResults.getResults().forEach(results -> {
+           Set<ConstraintViolation<Results>> resultsViolations = validator.validate(results);
+           AtomicReference<Integer> resultsIndex = new AtomicReference<>(0);
+           if(!resultsViolations.isEmpty()) {
+               resultsViolations.forEach(violation -> {
+                   validationsList.add("AnnotationGroupResults.Results["+annotationGroupResultsListIndex+"]: "+ violation.getMessage());
+               });
+           }
+           results.getResults().forEach(result -> {
+               Set<ConstraintViolation<Result>> resultViolations = validator.validate(result);
+               if(!resultViolations.isEmpty()) {
+                   resultViolations.forEach(violation -> {
+                       validationsList.add("AnnotationGroupResults["+annotationGroupResultsListIndex+"]["+ resultsIndex.get()+"]: "+violation.getMessage());
+                   });
+               }
+               resultsIndex.getAndSet(resultsIndex.get() + 1);
+           });
+           annotationGroupResultsListIndex.getAndSet(annotationGroupResultsListIndex.get() + 1);
+       });
+       if(!validationsList.isEmpty()) {
+           throw new IllegalArgumentException(String.join("Soemthing went wrong with validating: ",validationsList));
+       }
     }
 
     public List<AnnotationGroupResults> getAnnotationGroupResults(String groupId) {

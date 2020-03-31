@@ -3,7 +3,6 @@ package no.digipat.wizard.models;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -14,10 +13,10 @@ import java.util.List;
  *
  */
 public class AnnotationGroupResults {
-    @NotBlank(message = "GroupId can not be null or empty")
+    @NotBlank(message = "AnnotationGroupResults: GroupId can not be null or empty")
     private String groupId;
 
-    @NotEmpty(message = "results can not be null or empty")
+    @NotEmpty(message = "AnnotationGroupResults: results can not be null or empty")
     private List<Results> results;
 
 

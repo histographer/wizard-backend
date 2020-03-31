@@ -63,7 +63,21 @@ public class MongoResultsDAOTest {
 
         Results res3 = new Results().setResults(Stream.of(res1, res2).collect(Collectors.toList())).setAnnotationId("1");
         annotationGroupResults = new AnnotationGroupResults().setGroupId("1").setResults(new ArrayList<Results>() {{ add(res3); }});
+    }
 
+    private AnnotationGroupResults createAnnotationGroupResultsForTests() {
+        Result res1 = new Result().setType("he")
+                .setValues(new HashMap<String, Integer>(){{
+                    put("hemax", 32);
+                    put("coolcat", 32);
+                }});
+        Result res2 = new Result()
+                .setType("he").setValues(new HashMap<String, Integer>(){{
+                    put("hemax", 32);
+                    put("coolcat", 32);
+                }});
+        Results res3 = new Results().setResults(Stream.of(res1, res2).collect(Collectors.toList())).setAnnotationId("1");
+        return new AnnotationGroupResults().setGroupId("1").setResults(new ArrayList<Results>() {{ add(res3); }});
     }
 
 
@@ -97,6 +111,52 @@ public class MongoResultsDAOTest {
     @Test(expected=IllegalArgumentException.class)
     public void createAnnotationGroupResultsWithNull() {
         dao.createAnnotationGroupResults(null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void validationTestAnnotationGroupFail() {
+       AnnotationGroupResults res = createAnnotationGroupResultsForTests();
+       res.setGroupId("");
+       dao.validateAnnotationGroupResults(res);
+    }
+    @Test(expected=IllegalArgumentException.class)
+    public void validationTestAnnotationResultsFail() {
+        AnnotationGroupResults res = createAnnotationGroupResultsForTests();
+        res.setResults(new ArrayList<>());
+        dao.validateAnnotationGroupResults(res);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void validationTestAnnotationResultsResultsAnnotationIdFail() {
+        AnnotationGroupResults res = createAnnotationGroupResultsForTests();
+        res.getResults().get(0).setAnnotationId("");
+        dao.validateAnnotationGroupResults(res);
+    }
+    @Test(expected=IllegalArgumentException.class)
+    public void validationTestAnnotationResultsResultListFail() {
+        AnnotationGroupResults res = createAnnotationGroupResultsForTests();
+        res.getResults().get(0).setResults(new ArrayList<>());
+        dao.validateAnnotationGroupResults(res);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void validationTestResultTypeFail() {
+        AnnotationGroupResults res = createAnnotationGroupResultsForTests();
+        res.getResults().get(0).getResults().get(0).setType("");
+        dao.validateAnnotationGroupResults(res);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void validationTestResultValuesFail() {
+        AnnotationGroupResults res = createAnnotationGroupResultsForTests();
+        res.getResults().get(0).getResults().get(0).setValues(new HashMap<String, Integer>());
+        dao.validateAnnotationGroupResults(res);
+    }
+
+    @Test
+    public void validationTestSuccess() {
+        AnnotationGroupResults res = createAnnotationGroupResultsForTests();
+        dao.validateAnnotationGroupResults(res);
     }
     // TODO make test for getAnnotationGroupResults and check inserts
 

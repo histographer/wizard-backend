@@ -47,7 +47,12 @@ public class MongoResultsDAO {
     }
 
     public void createAnnotationGroupResults(AnnotationGroupResults annotationGroupResults) {
-       collection.insertOne(annotationGroupResults);
+        try{
+            validateAnnotationGroupResults(annotationGroupResults);
+            collection.insertOne(annotationGroupResults);
+        } catch (IllegalArgumentException e) {
+           throw new IllegalArgumentException("Something went wrong: "+e);
+        }
     }
 
     public void validateAnnotationGroupResults(AnnotationGroupResults annotationGroupResults) {
@@ -85,14 +90,12 @@ public class MongoResultsDAO {
        }
     }
 
-    public List<AnnotationGroupResults> getAnnotationGroupResults(String groupId) {
+    public List<AnnotationGroupResults> getResults(String groupId) {
         List<AnnotationGroupResults> resultArray = new ArrayList<>();
         FindIterable annotationGroupResults = collection.find(eq("groupId", groupId));
-
         for(Object agr : annotationGroupResults) {
            resultArray.add((AnnotationGroupResults) agr);
         }
-
         return resultArray;
     }
 

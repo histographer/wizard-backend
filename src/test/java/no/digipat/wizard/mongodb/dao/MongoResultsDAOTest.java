@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.eq;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnitParamsRunner.class)
 public class MongoResultsDAOTest {
@@ -158,12 +159,37 @@ public class MongoResultsDAOTest {
         AnnotationGroupResults res = createAnnotationGroupResultsForTests();
         dao.validateAnnotationGroupResults(res);
     }
-    // TODO make test for getAnnotationGroupResults and check inserts
+
+    @Test(expected=IllegalArgumentException.class)
+    public void createAnnotationGroupResultsFail() {
+        AnnotationGroupResults res = createAnnotationGroupResultsForTests();
+        res.setGroupId("");
+        dao.createAnnotationGroupResults(res);
+    }
+
+    @Test
+    public void createAnnotationGroupResultsSuccess() {
+       dao.createAnnotationGroupResults(createAnnotationGroupResultsForTests());
+    }
+
+    @Test
+    public void getResultsSuccess() {
+        AnnotationGroupResults agr = createAnnotationGroupResultsForTests();
+        dao.createAnnotationGroupResults(agr);
+        List<AnnotationGroupResults> res = dao.getResults(agr.getGroupId());
+        System.out.println(res.get(0).getGroupId());
+    }
+
+    @Test
+    public void getResultsIsEmpty() {
+        AnnotationGroupResults agr = createAnnotationGroupResultsForTests();
+        dao.createAnnotationGroupResults(agr);
+        List<AnnotationGroupResults> res = dao.getResults("THIS IS NOT VALID");
+        assertEquals(res.size(), 0);
+    }
 
     @After
     public void tearDown() {
         client.getDatabase(databaseName).drop();
     }
-
-
 }

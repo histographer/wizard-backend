@@ -118,6 +118,7 @@
             <include>DatabaseUnitTests.java</include>
             <include>ResultTests.java</include>
             <include>ResultsTests.java</include>
+            <include>AnalyzeTests.java</include>
           </includes>
           <skipTests>${skip.unit.tests}</skipTests>
         </configuration>

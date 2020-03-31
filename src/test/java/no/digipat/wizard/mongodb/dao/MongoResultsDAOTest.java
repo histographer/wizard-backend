@@ -90,10 +90,14 @@ public class MongoResultsDAOTest {
     }
 
     @Test
-    public void addAnnotationGroupResults() {
+    public void createAnnotationGroupResults() {
         dao.createAnnotationGroupResults(annotationGroupResults);
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void createAnnotationGroupResultsWithNull() {
+        dao.createAnnotationGroupResults(null);
+    }
     // TODO make test for getAnnotationGroupResults and check inserts
 
     @After

@@ -1,5 +1,7 @@
 package no.digipat.wizard.models;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.util.Map;
 
 /**
@@ -10,7 +12,9 @@ import java.util.Map;
  *
  */
 public class Result {
+    @NotBlank(message = "type can not be null or empty")
     private String type;
+    @NotEmpty(message = "values can not be null or empty")
     private Map<String, Integer> values;
 
     public String getType() {

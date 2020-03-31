@@ -13,7 +13,8 @@ import java.util.List;
  *
  */
 public class AnnotationGroupResults {
-    // TODO add identificator to an unique analysis ID
+    @NotBlank(message = "AnnotationGroupResults: analysisId can not be null or empty")
+    private String analysisId;
     @NotBlank(message = "AnnotationGroupResults: GroupId can not be null or empty")
     private String groupId;
 
@@ -39,6 +40,15 @@ public class AnnotationGroupResults {
         return this;
     }
 
+    public String getAnalysisId() {
+        return analysisId;
+    }
+
+    public AnnotationGroupResults setAnalysisId(String analysisId) {
+        this.analysisId = analysisId;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "AnnotationGroupResults{" +
@@ -46,4 +56,5 @@ public class AnnotationGroupResults {
                 ", annotations=" + annotations +
                 '}';
     }
+
 }

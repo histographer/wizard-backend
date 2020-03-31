@@ -1,5 +1,10 @@
 package no.digipat.wizard.mongodb;
 
+import com.mongodb.MongoClientOptions;
+import com.mongodb.ServerAddress;
+import no.digipat.wizard.mongodb.dao.MongoResultsDAOTest;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -13,6 +18,9 @@ import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAOTest;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAOTest;
 
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+
 /**
  * A suite of unit tests that require database connectivity.
  * Test cases in this suite should clear the contents of the
@@ -24,7 +32,8 @@ import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAOTest;
 @RunWith(Suite.class)
 @SuiteClasses({
     MongoAnnotationGroupDAOTest.class,
-    MongoAnalysisStatusDAOTest.class
+    MongoAnalysisStatusDAOTest.class,
+    MongoResultsDAOTest.class
 })
 public class DatabaseUnitTests {
     
@@ -36,7 +45,10 @@ public class DatabaseUnitTests {
     public static void setUpClass() {
         server = new MongoServer(new MemoryBackend());
         server.bind("localhost", 27017);
-        client = new MongoClient("localhost", 27017);
+
+        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
+                fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+        client = new MongoClient(new ServerAddress("localhost", 27017), MongoClientOptions.builder().codecRegistry(pojoCodecRegistry).build());
     }
     
     /**

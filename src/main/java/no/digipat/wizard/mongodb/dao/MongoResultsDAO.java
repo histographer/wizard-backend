@@ -66,7 +66,7 @@ public class MongoResultsDAO {
        }
 
         AtomicReference<Integer> annotationGroupResultsListIndex = new AtomicReference<>(0);
-        annotationGroupResults.getResults().forEach(results -> {
+        annotationGroupResults.getAnnotations().forEach(results -> {
            Set<ConstraintViolation<Results>> resultsViolations = validator.validate(results);
            AtomicReference<Integer> resultsIndex = new AtomicReference<>(0);
            if(!resultsViolations.isEmpty()) {

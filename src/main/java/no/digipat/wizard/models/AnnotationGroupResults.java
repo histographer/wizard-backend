@@ -17,7 +17,7 @@ public class AnnotationGroupResults {
     private String groupId;
 
     @NotEmpty(message = "AnnotationGroupResults: results can not be null or empty")
-    private List<Results> results;
+    private List<Results> annotations;
 
 
     public String getGroupId() {
@@ -29,12 +29,12 @@ public class AnnotationGroupResults {
         return this;
     }
 
-    public List<Results> getResults() {
-        return results;
+    public List<Results> getAnnotations() {
+        return annotations;
     }
 
-    public AnnotationGroupResults setResults(List<Results> results) {
-        this.results = results;
+    public AnnotationGroupResults setAnnotations(List<Results> annotations) {
+        this.annotations = annotations;
         return this;
     }
 }

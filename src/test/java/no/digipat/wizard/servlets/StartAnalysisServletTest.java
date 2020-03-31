@@ -8,6 +8,7 @@ import com.mongodb.MongoClient;
 import junitparams.JUnitParamsRunner;
 import no.digipat.wizard.models.AnnotationGroup;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -16,6 +17,7 @@ import org.junit.runner.RunWith;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -70,7 +72,7 @@ public class StartAnalysisServletTest {
                 .setName("group 1")
                 .setProjectId(20L);
         dao.createAnnotationGroup(group1);
-        WebRequest request = createPostRequest("analyze",analyzeBodyValid, "application/json");
+        WebRequest request = createPostRequest("startAnalysis",analyzeBodyValid, "application/json");
         WebResponse response = conversation.getResponse(request);
         assertEquals("Testing with message body: " + analyzeBodyInvalid + ".", 202, response.getResponseCode());
     }

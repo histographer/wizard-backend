@@ -1,7 +1,6 @@
 package no.digipat.wizard.models;
 
 import com.google.gson.Gson;
-import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class Analyze {
+public class AnalysisPostBody {
     @NotBlank
     private String groupId;
 
@@ -21,9 +20,14 @@ public class Analyze {
     private List<String> analysis;
 
 
-    public static void validate(Analyze analyze) {
+    /**
+     * Validates that @code{analysisPostBody} is valid.
+     *
+     * @param analysisPostBody the analysis post body
+     */
+    public static void validate(AnalysisPostBody analysisPostBody) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Set<ConstraintViolation<Analyze>> violations = factory.getValidator().validate(analyze);
+        Set<ConstraintViolation<AnalysisPostBody>> violations = factory.getValidator().validate(analysisPostBody);
 
         List<String> validationsList = new ArrayList<>();
 
@@ -35,12 +39,12 @@ public class Analyze {
         }
     }
 
-    public static String toJsonString(Analyze analyze) {
+    public static String toJsonString(AnalysisPostBody analysisPostBody) {
         Gson gson = new Gson();
-        return gson.toJson(analyze);
+        return gson.toJson(analysisPostBody);
     }
 
-    public static Analyze fromJsonString(String json) {
+    public static AnalysisPostBody fromJsonString(String json) {
         if(json == null) {
             throw new NullPointerException("Analyze: Json is not set");
         }
@@ -49,23 +53,23 @@ public class Analyze {
         }
 
         Gson gson = new Gson();
-        Analyze analyze = null;
+        AnalysisPostBody analysisPostBody = null;
         try {
-            analyze = gson.fromJson(json, Analyze.class);
+            analysisPostBody = gson.fromJson(json, AnalysisPostBody.class);
         } catch (Exception e) {
             throw new RuntimeException("AnnotationGroupResults: Can not create AnnotationGroupResults from json string. Input: "+json);
         }
 
-        if(analyze.getGroupId() == null) {
+        if(analysisPostBody.getGroupId() == null) {
             throw new NullPointerException("AnnotationGroupResults: GroupId is empty. Input: "+json);
         }
-        return analyze;
+        return analysisPostBody;
     }
     public String getGroupId() {
         return groupId;
     }
 
-    public Analyze setGroupId(String groupId) {
+    public AnalysisPostBody setGroupId(String groupId) {
         this.groupId = groupId;
         return this;
     }
@@ -74,7 +78,7 @@ public class Analyze {
         return annotations;
     }
 
-    public Analyze setAnnotations(List<Long> annotations) {
+    public AnalysisPostBody setAnnotations(List<Long> annotations) {
         this.annotations = annotations;
         return this;
     }
@@ -83,7 +87,7 @@ public class Analyze {
         return analysis;
     }
 
-    public Analyze setAnalysis(List<String> analysis) {
+    public AnalysisPostBody setAnalysis(List<String> analysis) {
         this.analysis = analysis;
         return this;
     }

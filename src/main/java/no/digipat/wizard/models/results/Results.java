@@ -1,6 +1,5 @@
-package no.digipat.wizard.models;
+package no.digipat.wizard.models.results;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -17,7 +16,7 @@ public class Results {
     @NotNull(message = "Results: annotationId can not be null")
     private Long annotationId;
     @NotEmpty(message = "Results: List can not be null or empty")
-    private List<Result> results;
+    private List<AnalysisResult> results;
 
     public Long getAnnotationId() {
         return annotationId;
@@ -28,12 +27,20 @@ public class Results {
         return this;
     }
 
-    public List<Result> getResults() {
+    public List<AnalysisResult> getAnalysisResults() {
         return results;
     }
 
-    public Results setResults(List<Result> results) {
-        this.results = results;
+    public Results setAnalysisResults(List<AnalysisResult> analysisResults) {
+        this.results= analysisResults;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Results{" +
+                "annotationId=" + annotationId +
+                ", results=" + results +
+                '}';
     }
 }

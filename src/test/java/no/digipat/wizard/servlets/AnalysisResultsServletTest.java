@@ -3,11 +3,11 @@ package no.digipat.wizard.servlets;
 import com.meterware.httpunit.*;
 import com.mongodb.MongoClient;
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import no.digipat.wizard.models.AnnotationGroup;
+import no.digipat.wizard.models.results.AnnotationGroupResults;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -16,9 +16,9 @@ import org.junit.runner.RunWith;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static java.util.Comparator.comparing;
 import static org.junit.Assert.*;
 
 @RunWith(JUnitParamsRunner.class)
@@ -31,6 +31,7 @@ public class AnalysisResultsServletTest {
     private WebConversation conversation;
     private String analyzeBodyValid;
     private String analyzeBodyInvalid;
+    private MongoResultsDAO resultDao;
 
     @BeforeClass
     public static void setUpClass() {
@@ -42,9 +43,10 @@ public class AnalysisResultsServletTest {
     @Before
     public void setUp() {
         dao = new MongoAnnotationGroupDAO(client, databaseName);
+        resultDao = new MongoResultsDAO(client, databaseName);
         conversation = new WebConversation();
         analyzeBodyInvalid = "{\"annotations\":[\"1\",\"2\",\"3\"],\"analysis\":[\"he\",\"rgb\"]}";
-        analyzeBodyValid = "{\"groupId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"annotations\":[{\"annotationId\":1l,\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
+        analyzeBodyValid = "{\"groupId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"annotations\":[{\"annotationId\":2,\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
     }
     
     private static PostMethodWebRequest createPostRequest(String path, String messageBody, String contentType) throws Exception {
@@ -54,7 +56,7 @@ public class AnalysisResultsServletTest {
     
     @Test
     public void testStatusCode400OnInvalidInput() throws Exception {
-        WebRequest request = createPostRequest("analysisResult",analyzeBodyInvalid, "application/json");
+        WebRequest request = createPostRequest("analysisResults",analyzeBodyInvalid, "application/json");
         WebResponse response = conversation.getResponse(request);
         assertEquals("Testing with message body: " + analyzeBodyInvalid + ".", 400, response.getResponseCode());
     }
@@ -69,9 +71,15 @@ public class AnalysisResultsServletTest {
                 .setName("group 1")
                 .setProjectId(20L);
         dao.createAnnotationGroup(group1);
-        WebRequest request = createPostRequest("analyze",analyzeBodyValid, "application/json");
+        WebRequest request = createPostRequest("analysisResults",analyzeBodyValid, "application/json");
         WebResponse response = conversation.getResponse(request);
-        assertEquals("Testing with message body: " + analyzeBodyInvalid + ".", 202, response.getResponseCode());
+        System.out.println(IOUtils.toString(response.getInputStream(), StandardCharsets.UTF_8));
+        assertEquals("Testing with message body: " + analyzeBodyValid + ".", 201, response.getResponseCode());
+        AnnotationGroup grp = dao.getAnnotationGroup("aaaaaaaaaaaaaaaaaaaaaaaa");
+        assertNotEquals(grp, null);
+        List<AnnotationGroupResults> agr = resultDao.getResults("aaaaaaaaaaaaaaaaaaaaaaaa");
+        System.out.println(agr);
+        assertEquals(agr.size(), 1);
     }
 
     @After

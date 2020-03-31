@@ -2,47 +2,46 @@ package no.digipat.wizard.models;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.runners.statements.ExpectException;
 
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 
-public class AnalyzeTests {
+public class AnalysisPostBodyTests {
     private String analysisJson;
-    private Analyze analyze;
+    private AnalysisPostBody analysisPostBody;
 
     @Before
     public void setUp() {
      analysisJson= "{\"groupId\":\"abc\",\"annotations\":[1,2,3],\"analysis\":[\"he\",\"rgb\"]}";
-     analyze = new Analyze().setGroupId("abc")
+     analysisPostBody = new AnalysisPostBody().setGroupId("abc")
              .setAnnotations(new ArrayList<Long>(){{ add(1l); add(2l); add(3l);}})
              .setAnalysis(new ArrayList<String>(){{ add("he"); add("rgb");}});
     }
 
     @Test
     public void toJsonFromAnalyzeModel() {
-        String json = Analyze.toJsonString(analyze);
+        String json = AnalysisPostBody.toJsonString(analysisPostBody);
         assertEquals(json, analysisJson);
     }
 
     @Test
     public void toAnalyzeFromJsonString() {
-        Analyze analyzeConverted = Analyze.fromJsonString(analysisJson);
-        assertEquals(analyze.getAnalysis(), analyzeConverted.getAnalysis());
-        assertEquals(analyze.getAnnotations(), analyzeConverted.getAnnotations());
-        assertEquals(analyze.getGroupId(), analyzeConverted.getGroupId());
+        AnalysisPostBody analysisPostBodyConverted = AnalysisPostBody.fromJsonString(analysisJson);
+        assertEquals(analysisPostBody.getAnalysis(), analysisPostBodyConverted.getAnalysis());
+        assertEquals(analysisPostBody.getAnnotations(), analysisPostBodyConverted.getAnnotations());
+        assertEquals(analysisPostBody.getGroupId(), analysisPostBodyConverted.getGroupId());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void validationTestFail() {
-        Analyze analyzeFail = new Analyze();
-        Analyze.validate(analyzeFail);
+        AnalysisPostBody analysisPostBodyFail = new AnalysisPostBody();
+        AnalysisPostBody.validate(analysisPostBodyFail);
     }
 
     @Test
     public void validationTestSuccess() {
-        Analyze.validate(analyze);
+        AnalysisPostBody.validate(analysisPostBody);
     }
 
 }

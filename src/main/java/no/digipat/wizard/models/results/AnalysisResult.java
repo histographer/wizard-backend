@@ -1,7 +1,8 @@
-package no.digipat.wizard.models;
+package no.digipat.wizard.models.results;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Map;
  * @author Kent Are Torvik
  *
  */
-public class Result {
+public class AnalysisResult {
     @NotBlank(message = "Result: Type can not be null or empty")
     private String type;
     @NotEmpty(message = "Result: Values can not be null or empty")
@@ -21,7 +22,7 @@ public class Result {
         return type;
     }
 
-    public Result setType(String type) {
+    public AnalysisResult setType(String type) {
         this.type = type;
         return this;
     }
@@ -30,10 +31,16 @@ public class Result {
         return values;
     }
 
-    public Result setValues(Map<String, Integer> values) {
+    public AnalysisResult setValues(Map<String, Integer> values) {
         this.values = values;
         return this;
     }
 
-
+    @Override
+    public String toString() {
+        return "AnalysisResult{" +
+                "type='" + type + '\'' +
+                ", values=" + values +
+                '}';
+    }
 }

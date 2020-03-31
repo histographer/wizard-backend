@@ -43,3 +43,17 @@ Creates a new annotation group.
 }
 
 ```
+
+### Post /startAnalysis
+
+Endpoint: `POST /startAnalysis`
+
+#### Request
+```JSON
+{
+    "groupId": "0123456789abcdef12345678",
+    "analysis": ["he", "rgb"]
+}
+```
+
+#### Response: 202 Accepted

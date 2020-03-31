@@ -1,4 +1,4 @@
-package no.digipat.wizard.models;
+package no.digipat.wizard.models.results;
 
 
 import javax.validation.constraints.NotBlank;
@@ -13,6 +13,7 @@ import java.util.List;
  *
  */
 public class AnnotationGroupResults {
+    // TODO add identificator to an unique analysis ID
     @NotBlank(message = "AnnotationGroupResults: GroupId can not be null or empty")
     private String groupId;
 
@@ -36,5 +37,13 @@ public class AnnotationGroupResults {
     public AnnotationGroupResults setAnnotations(List<Results> annotations) {
         this.annotations = annotations;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "AnnotationGroupResults{" +
+                "groupId='" + groupId + '\'' +
+                ", annotations=" + annotations +
+                '}';
     }
 }

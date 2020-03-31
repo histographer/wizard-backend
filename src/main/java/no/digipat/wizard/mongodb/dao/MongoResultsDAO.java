@@ -1,13 +1,16 @@
 package no.digipat.wizard.mongodb.dao;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import no.digipat.wizard.models.AnnotationGroupResults;
-import no.digipat.wizard.models.Result;
-import no.digipat.wizard.models.Results;
-import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
+import com.mongodb.client.MongoDatabase;
+import no.digipat.wizard.models.results.AnnotationGroupResults;
+import no.digipat.wizard.models.results.AnalysisResult;
+import no.digipat.wizard.models.results.Results;
 import com.google.gson.Gson;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -19,6 +22,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.mongodb.client.model.Filters.eq;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 /**
  * A data access object (DAO) for annotation group results.
@@ -36,7 +41,10 @@ public class MongoResultsDAO {
      * @param databaseName the name of the database
      */
     public MongoResultsDAO(MongoClient client, String databaseName) {
-        this.collection = client.getDatabase(databaseName).getCollection("AnnotationGroupResults", AnnotationGroupResults.class);
+        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
+                fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+        MongoDatabase database = client.getDatabase(databaseName).withCodecRegistry(pojoCodecRegistry);
+        this.collection = database.getCollection("AnnotationGroupResults", AnnotationGroupResults.class);
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
@@ -80,8 +88,8 @@ public class MongoResultsDAO {
                    validationsList.add("AnnotationGroupResults.Results["+annotationGroupResultsListIndex+"]: "+ violation.getMessage());
                });
            }
-           results.getResults().forEach(result -> {
-               Set<ConstraintViolation<Result>> resultViolations = validator.validate(result);
+           results.getAnalysisResults().forEach(result -> {
+               Set<ConstraintViolation<AnalysisResult>> resultViolations = validator.validate(result);
                if(!resultViolations.isEmpty()) {
                    resultViolations.forEach(violation -> {
                        validationsList.add("AnnotationGroupResults["+annotationGroupResultsListIndex+"]["+ resultsIndex.get()+"]: "+violation.getMessage());
@@ -119,7 +127,7 @@ public class MongoResultsDAO {
      * @param json the json string
      * @return the annotationGroupResults object
      */
-    public AnnotationGroupResults jsonToAnnotationGroupResults(String json)  {
+    public static AnnotationGroupResults jsonToAnnotationGroupResults(String json)  {
         if(json == null) {
             throw new NullPointerException("AnnotationGroupResults: Json is not set");
         }
@@ -132,7 +140,7 @@ public class MongoResultsDAO {
         try {
             annotationGroupResults = gson.fromJson(json, AnnotationGroupResults.class);
         } catch (Exception e) {
-            throw new RuntimeException("AnnotationGroupResults: Can not create AnnotationGroupResults from json string. Input: "+json);
+            throw new RuntimeException("AnnotationGroupResults: Can not create AnnotationGroupResults from json string. Input: "+json+". Error: "+e);
         }
 
         if(annotationGroupResults.getGroupId() == null) {
@@ -148,7 +156,7 @@ public class MongoResultsDAO {
      * @param annotationGroupResults the annotation group results
      * @return the string
      */
-    public String annotationGroupResultsToJson(AnnotationGroupResults annotationGroupResults) {
+    public static String annotationGroupResultsToJson(AnnotationGroupResults annotationGroupResults) {
         Gson gson = new Gson();
         return gson.toJson(annotationGroupResults);
     }

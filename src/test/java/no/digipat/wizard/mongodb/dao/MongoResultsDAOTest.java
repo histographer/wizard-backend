@@ -1,10 +1,8 @@
 package no.digipat.wizard.mongodb.dao;
 
-import com.mongodb.client.FindIterable;
-import no.digipat.wizard.models.AnnotationGroupResults;
-import no.digipat.wizard.models.Result;
-import no.digipat.wizard.models.Results;
-import org.bson.Document;
+import no.digipat.wizard.models.results.AnnotationGroupResults;
+import no.digipat.wizard.models.results.AnalysisResult;
+import no.digipat.wizard.models.results.Results;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -19,7 +17,6 @@ import no.digipat.wizard.mongodb.DatabaseUnitTests;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,33 +48,34 @@ public class MongoResultsDAOTest {
         analysisResultJsonStringNoGroupId = "{\"annotations\":[{\"annotationId\":1,\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
         analysisResultJsonStringNoResults = "{\"groupId\":\"testGroupdId\"";
         analysisResultJsonStringResultsNoLength = "{\"groupId\":\"testGroupdId\",\"results\":[]}]}";
-        Result res1 = new Result().setType("he")
+        AnalysisResult res1 = new AnalysisResult().setType("he")
                 .setValues(new HashMap<String, Integer>(){{
                 put("hemax", 32);
                 put("coolcat", 32);
                 }});
-        Result res2 = new Result()
+        AnalysisResult res2 = new AnalysisResult()
                 .setType("he").setValues(new HashMap<String, Integer>(){{
                 put("hemax", 32);
                 put("coolcat", 32);
                 }});
 
-        Results res3 = new Results().setResults(Stream.of(res1, res2).collect(Collectors.toList())).setAnnotationId(1l);
+        Results res3 = new Results().setAnalysisResults(Stream.of(res1, res2).collect(Collectors.toList())).setAnnotationId(1l);
         annotationGroupResults = new AnnotationGroupResults().setGroupId("1").setAnnotations(new ArrayList<Results>() {{ add(res3); }});
     }
 
     private AnnotationGroupResults createAnnotationGroupResultsForTests() {
-        Result res1 = new Result().setType("he")
+        AnalysisResult res1 = new AnalysisResult().setType("he")
                 .setValues(new HashMap<String, Integer>(){{
                     put("hemax", 32);
                     put("coolcat", 32);
                 }});
-        Result res2 = new Result()
-                .setType("he").setValues(new HashMap<String, Integer>(){{
+        AnalysisResult res2 = new AnalysisResult()
+                .setType("he")
+                .setValues(new HashMap<String, Integer>(){{
                     put("hemax", 32);
                     put("coolcat", 32);
                 }});
-        Results res3 = new Results().setResults(Stream.of(res1, res2).collect(Collectors.toList())).setAnnotationId(1l);
+        Results res3 = new Results().setAnalysisResults(Stream.of(res1, res2).collect(Collectors.toList())).setAnnotationId(1l);
         return new AnnotationGroupResults().setGroupId("1").setAnnotations(new ArrayList<Results>() {{ add(res3); }});
     }
 
@@ -136,21 +134,21 @@ public class MongoResultsDAOTest {
     @Test(expected=IllegalArgumentException.class)
     public void validationTestAnnotationResultsResultListFail() {
         AnnotationGroupResults res = createAnnotationGroupResultsForTests();
-        res.getAnnotations().get(0).setResults(new ArrayList<>());
+        res.getAnnotations().get(0).setAnalysisResults(new ArrayList<>());
         dao.validateAnnotationGroupResults(res);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void validationTestResultTypeFail() {
         AnnotationGroupResults res = createAnnotationGroupResultsForTests();
-        res.getAnnotations().get(0).getResults().get(0).setType("");
+        res.getAnnotations().get(0).getAnalysisResults().get(0).setType("");
         dao.validateAnnotationGroupResults(res);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void validationTestResultValuesFail() {
         AnnotationGroupResults res = createAnnotationGroupResultsForTests();
-        res.getAnnotations().get(0).getResults().get(0).setValues(new HashMap<String, Integer>());
+        res.getAnnotations().get(0).getAnalysisResults().get(0).setValues(new HashMap<String, Integer>());
         dao.validateAnnotationGroupResults(res);
     }
 
@@ -177,7 +175,9 @@ public class MongoResultsDAOTest {
         AnnotationGroupResults agr = createAnnotationGroupResultsForTests();
         dao.createAnnotationGroupResults(agr);
         List<AnnotationGroupResults> res = dao.getResults(agr.getGroupId());
+        System.out.println("Get Results success");
         System.out.println(res.get(0).getGroupId());
+        assertEquals(res.get(0).getGroupId(), agr.getGroupId());
     }
 
     @Test

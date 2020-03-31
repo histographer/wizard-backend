@@ -1,5 +1,7 @@
 package no.digipat.wizard.models;
 
+import no.digipat.wizard.models.results.AnalysisResult;
+import no.digipat.wizard.models.results.Results;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,8 +25,8 @@ public class ResultsTests {
         validator = factory.getValidator();
     }
 
-    private Result createResult() {
-        Result res1 = new Result().setType("he")
+    private AnalysisResult createResult() {
+        AnalysisResult res1 = new AnalysisResult().setType("he")
                 .setValues(new HashMap<String, Integer>(){{
                     put("hemax", 32);
                     put("coolcat", 32);
@@ -33,8 +35,8 @@ public class ResultsTests {
     }
 
     private Results createResults() {
-        List<Result> resultList = new ArrayList<Result>() {{ add(createResult()); }};
-        return new Results().setAnnotationId(1l).setResults(resultList);
+        List<AnalysisResult> analysisResultList = new ArrayList<AnalysisResult>() {{ add(createResult()); }};
+        return new Results().setAnnotationId(1l).setAnalysisResults(analysisResultList);
 
     }
 
@@ -53,10 +55,10 @@ public class ResultsTests {
     public void ResultsIfResultsAreNullOrEmpty() {
 
         Results results = createResults();
-        results.setResults(null);
+        results.setAnalysisResults(null);
         Set<ConstraintViolation<Results>> violations = validator.validate(results);
         assertEquals(violations.isEmpty(), false);
-        results.setResults(new ArrayList<Result>());
+        results.setAnalysisResults(new ArrayList<AnalysisResult>());
         Set<ConstraintViolation<Results>> violations2 = validator.validate(results);
         assertEquals(violations2.isEmpty(), false);
     }

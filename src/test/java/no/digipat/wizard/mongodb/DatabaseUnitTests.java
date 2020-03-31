@@ -33,7 +33,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 @RunWith(Suite.class)
 @SuiteClasses({
     MongoAnnotationGroupDAOTest.class,
-        MongoResultsDAOTest.class
+    MongoResultsDAOTest.class
 })
 public class DatabaseUnitTests {
     

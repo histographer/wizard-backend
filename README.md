@@ -2,6 +2,18 @@
 
 ## Endpoints
 
+### GET /analysisStatus?analysisId=id
+Gets the status of an analysis.
+
+#### Response
+
+```json
+{
+  "status": "<pending, success, failure>"
+}
+
+```
+
 ### GET /annotationGroup?projectId=id
 Gets an overview of the annotation groups belonging to a project.
 

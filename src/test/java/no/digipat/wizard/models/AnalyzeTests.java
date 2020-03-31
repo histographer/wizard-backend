@@ -2,6 +2,7 @@ package no.digipat.wizard.models;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.internal.runners.statements.ExpectException;
 
 import java.util.ArrayList;
 
@@ -25,11 +26,23 @@ public class AnalyzeTests {
         assertEquals(json, analysisJson);
     }
 
+    @Test
     public void toAnalyzeFromJsonString() {
         Analyze analyzeConverted = Analyze.fromJsonString(analysisJson);
         assertEquals(analyze.getAnalysis(), analyzeConverted.getAnalysis());
         assertEquals(analyze.getAnnotations(), analyzeConverted.getAnnotations());
         assertEquals(analyze.getGroupId(), analyzeConverted.getGroupId());
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void validationTestFail() {
+        Analyze analyzeFail = new Analyze();
+        Analyze.validate(analyzeFail);
+    }
+
+    @Test
+    public void validationTestSuccess() {
+        Analyze.validate(analyze);
     }
 
 }

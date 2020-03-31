@@ -1,10 +1,16 @@
 package no.digipat.wizard.models;
 
 import com.google.gson.Gson;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Analyze {
     @NotBlank
@@ -13,6 +19,21 @@ public class Analyze {
     private List<String> annotations;
     @NotEmpty
     private List<String> analysis;
+
+
+    public static void validate(Analyze analyze) {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Set<ConstraintViolation<Analyze>> violations = factory.getValidator().validate(analyze);
+
+        List<String> validationsList = new ArrayList<>();
+
+        if(!violations.isEmpty()) {
+            violations.forEach(violation -> {
+                validationsList.add(violation.getMessage());
+            });
+            throw new IllegalArgumentException(String.join("Something went wrong with validating Analyze object: ",validationsList));
+        }
+    }
 
     public static String toJsonString(Analyze analyze) {
         Gson gson = new Gson();

@@ -37,10 +37,6 @@ public class MongoResultsDAO {
      */
     public MongoResultsDAO(MongoClient client, String databaseName) {
         this.collection = client.getDatabase(databaseName).getCollection("AnnotationGroupResults", AnnotationGroupResults.class);
-        ValidatorFactory validatorFactory = Validation.byDefaultProvider()
-                .configure()
-                .messageInterpolator(new ParameterMessageInterpolator())
-                .buildValidatorFactory();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }

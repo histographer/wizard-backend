@@ -17,7 +17,8 @@ import com.mongodb.MongoClientURI;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    AnnotationGroupServletTest.class
+    AnnotationGroupServletTest.class,
+    AnalysisStatusServletTest.class
 })
 public class IntegrationTests {
     

@@ -30,7 +30,7 @@ public class AnalysisStatus {
         /**
          * Indicates that the analysis failed.
          */
-        FAILED;
+        FAILURE;
     }
     
     private String analysisId;

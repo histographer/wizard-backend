@@ -152,10 +152,10 @@ public class MongoAnalysisStatusDAOTest {
                 .setStatus(Status.PENDING);
         dao.createAnalysisStatus(analysis);
         
-        boolean updated = dao.updateStatus(analysis.getAnalysisId(), Status.FAILED);
+        boolean updated = dao.updateStatus(analysis.getAnalysisId(), Status.FAILURE);
         
         assertTrue(updated);
-        assertEquals(Status.FAILED, dao.getAnalysisStatus(analysis.getAnalysisId()).getStatus());
+        assertEquals(Status.FAILURE, dao.getAnalysisStatus(analysis.getAnalysisId()).getStatus());
     }
         
 }

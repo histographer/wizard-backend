@@ -47,8 +47,8 @@ public class MongoResultsDAOTest {
     @Before
     public void setUp() {
         dao = new MongoResultsDAO(client, databaseName);
-        analysisResultJsonString = "{\"groupId\":\"testGroupdId\",\"annotations\":[{\"annotationId\":\"id\",\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
-        analysisResultJsonStringNoGroupId = "{\"annotations\":[{\"annotationId\":\"id\",\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
+        analysisResultJsonString = "{\"groupId\":\"testGroupdId\",\"annotations\":[{\"annotationId\":2,\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
+        analysisResultJsonStringNoGroupId = "{\"annotations\":[{\"annotationId\":1,\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
         analysisResultJsonStringNoResults = "{\"groupId\":\"testGroupdId\"";
         analysisResultJsonStringResultsNoLength = "{\"groupId\":\"testGroupdId\",\"results\":[]}]}";
         Result res1 = new Result().setType("he")
@@ -62,7 +62,7 @@ public class MongoResultsDAOTest {
                 put("coolcat", 32);
                 }});
 
-        Results res3 = new Results().setResults(Stream.of(res1, res2).collect(Collectors.toList())).setAnnotationId("1");
+        Results res3 = new Results().setResults(Stream.of(res1, res2).collect(Collectors.toList())).setAnnotationId(1l);
         annotationGroupResults = new AnnotationGroupResults().setGroupId("1").setAnnotations(new ArrayList<Results>() {{ add(res3); }});
     }
 
@@ -77,7 +77,7 @@ public class MongoResultsDAOTest {
                     put("hemax", 32);
                     put("coolcat", 32);
                 }});
-        Results res3 = new Results().setResults(Stream.of(res1, res2).collect(Collectors.toList())).setAnnotationId("1");
+        Results res3 = new Results().setResults(Stream.of(res1, res2).collect(Collectors.toList())).setAnnotationId(1l);
         return new AnnotationGroupResults().setGroupId("1").setAnnotations(new ArrayList<Results>() {{ add(res3); }});
     }
 
@@ -130,7 +130,7 @@ public class MongoResultsDAOTest {
     @Test(expected=IllegalArgumentException.class)
     public void validationTestAnnotationResultsResultsAnnotationIdFail() {
         AnnotationGroupResults res = createAnnotationGroupResultsForTests();
-        res.getAnnotations().get(0).setAnnotationId("");
+        res.getAnnotations().get(0).setAnnotationId(null);
         dao.validateAnnotationGroupResults(res);
     }
     @Test(expected=IllegalArgumentException.class)

@@ -22,7 +22,7 @@ import static java.util.Comparator.comparing;
 import static org.junit.Assert.*;
 
 @RunWith(JUnitParamsRunner.class)
-public class AnalyzeServletTest {
+public class AnalysisResultsServletTest {
     
     private static URL baseUrl;
     private static String databaseName;
@@ -43,9 +43,8 @@ public class AnalyzeServletTest {
     public void setUp() {
         dao = new MongoAnnotationGroupDAO(client, databaseName);
         conversation = new WebConversation();
-        analyzeBodyValid = "{\"groupId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"annotations\":[\"1\",\"2\",\"3\"],\"analysis\":[\"he\",\"rgb\"]}";
         analyzeBodyInvalid = "{\"annotations\":[\"1\",\"2\",\"3\"],\"analysis\":[\"he\",\"rgb\"]}";
-
+        analyzeBodyValid = "{\"groupId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"annotations\":[{\"annotationId\":1l,\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
     }
     
     private static PostMethodWebRequest createPostRequest(String path, String messageBody, String contentType) throws Exception {
@@ -55,7 +54,7 @@ public class AnalyzeServletTest {
     
     @Test
     public void testStatusCode400OnInvalidInput() throws Exception {
-        WebRequest request = createPostRequest("analyze",analyzeBodyInvalid, "application/json");
+        WebRequest request = createPostRequest("analysisResult",analyzeBodyInvalid, "application/json");
         WebResponse response = conversation.getResponse(request);
         assertEquals("Testing with message body: " + analyzeBodyInvalid + ".", 400, response.getResponseCode());
     }

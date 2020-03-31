@@ -34,7 +34,7 @@ public class ResultsTests {
 
     private Results createResults() {
         List<Result> resultList = new ArrayList<Result>() {{ add(createResult()); }};
-        return new Results().setAnnotationId("39").setResults(resultList);
+        return new Results().setAnnotationId(1l).setResults(resultList);
 
     }
 
@@ -45,9 +45,9 @@ public class ResultsTests {
         results.setAnnotationId(null);
         Set<ConstraintViolation<Results>> violations = validator.validate(results);
         assertEquals(violations.isEmpty(), false);
-        results.setAnnotationId("");
+        results.setAnnotationId(1l);
         Set<ConstraintViolation<Results>> violations2 = validator.validate(results);
-        assertEquals(violations2.isEmpty(), false);
+        assertEquals(violations2.isEmpty(), true);
     }
     @Test
     public void ResultsIfResultsAreNullOrEmpty() {

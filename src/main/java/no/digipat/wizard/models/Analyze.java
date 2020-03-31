@@ -15,8 +15,8 @@ import java.util.Set;
 public class Analyze {
     @NotBlank
     private String groupId;
-    @NotEmpty
-    private List<String> annotations;
+
+    private List<Long> annotations;
     @NotEmpty
     private List<String> analysis;
 
@@ -70,11 +70,11 @@ public class Analyze {
         return this;
     }
 
-    public List<String> getAnnotations() {
+    public List<Long> getAnnotations() {
         return annotations;
     }
 
-    public Analyze setAnnotations(List<String> annotations) {
+    public Analyze setAnnotations(List<Long> annotations) {
         this.annotations = annotations;
         return this;
     }
@@ -89,3 +89,4 @@ public class Analyze {
     }
 
 }
+

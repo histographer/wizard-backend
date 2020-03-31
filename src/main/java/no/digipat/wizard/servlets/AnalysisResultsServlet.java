@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 
 @WebServlet(urlPatterns = "/analyze")
-public class AnalyzeServlet extends HttpServlet {
+public class AnalysisResultServlet extends HttpServlet {
 
 
     @Override

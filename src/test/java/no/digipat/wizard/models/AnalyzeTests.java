@@ -14,9 +14,9 @@ public class AnalyzeTests {
 
     @Before
     public void setUp() {
-     analysisJson= "{\"groupId\":\"abc\",\"annotations\":[\"1\",\"2\",\"3\"],\"analysis\":[\"he\",\"rgb\"]}";
+     analysisJson= "{\"groupId\":\"abc\",\"annotations\":[1,2,3],\"analysis\":[\"he\",\"rgb\"]}";
      analyze = new Analyze().setGroupId("abc")
-             .setAnnotations(new ArrayList<String>(){{ add("1"); add("2"); add("3");}})
+             .setAnnotations(new ArrayList<Long>(){{ add(1l); add(2l); add(3l);}})
              .setAnalysis(new ArrayList<String>(){{ add("he"); add("rgb");}});
     }
 

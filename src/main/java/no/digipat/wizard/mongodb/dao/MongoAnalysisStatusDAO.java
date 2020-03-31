@@ -15,7 +15,7 @@ import no.digipat.wizard.models.AnalysisStatus;
 import no.digipat.wizard.models.AnalysisStatus.Status;
 
 /**
- * A Data Access Object (DAO) for analysis requests.
+ * A Data Access Object (DAO) for analysis statuses.
  * 
  * @author Jon Wallem Anundsen
  *

@@ -2,13 +2,10 @@ package no.digipat.wizard.servlets;
 
 import com.mongodb.MongoClient;
 import no.digipat.wizard.models.AnalysisStatus;
-import no.digipat.wizard.models.AnnotationGroup;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
 import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAO;
-import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -44,6 +41,7 @@ public class AnalysisResultsServlet extends HttpServlet {
                 resultsDao.createAnnotationGroupResults(results);
             } catch (IllegalStateException e) { // Duplicate analysis ID
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
             }
             analysisStatusDao.updateStatus(results.getAnalysisId(), AnalysisStatus.Status.SUCCESS);
             response.setStatus(HttpServletResponse.SC_CREATED);

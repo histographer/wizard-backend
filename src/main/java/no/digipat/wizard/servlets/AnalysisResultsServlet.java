@@ -2,13 +2,10 @@ package no.digipat.wizard.servlets;
 
 import com.mongodb.MongoClient;
 import no.digipat.wizard.models.AnalysisStatus;
-import no.digipat.wizard.models.AnnotationGroup;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
 import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAO;
-import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -44,12 +41,41 @@ public class AnalysisResultsServlet extends HttpServlet {
                 resultsDao.createAnnotationGroupResults(results);
             } catch (IllegalStateException e) { // Duplicate analysis ID
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
             }
             analysisStatusDao.updateStatus(results.getAnalysisId(), AnalysisStatus.Status.SUCCESS);
             response.setStatus(HttpServletResponse.SC_CREATED);
         }
     }
     
+    /**
+     * Gets the result of an analysis, as determined by the query
+     * parameter {@code analysisId}. The response will contain a JSON
+     * object of the following form:
+     * 
+     * <pre>
+     * {
+     *   "analysisId": &lt;string&gt;,
+     *   "annotations": [
+     *     {
+     *       "annotationId": &lt;long&gt;,
+     *       "results": [
+     *         {
+     *           "type": &lt;string&gt;
+     *           "values": {
+     *             "value1": &lt;int&gt;,
+     *             "value2": &lt;int&gt;
+     *             ...
+     *           }
+     *         }
+     *       ],
+     *       ...
+     *     }
+     *   ]
+     * }
+     * </pre>
+     * 
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         MongoResultsDAO dao = new MongoResultsDAO(getDatabaseClient(), getDatabaseName());

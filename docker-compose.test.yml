@@ -3,15 +3,16 @@ version: '3.1'
 services:
   
   mongo:
-    image: mongo:latest
     container_name: wizard_mongo_test
     restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.init_mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${WIZARD_TEST_MONGODB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${WIZARD_TEST_MONGODB_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: wizard
     volumes:
-      - ./init-mongo-test.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - mongodata:/data/db
     ports:
       - ${WIZARD_TEST_MONGODB_PORT}:27017

@@ -4,6 +4,9 @@ package no.digipat.wizard.models.results;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.List;
 @EqualsAndHashCode
 public class AnnotationGroupResults {
     @NotBlank(message = "AnnotationGroupResults: AnalysisId can not be null or empty")
+    @BsonId
     private String analysisId;
 
     @NotEmpty(message = "AnnotationGroupResults: results can not be null or empty")

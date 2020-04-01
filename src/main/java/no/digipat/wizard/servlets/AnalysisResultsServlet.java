@@ -20,19 +20,19 @@ import org.apache.commons.io.IOUtils;
 
 @WebServlet(urlPatterns = "/analysisResults")
 public class AnalysisResultsServlet extends HttpServlet {
-
-    //TODO DOCS
+    
+    // TODO DOCS
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String databaseName = getDatabaseName();
         MongoClient client = getDatabaseClient();
-        MongoResultsDAO ResultsDao = new MongoResultsDAO(client, databaseName);
+        MongoResultsDAO resultsDao = new MongoResultsDAO(client, databaseName);
         MongoAnalysisStatusDAO analysisStatusDao = new MongoAnalysisStatusDAO(client, databaseName);
         String requestJson = IOUtils.toString(request.getReader());
         AnnotationGroupResults results;
         try {
             results = MongoResultsDAO.jsonToAnnotationGroupResults(requestJson);
-        } catch (IllegalArgumentException| NullPointerException e) {
+        } catch (IllegalArgumentException | NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
             return;
         }
@@ -40,7 +40,11 @@ public class AnalysisResultsServlet extends HttpServlet {
         if (status == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
-            ResultsDao.createAnnotationGroupResults(results);
+            try {
+                resultsDao.createAnnotationGroupResults(results);
+            } catch (IllegalStateException e) { // Duplicate analysis ID
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
             analysisStatusDao.updateStatus(results.getAnalysisId(), AnalysisStatus.Status.SUCCESS);
             response.setStatus(HttpServletResponse.SC_CREATED);
         }

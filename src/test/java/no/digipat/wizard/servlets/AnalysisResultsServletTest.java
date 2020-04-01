@@ -3,8 +3,8 @@ package no.digipat.wizard.servlets;
 import com.meterware.httpunit.*;
 import com.mongodb.MongoClient;
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import no.digipat.wizard.models.AnalysisStatus;
+import no.digipat.wizard.models.AnalysisStatus.Status;
 import no.digipat.wizard.models.AnnotationGroup;
 import no.digipat.wizard.models.results.AnalysisResult;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
@@ -13,7 +13,6 @@ import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAO;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -21,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -99,6 +99,28 @@ public class AnalysisResultsServletTest {
         AnalysisStatus status = statusDao.getAnalysisStatus("aaaaaaaaaaaaaaaaaaaaaaaa");
         assertEquals(status.getStatus(), AnalysisStatus.Status.SUCCESS);
         assertEquals(MongoResultsDAO.jsonToAnnotationGroupResults(analyzeBodyValid), agr);
+    }
+    
+    @Test
+    public void testStatusCode400OnDuplicateAnalysisId() throws Exception {
+        statusDao.createAnalysisStatus(
+                new AnalysisStatus()
+                .setAnalysisId("aaaaaaaaaaaaaaaaaaaaaaaa")
+                .setAnnotationGroupId("bbbbbbbbbbbbbbbbbbbbbbbb")
+                .setStatus(Status.PENDING)
+        );
+        WebRequest request = createPostRequest("analysisResults", analyzeBodyValid, "application/json");
+        conversation.sendRequest(request);
+        
+        try {
+            WebResponse response = conversation.getResponse(request);
+            assertEquals(400, response.getResponseCode());
+        } catch (IOException e) {
+            // Workaround for an annoying bug that sporadically makes conversation.getResponse
+            // (and similar methods) throw IOException when the response code is 400,
+            // even if conversation.getExceptionsThrownOnErrorStatus() is false
+            assertTrue(e.getMessage().contains("400")); // Kind of a hack, but there's not much else we can do
+        }
     }
     
     @Test

@@ -113,9 +113,9 @@ public class MongoResultsDAO {
      */
     public List<AnnotationGroupResults> getResults(String analysisId) {
         List<AnnotationGroupResults> resultArray = new ArrayList<>();
-        FindIterable annotationGroupResults = collection.find(eq("analysisId", analysisId));
-        for(Object agr : annotationGroupResults) {
-           resultArray.add((AnnotationGroupResults) agr);
+        FindIterable<AnnotationGroupResults> annotationGroupResults = collection.find(eq("analysisId", analysisId));
+        for(AnnotationGroupResults agr : annotationGroupResults) {
+           resultArray.add(agr);
         }
         return resultArray;
     }

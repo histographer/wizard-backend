@@ -18,14 +18,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 @RunWith(JUnitParamsRunner.class)
 public class StartAnalysisServletTest {
@@ -67,8 +66,16 @@ public class StartAnalysisServletTest {
         WebResponse response = conversation.getResponse(request);
         assertEquals("Testing with message body: " + analyzeBodyInvalid + ".", 400, response.getResponseCode());
     }
-
-
+    
+    @Test
+    public void testStatusCode404OnNonexistentAnnotationGroup() throws Exception {
+        WebRequest request = createPostRequest("startAnalysis",analyzeBodyValid, "application/json");
+        
+        WebResponse response = conversation.getResponse(request);
+        
+        assertEquals(404, response.getResponseCode());
+    }
+    
     @Test
     public void testStatusCode202OnValidInput() throws Exception {
         AnnotationGroup group1 = new AnnotationGroup()

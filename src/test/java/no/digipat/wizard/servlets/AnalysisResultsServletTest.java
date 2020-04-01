@@ -10,6 +10,7 @@ import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAO;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -29,7 +30,7 @@ public class AnalysisResultsServletTest {
     private static URL baseUrl;
     private static String databaseName;
     private static MongoClient client;
-    private MongoAnnotationGroupDAO dao;
+    private MongoAnnotationGroupDAO groupDao;
     private WebConversation conversation;
     private String analyzeBodyValid;
     private String analyzeBodyInvalid;
@@ -45,7 +46,7 @@ public class AnalysisResultsServletTest {
     
     @Before
     public void setUp() {
-        dao = new MongoAnnotationGroupDAO(client, databaseName);
+        groupDao = new MongoAnnotationGroupDAO(client, databaseName);
         resultDao = new MongoResultsDAO(client, databaseName);
         statusDao = new MongoAnalysisStatusDAO(client, databaseName);
         conversation = new WebConversation();
@@ -59,13 +60,21 @@ public class AnalysisResultsServletTest {
     }
     
     @Test
+    public void testStatusCode404OnNonexistentAnalysis() throws Exception {
+        WebRequest request = createPostRequest("analysisResults", analyzeBodyValid, "application/json");
+        
+        WebResponse response = conversation.getResponse(request);
+        
+        assertEquals(404, response.getResponseCode());
+    }
+    
+    @Test
     public void testStatusCode400OnInvalidInput() throws Exception {
         WebRequest request = createPostRequest("analysisResults",analyzeBodyInvalid, "application/json");
         WebResponse response = conversation.getResponse(request);
         assertEquals("Testing with message body: " + analyzeBodyInvalid + ".", 400, response.getResponseCode());
     }
-
-
+    
     @Test
     public void testStatusCode202OnValidInput() throws Exception {
         String grpId = "cccccccccccccccccccccccc";
@@ -75,13 +84,13 @@ public class AnalysisResultsServletTest {
                 .setCreationDate(new Date())
                 .setName("group 1")
                 .setProjectId(20L);
-        dao.createAnnotationGroup(group1);
+        groupDao.createAnnotationGroup(group1);
         statusDao.createAnalysisStatus(new AnalysisStatus().setAnalysisId("aaaaaaaaaaaaaaaaaaaaaaaa").setAnnotationGroupId(grpId).setStatus(AnalysisStatus.Status.PENDING));
         WebRequest request = createPostRequest("analysisResults",analyzeBodyValid, "application/json");
         WebResponse response = conversation.getResponse(request);
         System.out.println(IOUtils.toString(response.getInputStream(), StandardCharsets.UTF_8));
         assertEquals("Testing with message body: " + analyzeBodyValid + ".", 201, response.getResponseCode());
-        AnnotationGroup grp = dao.getAnnotationGroup(grpId);
+        AnnotationGroup grp = groupDao.getAnnotationGroup(grpId);
         assertNotEquals(grp, null);
         List<AnnotationGroupResults> agr = resultDao.getResults("aaaaaaaaaaaaaaaaaaaaaaaa");
         System.out.println(agr);

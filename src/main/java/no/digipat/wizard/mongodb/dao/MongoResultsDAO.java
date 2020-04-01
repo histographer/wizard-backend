@@ -122,17 +122,18 @@ public class MongoResultsDAO {
 
     /**
      * Json to annotation group results annotation group results.
-     * @throws NullPointerException if {@code json} is null or not set
-     * @throws RuntimeException if {@code json} can not be cast to AnnotationGroupResults
+     * @throws NullPointerException if {@code json} is null
+     * @throws IllegalArgumentException if {@code json} can not be cast to AnnotationGroupResults
      * @param json the json string
      * @return the annotationGroupResults object
      */
-    public static AnnotationGroupResults jsonToAnnotationGroupResults(String json)  {
+    public static AnnotationGroupResults jsonToAnnotationGroupResults(String json)
+            throws IllegalArgumentException, NullPointerException {
         if(json == null) {
             throw new NullPointerException("AnnotationGroupResults: Json is not set");
         }
         if(json.isEmpty()) {
-            throw new NullPointerException("AnnotationGroupResults: Jsonstring is empty");
+            throw new IllegalArgumentException("AnnotationGroupResults: Jsonstring is empty");
         }
 
         Gson gson = new Gson();
@@ -140,7 +141,7 @@ public class MongoResultsDAO {
         try {
             annotationGroupResults = gson.fromJson(json, AnnotationGroupResults.class);
         } catch (Exception e) {
-            throw new RuntimeException("AnnotationGroupResults: Can not create AnnotationGroupResults from json string. Input: "+json+". Error: "+e);
+            throw new IllegalArgumentException("AnnotationGroupResults: Can not create AnnotationGroupResults from json string. Input: "+json+". Error: "+e);
         }
 
         if(annotationGroupResults.getAnalysisId() == null) {

@@ -93,11 +93,11 @@ public class MongoResultsDAOTest {
     public void jsonToAnnotationGroupResultsNull() {
         dao.jsonToAnnotationGroupResults(null);
     }
-    @Test(expected=RuntimeException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void jsonToAnnotationGroupResultsEmptyString() {
         dao.jsonToAnnotationGroupResults("");
     }
-    @Test(expected=RuntimeException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void jsonToAnnotationGroupResultsResultsNoLength() {
         dao.jsonToAnnotationGroupResults(analysisResultJsonStringResultsNoLength);
     }

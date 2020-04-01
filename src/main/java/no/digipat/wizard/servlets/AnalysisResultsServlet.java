@@ -50,6 +50,34 @@ public class AnalysisResultsServlet extends HttpServlet {
         }
     }
     
+    /**
+     * Gets the result of an analysis, as determined by the query
+     * parameter {@code analysisId}. The response will contain a JSON
+     * object of the following form:
+     * 
+     * <pre>
+     * {
+     *   "analysisId": &lt;string&gt;,
+     *   "annotations": [
+     *     {
+     *       "annotationId": &lt;long&gt;,
+     *       "results": [
+     *         {
+     *           "type": &lt;string&gt;
+     *           "values": {
+     *             "value1": &lt;int&gt;,
+     *             "value2": &lt;int&gt;
+     *             ...
+     *           }
+     *         }
+     *       ],
+     *       ...
+     *     }
+     *   ]
+     * }
+     * </pre>
+     * 
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         MongoResultsDAO dao = new MongoResultsDAO(getDatabaseClient(), getDatabaseName());

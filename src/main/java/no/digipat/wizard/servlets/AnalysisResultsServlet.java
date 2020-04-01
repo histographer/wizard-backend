@@ -20,30 +20,59 @@ import org.apache.commons.io.IOUtils;
 
 @WebServlet(urlPatterns = "/analysisResults")
 public class AnalysisResultsServlet extends HttpServlet {
-
-    //TODO DOCS
+    
+    // TODO DOCS
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        ServletContext context = getServletContext();
-        String databaseName = (String) context.getAttribute("MONGO_DATABASE");
-        MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
-        MongoResultsDAO ResultsDao = new MongoResultsDAO(client, databaseName);
+        String databaseName = getDatabaseName();
+        MongoClient client = getDatabaseClient();
+        MongoResultsDAO resultsDao = new MongoResultsDAO(client, databaseName);
         MongoAnalysisStatusDAO analysisStatusDao = new MongoAnalysisStatusDAO(client, databaseName);
+        String requestJson = IOUtils.toString(request.getReader());
+        AnnotationGroupResults results;
         try {
-            String requestJson = IOUtils.toString(request.getReader());
-            AnnotationGroupResults results = MongoResultsDAO.jsonToAnnotationGroupResults(requestJson);
-            AnalysisStatus status = analysisStatusDao.getAnalysisStatus(results.getAnalysisId());
-            if(status == null) {
-                throw new IllegalArgumentException("AnalysisStatus does not exist in the database");
-            }
-            ResultsDao.createAnnotationGroupResults(results);
-            analysisStatusDao.updateStatus(results.getAnalysisId(), AnalysisStatus.Status.SUCCESS);
-
-        } catch (IllegalArgumentException| NullPointerException | ClassCastException e) {
+            results = MongoResultsDAO.jsonToAnnotationGroupResults(requestJson);
+        } catch (IllegalArgumentException | NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
-        } catch (RuntimeException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+            return;
         }
-        response.setStatus(HttpServletResponse.SC_CREATED);
+        AnalysisStatus status = analysisStatusDao.getAnalysisStatus(results.getAnalysisId());
+        if (status == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        } else {
+            try {
+                resultsDao.createAnnotationGroupResults(results);
+            } catch (IllegalStateException e) { // Duplicate analysis ID
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
+            analysisStatusDao.updateStatus(results.getAnalysisId(), AnalysisStatus.Status.SUCCESS);
+            response.setStatus(HttpServletResponse.SC_CREATED);
+        }
     }
+    
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        MongoResultsDAO dao = new MongoResultsDAO(getDatabaseClient(), getDatabaseName());
+        String analysisId = request.getParameter("analysisId");
+        if (analysisId == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        AnnotationGroupResults results = dao.getResults(analysisId);
+        if (results == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        } else {
+            response.setContentType("application/json");
+            response.getWriter().print(MongoResultsDAO.annotationGroupResultsToJson(results));
+        }
+    }
+    
+    private String getDatabaseName() {
+        return (String) getServletContext().getAttribute("MONGO_DATABASE");
+    }
+    
+    private MongoClient getDatabaseClient() {
+        return (MongoClient) getServletContext().getAttribute("MONGO_CLIENT");
+    }
+    
 }

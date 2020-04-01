@@ -18,8 +18,8 @@ import com.mongodb.MongoClientURI;
 @RunWith(Suite.class)
 @SuiteClasses({
     AnnotationGroupServletTest.class,
-        StartAnalysisServletTest.class,
-        AnalysisResultsServletTest.class
+    StartAnalysisServletTest.class,
+    AnalysisResultsServletTest.class
 })
 public class IntegrationTests {
     

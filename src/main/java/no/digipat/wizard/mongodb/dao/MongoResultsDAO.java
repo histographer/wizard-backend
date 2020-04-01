@@ -2,6 +2,7 @@ package no.digipat.wizard.mongodb.dao;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -53,13 +54,22 @@ public class MongoResultsDAO {
      * Create annotation group results.
      *
      * @param annotationGroupResults the annotation group results
+     * 
+     * @throws IllegalArgumentException if the results are invalid
+     * @throws IllegalStateException if an instance of {@code AnnotationGroupResults} with the
+     * same analysis ID already exists in the database
      */
-    public void createAnnotationGroupResults(AnnotationGroupResults annotationGroupResults) {
-        try{
-            validateAnnotationGroupResults(annotationGroupResults);
+    public void createAnnotationGroupResults(AnnotationGroupResults annotationGroupResults)
+            throws IllegalArgumentException, IllegalStateException {
+        validateAnnotationGroupResults(annotationGroupResults);
+        try {
             collection.insertOne(annotationGroupResults);
-        } catch (IllegalArgumentException e) {
-           throw new IllegalArgumentException("Something went wrong: "+e);
+        } catch (MongoWriteException e) {
+            if (e.getCode() == 11000) { // Error code 11000 indicates a duplicate key
+                throw new IllegalStateException("Duplicate analysis ID", e);
+            } else {
+                throw e;
+            }
         }
     }
 
@@ -69,7 +79,7 @@ public class MongoResultsDAO {
      * @param annotationGroupResults the annotation group results
      * @throws IllegalArgumentException if it doesn't pass validation
      */
-    public void validateAnnotationGroupResults(AnnotationGroupResults annotationGroupResults) {
+    public void validateAnnotationGroupResults(AnnotationGroupResults annotationGroupResults) throws IllegalArgumentException {
         List<String> validationsList = new ArrayList<String>();
        Set<ConstraintViolation<AnnotationGroupResults>> violations = validator.validate(annotationGroupResults);
        if(!violations.isEmpty()) {
@@ -105,34 +115,29 @@ public class MongoResultsDAO {
     }
 
     /**
-     * Gets a list of AnnotationGroupResults from the database.
-     * If none is found, empty list is returned
+     * Gets an instance of {@code AnnotationGroupResults} from the database.
      *
      * @param analysisId the analysisId
-     * @return the results
+     * @return the results, or {@code null} if the results don't exist
      */
-    public List<AnnotationGroupResults> getResults(String analysisId) {
-        List<AnnotationGroupResults> resultArray = new ArrayList<>();
-        FindIterable annotationGroupResults = collection.find(eq("analysisId", analysisId));
-        for(Object agr : annotationGroupResults) {
-           resultArray.add((AnnotationGroupResults) agr);
-        }
-        return resultArray;
+    public AnnotationGroupResults getResults(String analysisId) {
+        return collection.find(eq("_id", analysisId)).first();
     }
 
     /**
      * Json to annotation group results annotation group results.
-     * @throws NullPointerException if {@code json} is null or not set
-     * @throws RuntimeException if {@code json} can not be cast to AnnotationGroupResults
+     * @throws NullPointerException if {@code json} is null
+     * @throws IllegalArgumentException if {@code json} can not be cast to AnnotationGroupResults
      * @param json the json string
      * @return the annotationGroupResults object
      */
-    public static AnnotationGroupResults jsonToAnnotationGroupResults(String json)  {
+    public static AnnotationGroupResults jsonToAnnotationGroupResults(String json)
+            throws IllegalArgumentException, NullPointerException {
         if(json == null) {
             throw new NullPointerException("AnnotationGroupResults: Json is not set");
         }
         if(json.isEmpty()) {
-            throw new NullPointerException("AnnotationGroupResults: Jsonstring is empty");
+            throw new IllegalArgumentException("AnnotationGroupResults: Jsonstring is empty");
         }
 
         Gson gson = new Gson();
@@ -140,7 +145,7 @@ public class MongoResultsDAO {
         try {
             annotationGroupResults = gson.fromJson(json, AnnotationGroupResults.class);
         } catch (Exception e) {
-            throw new RuntimeException("AnnotationGroupResults: Can not create AnnotationGroupResults from json string. Input: "+json+". Error: "+e);
+            throw new IllegalArgumentException("AnnotationGroupResults: Can not create AnnotationGroupResults from json string. Input: "+json+". Error: "+e);
         }
 
         if(annotationGroupResults.getAnalysisId() == null) {

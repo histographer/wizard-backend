@@ -2,6 +2,9 @@ package no.digipat.wizard.models.results;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+
+import lombok.EqualsAndHashCode;
+
 import java.util.List;
 
 /**
@@ -12,6 +15,7 @@ import java.util.List;
  * @author Kent Are Torvik
  *
  */
+@EqualsAndHashCode
 public class Results {
     @NotNull(message = "Results: annotationId can not be null")
     private Long annotationId;

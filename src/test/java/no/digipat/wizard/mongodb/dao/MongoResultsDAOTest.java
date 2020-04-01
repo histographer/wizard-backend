@@ -16,12 +16,10 @@ import no.digipat.wizard.mongodb.DatabaseUnitTests;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.mongodb.client.model.Filters.eq;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class MongoResultsDAOTest {
@@ -93,11 +91,11 @@ public class MongoResultsDAOTest {
     public void jsonToAnnotationGroupResultsNull() {
         dao.jsonToAnnotationGroupResults(null);
     }
-    @Test(expected=RuntimeException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void jsonToAnnotationGroupResultsEmptyString() {
         dao.jsonToAnnotationGroupResults("");
     }
-    @Test(expected=RuntimeException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void jsonToAnnotationGroupResultsResultsNoLength() {
         dao.jsonToAnnotationGroupResults(analysisResultJsonStringResultsNoLength);
     }
@@ -174,20 +172,24 @@ public class MongoResultsDAOTest {
     public void getResultsSuccess() {
         AnnotationGroupResults agr = createAnnotationGroupResultsForTests();
         dao.createAnnotationGroupResults(agr);
-        List<AnnotationGroupResults> res = dao.getResults(agr.getAnalysisId());
-        System.out.println("Get Results success");
-        System.out.println(res.get(0).getAnalysisId());
-        assertEquals(res.get(0).getAnalysisId(), agr.getAnalysisId());
+        AnnotationGroupResults res = dao.getResults(agr.getAnalysisId());
+        assertEquals(agr, res);
     }
 
     @Test
-    public void getResultsIsEmpty() {
+    public void getNonexistentResults() {
         AnnotationGroupResults agr = createAnnotationGroupResultsForTests();
         dao.createAnnotationGroupResults(agr);
-        List<AnnotationGroupResults> res = dao.getResults("THIS IS NOT VALID");
-        assertEquals(res.size(), 0);
+        assertNull(dao.getResults("THIS IS NOT VALID"));
     }
-
+    
+    @Test(expected=IllegalStateException.class)
+    public void testCreateResultsWithDuplicateAnalysisId() throws Exception {
+        AnnotationGroupResults results = createAnnotationGroupResultsForTests();
+        dao.createAnnotationGroupResults(results);
+        dao.createAnnotationGroupResults(results);
+    }
+    
     @After
     public void tearDown() {
         client.getDatabase(databaseName).drop();

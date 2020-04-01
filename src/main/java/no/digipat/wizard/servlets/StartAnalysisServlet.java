@@ -41,7 +41,8 @@ public class StartAnalysisServlet extends HttpServlet {
             status.setAnalysisId(id);
             response.getWriter().print(new JSONObject(status));
             if(annotationGroup == null) {
-                throw new IllegalArgumentException("Annotation group does not exist in the database");
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
             }
             analysisPostBody.setAnnotations(annotationGroup.getAnnotationIds());
         } catch (IllegalArgumentException| NullPointerException | ClassCastException e) {

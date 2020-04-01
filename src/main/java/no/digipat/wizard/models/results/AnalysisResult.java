@@ -2,6 +2,9 @@ package no.digipat.wizard.models.results;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+
+import lombok.EqualsAndHashCode;
+
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +15,7 @@ import java.util.Map;
  * @author Kent Are Torvik
  *
  */
+@EqualsAndHashCode
 public class AnalysisResult {
     @NotBlank(message = "Result: Type can not be null or empty")
     private String type;

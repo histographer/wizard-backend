@@ -175,9 +175,8 @@ public class MongoResultsDAOTest {
         AnnotationGroupResults agr = createAnnotationGroupResultsForTests();
         dao.createAnnotationGroupResults(agr);
         List<AnnotationGroupResults> res = dao.getResults(agr.getAnalysisId());
-        System.out.println("Get Results success");
-        System.out.println(res.get(0).getAnalysisId());
-        assertEquals(res.get(0).getAnalysisId(), agr.getAnalysisId());
+        assertEquals(1, res.size());
+        assertEquals(res.get(0), agr);
     }
 
     @Test

@@ -3,6 +3,9 @@ package no.digipat.wizard.models.results;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+
+import lombok.EqualsAndHashCode;
+
 import java.util.List;
 
 /**
@@ -12,6 +15,7 @@ import java.util.List;
  * @author Kent Are Torvik
  *
  */
+@EqualsAndHashCode
 public class AnnotationGroupResults {
     @NotBlank(message = "AnnotationGroupResults: AnalysisId can not be null or empty")
     private String analysisId;

@@ -3,9 +3,12 @@ package no.digipat.wizard.servlets;
 import com.meterware.httpunit.*;
 import com.mongodb.MongoClient;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import no.digipat.wizard.models.AnalysisStatus;
 import no.digipat.wizard.models.AnnotationGroup;
+import no.digipat.wizard.models.results.AnalysisResult;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
+import no.digipat.wizard.models.results.Results;
 import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAO;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
@@ -69,14 +72,14 @@ public class AnalysisResultsServletTest {
     }
     
     @Test
-    public void testStatusCode400OnInvalidInput() throws Exception {
+    public void testStatusCode400OnInvalidPost() throws Exception {
         WebRequest request = createPostRequest("analysisResults",analyzeBodyInvalid, "application/json");
         WebResponse response = conversation.getResponse(request);
         assertEquals("Testing with message body: " + analyzeBodyInvalid + ".", 400, response.getResponseCode());
     }
     
     @Test
-    public void testStatusCode202OnValidInput() throws Exception {
+    public void testStatusCode202OnValidPost() throws Exception {
         String grpId = "cccccccccccccccccccccccc";
         AnnotationGroup group1 = new AnnotationGroup()
                 .setGroupId(grpId)
@@ -92,13 +95,62 @@ public class AnalysisResultsServletTest {
         assertEquals("Testing with message body: " + analyzeBodyValid + ".", 201, response.getResponseCode());
         AnnotationGroup grp = groupDao.getAnnotationGroup(grpId);
         assertNotEquals(grp, null);
-        List<AnnotationGroupResults> agr = resultDao.getResults("aaaaaaaaaaaaaaaaaaaaaaaa");
-        System.out.println(agr);
-        assertEquals(agr.size(), 1);
+        AnnotationGroupResults agr = resultDao.getResults("aaaaaaaaaaaaaaaaaaaaaaaa");
         AnalysisStatus status = statusDao.getAnalysisStatus("aaaaaaaaaaaaaaaaaaaaaaaa");
         assertEquals(status.getStatus(), AnalysisStatus.Status.SUCCESS);
+        assertEquals(MongoResultsDAO.jsonToAnnotationGroupResults(analyzeBodyValid), agr);
     }
-
+    
+    @Test
+    public void testStatusCode400OnInvalidGet() throws Exception {
+        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisResults");
+        
+        WebResponse response = conversation.getResponse(request);
+        
+        assertEquals(400, response.getResponseCode());
+    }
+    
+    @Test
+    public void testStatusCode404OnGettingNonexistentResults() throws Exception {
+        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisResults?analysisId=aaaaaaaaaaaaaaaaaaaaaaaa");
+        
+        WebResponse response = conversation.getResponse(request);
+        
+        assertEquals(404, response.getResponseCode());
+    }
+    
+    @Test
+    public void testGetResults() throws Exception {
+        AnnotationGroupResults results = new AnnotationGroupResults()
+                .setAnalysisId("aaaaaaaaaaaaaaaaaaaaaaaa")
+                .setAnnotations(Arrays.asList(
+                        new Results().setAnnotationId(1L).setAnalysisResults(Arrays.asList(
+                                new AnalysisResult().setType("he").setValues(new HashMap<String, Integer>() {{
+                                    put("hematoxylin", 180);
+                                    put("eosin", 224);
+                                }})
+                        )),
+                        new Results().setAnnotationId(2L).setAnalysisResults(Arrays.asList(
+                                new AnalysisResult().setType("he").setValues(new HashMap<String, Integer>() {{
+                                    put("hematoxylin", 150);
+                                    put("eosin", 200);
+                                }}),
+                                new AnalysisResult().setType("cool-analysis").setValues(new HashMap<String, Integer>() {{
+                                    put("elite", 1337);
+                                }})
+                        ))
+                ));
+        resultDao.createAnnotationGroupResults(results);
+        
+        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisResults?analysisId=aaaaaaaaaaaaaaaaaaaaaaaa");
+        WebResponse response = conversation.getResponse(request);
+        
+        assertEquals(200, response.getResponseCode());
+        assertEquals("application/json", response.getContentType());
+        AnnotationGroupResults receivedResults = MongoResultsDAO.jsonToAnnotationGroupResults(response.getText());
+        assertEquals(results, receivedResults);
+    }
+    
     @After
     public void tearDown() {
         client.getDatabase(databaseName).drop();

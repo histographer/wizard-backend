@@ -2,9 +2,9 @@ package no.digipat.wizard.servlets;
 
 import com.mongodb.MongoClient;
 import no.digipat.wizard.models.AnalysisPostBody;
-import no.digipat.wizard.models.AnalysisStatus;
+import no.digipat.wizard.models.AnalysisInformation;
 import no.digipat.wizard.models.AnnotationGroup;
-import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAO;
+import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
@@ -29,17 +29,17 @@ public class StartAnalysisServlet extends HttpServlet {
         String databaseName = (String) context.getAttribute("MONGO_DATABASE");
         MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
         MongoAnnotationGroupDAO dao = new MongoAnnotationGroupDAO(client, databaseName);
-        MongoAnalysisStatusDAO analysisStatusDao = new MongoAnalysisStatusDAO(client, databaseName);
+        MongoAnalysisInformationDAO analysisInformationDao = new MongoAnalysisInformationDAO(client, databaseName);
         try {
             String requestJson = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
             AnalysisPostBody analysisPostBody = AnalysisPostBody.fromJsonString(requestJson);
             AnnotationGroup annotationGroup = dao.getAnnotationGroup(analysisPostBody.getGroupId());
             String uuid = UUID.randomUUID().toString();
-            AnalysisStatus status = new AnalysisStatus().setStatus(AnalysisStatus.Status.PENDING)
+            AnalysisInformation info = new AnalysisInformation().setStatus(AnalysisInformation.Status.PENDING)
                     .setAnnotationGroupId(analysisPostBody.getGroupId());
-            String id = analysisStatusDao.createAnalysisStatus(status);
-            status.setAnalysisId(id);
-            response.getWriter().print(new JSONObject(status));
+            String id = analysisInformationDao.createAnalysisInformation(info);
+            info.setAnalysisId(id);
+            response.getWriter().print(new JSONObject(info));
             if(annotationGroup == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;

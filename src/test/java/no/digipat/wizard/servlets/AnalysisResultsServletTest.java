@@ -3,13 +3,13 @@ package no.digipat.wizard.servlets;
 import com.meterware.httpunit.*;
 import com.mongodb.MongoClient;
 import junitparams.JUnitParamsRunner;
-import no.digipat.wizard.models.AnalysisStatus;
-import no.digipat.wizard.models.AnalysisStatus.Status;
+import no.digipat.wizard.models.AnalysisInformation;
+import no.digipat.wizard.models.AnalysisInformation.Status;
 import no.digipat.wizard.models.AnnotationGroup;
 import no.digipat.wizard.models.results.AnalysisResult;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
 import no.digipat.wizard.models.results.Results;
-import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAO;
+import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
 import org.apache.commons.io.IOUtils;
@@ -38,7 +38,7 @@ public class AnalysisResultsServletTest {
     private String analyzeBodyValid;
     private String analyzeBodyInvalid;
     private MongoResultsDAO resultDao;
-    private MongoAnalysisStatusDAO statusDao;
+    private MongoAnalysisInformationDAO infoDao;
 
     @BeforeClass
     public static void setUpClass() {
@@ -51,7 +51,7 @@ public class AnalysisResultsServletTest {
     public void setUp() {
         groupDao = new MongoAnnotationGroupDAO(client, databaseName);
         resultDao = new MongoResultsDAO(client, databaseName);
-        statusDao = new MongoAnalysisStatusDAO(client, databaseName);
+        infoDao = new MongoAnalysisInformationDAO(client, databaseName);
         conversation = new WebConversation();
         analyzeBodyInvalid = "{\"annotations\":[\"1\",\"2\",\"3\"],\"analysis\":[\"he\",\"rgb\"]}";
         analyzeBodyValid = "{\"analysisId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"annotations\":[{\"annotationId\":2,\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
@@ -88,7 +88,7 @@ public class AnalysisResultsServletTest {
                 .setName("group 1")
                 .setProjectId(20L);
         groupDao.createAnnotationGroup(group1);
-        statusDao.createAnalysisStatus(new AnalysisStatus().setAnalysisId("aaaaaaaaaaaaaaaaaaaaaaaa").setAnnotationGroupId(grpId).setStatus(AnalysisStatus.Status.PENDING));
+        infoDao.createAnalysisInformation(new AnalysisInformation().setAnalysisId("aaaaaaaaaaaaaaaaaaaaaaaa").setAnnotationGroupId(grpId).setStatus(AnalysisInformation.Status.PENDING));
         WebRequest request = createPostRequest("analysisResults",analyzeBodyValid, "application/json");
         WebResponse response = conversation.getResponse(request);
         System.out.println(IOUtils.toString(response.getInputStream(), StandardCharsets.UTF_8));
@@ -96,15 +96,15 @@ public class AnalysisResultsServletTest {
         AnnotationGroup grp = groupDao.getAnnotationGroup(grpId);
         assertNotEquals(grp, null);
         AnnotationGroupResults agr = resultDao.getResults("aaaaaaaaaaaaaaaaaaaaaaaa");
-        AnalysisStatus status = statusDao.getAnalysisStatus("aaaaaaaaaaaaaaaaaaaaaaaa");
-        assertEquals(status.getStatus(), AnalysisStatus.Status.SUCCESS);
+        AnalysisInformation info = infoDao.getAnalysisInformation("aaaaaaaaaaaaaaaaaaaaaaaa");
+        assertEquals(info.getStatus(), AnalysisInformation.Status.SUCCESS);
         assertEquals(MongoResultsDAO.jsonToAnnotationGroupResults(analyzeBodyValid), agr);
     }
     
     @Test
     public void testStatusCode400OnDuplicateAnalysisId() throws Exception {
-        statusDao.createAnalysisStatus(
-                new AnalysisStatus()
+        infoDao.createAnalysisInformation(
+                new AnalysisInformation()
                 .setAnalysisId("aaaaaaaaaaaaaaaaaaaaaaaa")
                 .setAnnotationGroupId("bbbbbbbbbbbbbbbbbbbbbbbb")
                 .setStatus(Status.PENDING)

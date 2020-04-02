@@ -6,9 +6,9 @@ import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 import com.mongodb.MongoClient;
 import junitparams.JUnitParamsRunner;
-import no.digipat.wizard.models.AnalysisStatus;
+import no.digipat.wizard.models.AnalysisInformation;
 import no.digipat.wizard.models.AnnotationGroup;
-import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAO;
+import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
@@ -36,7 +36,7 @@ public class StartAnalysisServletTest {
     private WebConversation conversation;
     private String analyzeBodyValid;
     private String analyzeBodyInvalid;
-    private MongoAnalysisStatusDAO statusDao;
+    private MongoAnalysisInformationDAO infoDao;
 
     @BeforeClass
     public static void setUpClass() {
@@ -51,7 +51,7 @@ public class StartAnalysisServletTest {
         conversation = new WebConversation();
         analyzeBodyValid = "{\"groupId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"analysis\":[\"he\",\"rgb\"]}";
         analyzeBodyInvalid = "{\"annotations\":[\"1\",\"2\",\"3\"],\"analysis\":[\"he\",\"rgb\"]}";
-        statusDao = new MongoAnalysisStatusDAO(client, databaseName);
+        infoDao = new MongoAnalysisInformationDAO(client, databaseName);
 
     }
     
@@ -89,8 +89,8 @@ public class StartAnalysisServletTest {
         WebResponse response = conversation.getResponse(request);
         assertEquals("Testing with message body: " + analyzeBodyValid + ".", 202, response.getResponseCode());
         JSONObject jsonObject = new JSONObject(response.getText());
-        AnalysisStatus status = statusDao.getAnalysisStatus(jsonObject.getString("analysisId"));
-        assertNotNull(status);
+        AnalysisInformation info = infoDao.getAnalysisInformation(jsonObject.getString("analysisId"));
+        assertNotNull(info);
     }
 
     @After

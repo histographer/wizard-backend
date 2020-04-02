@@ -126,6 +126,7 @@
             <include>ResultTests.java</include>
             <include>ResultsTests.java</include>
             <include>AnalyzeTests.java</include>
+            <include>AnalysisInformationTest.java</include>
           </includes>
           <skipTests>${skip.unit.tests}</skipTests>
         </configuration>

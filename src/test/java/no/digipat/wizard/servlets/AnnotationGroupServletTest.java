@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import static java.util.Comparator.comparing;
@@ -51,6 +53,11 @@ public class AnnotationGroupServletTest {
     public void setUp() {
         dao = new MongoAnnotationGroupDAO(client, databaseName);
         conversation = new WebConversation();
+    }
+    
+    @After
+    public void tearDown() {
+        client.getDatabase(databaseName).drop();
     }
     
     private static PostMethodWebRequest createPostRequest(String path, String messageBody, String contentType) throws Exception {
@@ -175,9 +182,46 @@ public class AnnotationGroupServletTest {
         assertEquals(400, response.getResponseCode());
     }
     
-    @After
-    public void tearDown() {
-        client.getDatabase(databaseName).drop();
+    @Test
+    public void testUnicodeCharactersOnCreation() throws Exception {
+        JSONObject requestJson = new JSONObject();
+        List<Long> annotationIds = Arrays.asList(new Long[] {42L, 1337L, Long.MAX_VALUE});
+        requestJson.put("annotations", annotationIds);
+        String groupName = "ÆØÅæøåαβγ";
+        requestJson.put("name", groupName);
+        requestJson.put("projectId", 20);
+        
+        WebRequest request = createPostRequest("annotationGroup", requestJson.toString(), "application/json");
+        WebResponse response = conversation.getResponse(request);
+        
+        assertEquals(200, response.getResponseCode());
+        JSONObject responseJson = new JSONObject(response.getText());
+        String groupId = responseJson.getString("groupId");
+        AnnotationGroup group = dao.getAnnotationGroup(groupId);
+        assertEquals(groupName, group.getName());
+    }
+    
+    @Test
+    public void testUnicodeCharactersOnRetrieval() throws Exception {
+        AnnotationGroup group = new AnnotationGroup()
+                .setCreationDate(new Date())
+                .setAnnotationIds(new ArrayList<Long>())
+                .setProjectId(20L)
+                .setName("ÆØÅæøåαβγ");
+        dao.createAnnotationGroup(group);
+        
+        WebRequest request = new GetMethodWebRequest(baseUrl, "annotationGroup?projectId=" + 20);
+        WebResponse response = conversation.getResponse(request);
+        System.out.println(response.getContentType());
+        System.out.println(response.getCharacterSet());
+        System.out.println(response.getHeaderField("content-type"));
+        System.out.println(StandardCharsets.UTF_8.name());
+        
+        assertEquals(200, response.getResponseCode());
+        JSONObject json = new JSONObject(response.getText());
+        System.out.println(response.getText());
+        JSONArray array = json.getJSONArray("groups");
+        assertEquals(group.getName(), ((JSONObject) array.get(0)).get("name"));
     }
     
 }

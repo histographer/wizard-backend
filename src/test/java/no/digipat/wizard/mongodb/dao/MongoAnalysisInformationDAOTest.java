@@ -2,6 +2,9 @@ package no.digipat.wizard.mongodb.dao;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -126,17 +129,17 @@ public class MongoAnalysisInformationDAOTest {
     }
     
     @Test(expected=IllegalArgumentException.class)
-    @Parameters({
-        "abc",
-        "oooooooooooooooooooooooo"
-    })
+    @Parameters(method="getInvalidIds")
     public void testUpdateInvalidId(String id) {
         dao.updateStatus(id, Status.SUCCESS);
     }
     
-    @Test(expected=IllegalArgumentException.class)
-    public void testUpdateNullId() {
-        dao.updateStatus(null, Status.SUCCESS);
+    private static String[] getInvalidIds() {
+        return new String[] {
+                "abc",
+                "oooooooooooooooooooooooo",
+                null
+        };
     }
     
     @Test
@@ -157,5 +160,32 @@ public class MongoAnalysisInformationDAOTest {
         assertTrue(updated);
         assertEquals(Status.FAILURE, dao.getAnalysisInformation(analysis.getAnalysisId()).getStatus());
     }
+    
+    @Test
+    public void testGetAnalysesForGroup() throws Exception {
+        AnalysisInformation info1 = new AnalysisInformation()
+                .setAnnotationGroupId("abcdef0123456789abcdef12")
+                .setStatus(Status.PENDING);
+        String id1 = dao.createAnalysisInformation(info1);
+        AnalysisInformation info2 = new AnalysisInformation()
+                .setAnnotationGroupId("abcdef0123456789abcdef12")
+                .setStatus(Status.SUCCESS);
+        String id2 = dao.createAnalysisInformation(info2);
+        AnalysisInformation info3 = new AnalysisInformation()
+                .setAnnotationGroupId("0123456789abcdef01234567")
+                .setStatus(Status.FAILURE);
+        dao.createAnalysisInformation(info3);
         
+        List<AnalysisInformation> analyses = dao.getAnalysisInformationForAnnotationGroup("abcdef0123456789abcdef12");
+        
+        assertEquals(Arrays.asList(info1.setAnalysisId(id1), info2.setAnalysisId(id2)), analyses);
+    }
+    
+    @Test
+    public void testGetAnalysesForNonexistentGroup() throws Exception {
+        List<AnalysisInformation> analyses = dao.getAnalysisInformationForAnnotationGroup(hexId);
+        
+        assertEquals("List is not empty.", 0, analyses.size());
+    }
+    
 }

@@ -11,8 +11,12 @@ import com.mongodb.client.result.UpdateResult;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import no.digipat.wizard.models.AnalysisInformation;
 import no.digipat.wizard.models.AnalysisInformation.Status;
+import no.digipat.wizard.models.AnnotationGroup;
 
 /**
  * A Data Access Object (DAO) for analysis info.
@@ -49,7 +53,7 @@ public class MongoAnalysisInformationDAO {
         try {
             collection.insertOne(document);
         } catch (MongoWriteException e) {
-            if (e.getCode() == 11000) { // Error code 11000 indicates a duplicated key
+            if (e.getCode() == 11000) { // Error code 11000 indicates a duplicate key
                 throw new IllegalStateException("Duplicate analysis ID", e);
             } else {
                 throw e;
@@ -90,6 +94,24 @@ public class MongoAnalysisInformationDAO {
         } else {
             return documentToAnalysisInformation(document);
         }
+    }
+    
+    /**
+     * Gets information about all the analyses associated with a given annotation
+     * group.
+     * 
+     * @param annotationGroupId the ID of the annotation group
+     * 
+     * @return a list containing information about the analyses
+     * 
+     * @see AnnotationGroup
+     */
+    public List<AnalysisInformation> getAnalysisInformationForAnnotationGroup(String annotationGroupId) {
+        List<AnalysisInformation> analyses = new ArrayList<>();
+        for (Document document : collection.find(eq("annotationGroupId", annotationGroupId))) {
+            analyses.add(documentToAnalysisInformation(document));
+        }
+        return analyses;
     }
     
     private static AnalysisInformation documentToAnalysisInformation(Document document) {

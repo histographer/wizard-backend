@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -212,14 +211,9 @@ public class AnnotationGroupServletTest {
         
         WebRequest request = new GetMethodWebRequest(baseUrl, "annotationGroup?projectId=" + 20);
         WebResponse response = conversation.getResponse(request);
-        System.out.println(response.getContentType());
-        System.out.println(response.getCharacterSet());
-        System.out.println(response.getHeaderField("content-type"));
-        System.out.println(StandardCharsets.UTF_8.name());
         
         assertEquals(200, response.getResponseCode());
         JSONObject json = new JSONObject(response.getText());
-        System.out.println(response.getText());
         JSONArray array = json.getJSONArray("groups");
         assertEquals(group.getName(), ((JSONObject) array.get(0)).get("name"));
     }

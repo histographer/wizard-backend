@@ -19,18 +19,18 @@ import com.mongodb.MongoClient;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import no.digipat.wizard.models.AnalysisStatus;
-import no.digipat.wizard.models.AnalysisStatus.Status;
-import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAO;
+import no.digipat.wizard.models.AnalysisInformation;
+import no.digipat.wizard.models.AnalysisInformation.Status;
+import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
 
 @RunWith(JUnitParamsRunner.class)
-public class AnalysisStatusServletTest {
+public class AnalysisInformationServletTest {
     
     private static final String hexId = "abcdef0123456789abcdef12";
     private static URL baseUrl;
     private static String databaseName;
     private static MongoClient client;
-    private MongoAnalysisStatusDAO dao;
+    private MongoAnalysisInformationDAO dao;
     private WebConversation conversation;
     
     @BeforeClass
@@ -42,7 +42,7 @@ public class AnalysisStatusServletTest {
     
     @Before
     public void setUp() {
-        dao = new MongoAnalysisStatusDAO(client, databaseName);
+        dao = new MongoAnalysisInformationDAO(client, databaseName);
         conversation = new WebConversation();
     }
     
@@ -53,13 +53,13 @@ public class AnalysisStatusServletTest {
     
     @Test
     @Parameters(method="getStatusValues")
-    public void testGetStatus(Status status) throws Exception {
-        String analysisId = dao.createAnalysisStatus(
-                new AnalysisStatus()
+    public void testGetInformation(Status status) throws Exception {
+        String analysisId = dao.createAnalysisInformation(
+                new AnalysisInformation()
                     .setAnnotationGroupId(hexId)
                     .setStatus(status)
         );
-        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisStatus?analysisId=" + analysisId);
+        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisInformation?analysisId=" + analysisId);
         
         WebResponse response = conversation.getResponse(request);
         
@@ -75,7 +75,7 @@ public class AnalysisStatusServletTest {
     
     @Test
     public void testStatusCode404() throws Exception {
-        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisStatus?analysisId=" + hexId);
+        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisInformation?analysisId=" + hexId);
         
         WebResponse response = conversation.getResponse(request);
         
@@ -84,10 +84,10 @@ public class AnalysisStatusServletTest {
     
     @Test
     @Parameters({
-        "analysisStatus",
-        "analysisStatus?analysisId=",
-        "analysisStatus?analysisId=oooooooooooooooooooooooo",
-        "analysisStatus?analysisId=abc",
+        "analysisInformation",
+        "analysisInformation?analysisId=",
+        "analysisInformation?analysisId=oooooooooooooooooooooooo",
+        "analysisInformation?analysisId=abc",
     })
     public void testStatusCode400(String path) throws Exception {
         WebRequest request = new GetMethodWebRequest(baseUrl, path);

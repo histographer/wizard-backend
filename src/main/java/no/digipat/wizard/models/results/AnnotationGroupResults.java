@@ -5,9 +5,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 import org.bson.codecs.pojo.annotations.BsonId;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import lombok.EqualsAndHashCode;
+import no.digipat.wizard.models.AnalysisInformation;
 
 import java.util.List;
 
@@ -16,6 +16,8 @@ import java.util.List;
  * this class return the instance on which they are called.
  *
  * @author Kent Are Torvik
+ * 
+ * @see AnalysisInformation
  *
  */
 @EqualsAndHashCode

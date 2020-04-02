@@ -1,16 +1,18 @@
 package no.digipat.wizard.models;
 
 import lombok.EqualsAndHashCode;
+import no.digipat.wizard.models.results.AnnotationGroupResults;
 
 /**
- * A representation of an analysis that has been started, but may
- * or may not have been succesfully completed.
+ * A representation of information about an analysis.
  * 
  * @author Jon Wallem Anundsen
+ * 
+ * @see AnnotationGroupResults
  *
  */
 @EqualsAndHashCode
-public class AnalysisStatus {
+public class AnalysisInformation {
     
     /**
      * The status of an analysis.
@@ -48,7 +50,7 @@ public class AnalysisStatus {
      * 
      * @return this
      */
-    public AnalysisStatus setAnalysisId(String analysisId) {
+    public AnalysisInformation setAnalysisId(String analysisId) {
         this.analysisId = analysisId;
         return this;
     }
@@ -67,7 +69,7 @@ public class AnalysisStatus {
      * 
      * @see AnnotationGroup
      */
-    public AnalysisStatus setAnnotationGroupId(String annotationGroupId) {
+    public AnalysisInformation setAnnotationGroupId(String annotationGroupId) {
         this.annotationGroupId = annotationGroupId;
         return this;
     }
@@ -83,7 +85,7 @@ public class AnalysisStatus {
      * 
      * @return this
      */
-    public AnalysisStatus setStatus(Status status) {
+    public AnalysisInformation setStatus(Status status) {
         this.status = status;
         return this;
     }

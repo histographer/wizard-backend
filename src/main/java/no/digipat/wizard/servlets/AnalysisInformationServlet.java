@@ -13,14 +13,14 @@ import org.json.JSONObject;
 
 import com.mongodb.MongoClient;
 
-import no.digipat.wizard.models.AnalysisStatus;
-import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAO;
+import no.digipat.wizard.models.AnalysisInformation;
+import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
 
-@WebServlet("/analysisStatus")
-public class AnalysisStatusServlet extends HttpServlet {
+@WebServlet("/analysisInformation")
+public class AnalysisInformationServlet extends HttpServlet {
     
     /**
-     * Gets the status of an analysis, as determined by the query
+     * Gets information about an analysis, as determined by the query
      * string parameter {@code analysisId}.
      * 
      * <p>
@@ -41,14 +41,14 @@ public class AnalysisStatusServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String analysisId = request.getParameter("analysisId");
-        MongoAnalysisStatusDAO dao = getDao();
+        MongoAnalysisInformationDAO dao = getDao();
         try {
-            AnalysisStatus analysisStatus = dao.getAnalysisStatus(analysisId);
-            if (analysisStatus == null) {
+            AnalysisInformation analysisInformation = dao.getAnalysisInformation(analysisId);
+            if (analysisInformation == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             } else {
                 JSONObject json = new JSONObject();
-                json.put("status", analysisStatus.getStatus().name().toLowerCase());
+                json.put("status", analysisInformation.getStatus().name().toLowerCase());
                 response.setContentType("application/json");
                 response.getWriter().print(json);
             }
@@ -57,11 +57,11 @@ public class AnalysisStatusServlet extends HttpServlet {
         }
     }
     
-    private MongoAnalysisStatusDAO getDao() {
+    private MongoAnalysisInformationDAO getDao() {
         ServletContext context = getServletContext();
         MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
         String databaseName = (String) context.getAttribute("MONGO_DATABASE");
-        return new MongoAnalysisStatusDAO(client, databaseName);
+        return new MongoAnalysisInformationDAO(client, databaseName);
     }
     
 }

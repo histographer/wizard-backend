@@ -12,17 +12,17 @@ import com.mongodb.MongoClient;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import no.digipat.wizard.models.AnalysisStatus;
-import no.digipat.wizard.models.AnalysisStatus.Status;
+import no.digipat.wizard.models.AnalysisInformation;
+import no.digipat.wizard.models.AnalysisInformation.Status;
 import no.digipat.wizard.mongodb.DatabaseUnitTests;
 
 @RunWith(JUnitParamsRunner.class)
-public class MongoAnalysisStatusDAOTest {
+public class MongoAnalysisInformationDAOTest {
     
     private static final String hexId = "0123456789abcdef01234567"; // 24 hexadecimal characters
     private static MongoClient client;
     private static String databaseName;
-    private MongoAnalysisStatusDAO dao;
+    private MongoAnalysisInformationDAO dao;
     
     @BeforeClass
     public static void setUpClass() {
@@ -32,7 +32,7 @@ public class MongoAnalysisStatusDAOTest {
     
     @Before
     public void setUp() {
-        dao = new MongoAnalysisStatusDAO(client, databaseName);
+        dao = new MongoAnalysisInformationDAO(client, databaseName);
     }
     
     @After
@@ -40,8 +40,8 @@ public class MongoAnalysisStatusDAOTest {
         client.getDatabase(databaseName).drop();
     }
     
-    private static AnalysisStatus createAnalysisStatusWithNonNullFields() {
-        return new AnalysisStatus()
+    private static AnalysisInformation createAnalysisInfoWithNonNullFields() {
+        return new AnalysisInformation()
                 .setAnalysisId(hexId)
                 .setAnnotationGroupId(hexId)
                 .setStatus(Status.PENDING);
@@ -49,12 +49,12 @@ public class MongoAnalysisStatusDAOTest {
     
     @Test(expected=NullPointerException.class)
     public void testCreateAnalysisWithNullStatus() {
-        dao.createAnalysisStatus(createAnalysisStatusWithNonNullFields().setStatus(null));
+        dao.createAnalysisInformation(createAnalysisInfoWithNonNullFields().setStatus(null));
     }
     
     @Test(expected=NullPointerException.class)
     public void testCreateAnalysisWithNullGroupId() {
-        dao.createAnalysisStatus(createAnalysisStatusWithNonNullFields().setAnnotationGroupId(null));
+        dao.createAnalysisInformation(createAnalysisInfoWithNonNullFields().setAnnotationGroupId(null));
     }
     
     @Test(expected=IllegalArgumentException.class)
@@ -63,24 +63,24 @@ public class MongoAnalysisStatusDAOTest {
         "oooooooooooooooooooooooo"
     })
     public void testCreateAnalysisWithInvalidId(String id) {
-        dao.createAnalysisStatus(createAnalysisStatusWithNonNullFields().setAnalysisId(id));
+        dao.createAnalysisInformation(createAnalysisInfoWithNonNullFields().setAnalysisId(id));
     }
     
     @Test(expected=IllegalStateException.class)
     public void testCreateAnalysisWithDuplicateId() {
-        AnalysisStatus analysisStatus = createAnalysisStatusWithNonNullFields();
-        dao.createAnalysisStatus(analysisStatus);
-        dao.createAnalysisStatus(analysisStatus);
+        AnalysisInformation analysisInformation = createAnalysisInfoWithNonNullFields();
+        dao.createAnalysisInformation(analysisInformation);
+        dao.createAnalysisInformation(analysisInformation);
     }
     
     @Test
     public void testCreateAnalysisWithNullId() {
-        AnalysisStatus analysis = new AnalysisStatus()
+        AnalysisInformation analysis = new AnalysisInformation()
                 .setAnnotationGroupId(hexId)
                 .setStatus(Status.PENDING);
         
-        String id = dao.createAnalysisStatus(analysis);
-        AnalysisStatus retrievedAnalysis = dao.getAnalysisStatus(id);
+        String id = dao.createAnalysisInformation(analysis);
+        AnalysisInformation retrievedAnalysis = dao.getAnalysisInformation(id);
         
         assertNotNull(id);
         analysis.setAnalysisId(id); // Set ID so we can use equals method
@@ -89,13 +89,13 @@ public class MongoAnalysisStatusDAOTest {
     
     @Test
     public void testCreateAnalysisWithProvidedId() {
-        AnalysisStatus analysis = new AnalysisStatus()
+        AnalysisInformation analysis = new AnalysisInformation()
                 .setAnalysisId(hexId)
                 .setAnnotationGroupId("abcdef0123456789abcdef12")
                 .setStatus(Status.SUCCESS);
         
-        String id = dao.createAnalysisStatus(analysis);
-        AnalysisStatus retrievedAnalysis = dao.getAnalysisStatus(id);
+        String id = dao.createAnalysisInformation(analysis);
+        AnalysisInformation retrievedAnalysis = dao.getAnalysisInformation(id);
         
         assertEquals(analysis.getAnalysisId(), id);
         assertEquals(analysis, retrievedAnalysis);
@@ -107,17 +107,17 @@ public class MongoAnalysisStatusDAOTest {
         "oooooooooooooooooooooooo"
     })
     public void testGetAnalysisWithInvalidId(String id) {
-        dao.getAnalysisStatus(id);
+        dao.getAnalysisInformation(id);
     }
     
     @Test(expected=IllegalArgumentException.class)
     public void testGetAnalysisWithNullId() {
-        dao.getAnalysisStatus(null);
+        dao.getAnalysisInformation(null);
     }
     
     @Test
     public void testGetNonexistentAnalysis() {
-        assertNull(dao.getAnalysisStatus(hexId));
+        assertNull(dao.getAnalysisInformation(hexId));
     }
     
     @Test(expected=NullPointerException.class)
@@ -146,16 +146,16 @@ public class MongoAnalysisStatusDAOTest {
     
     @Test
     public void testUpdateStatus() {
-        AnalysisStatus analysis = new AnalysisStatus()
+        AnalysisInformation analysis = new AnalysisInformation()
                 .setAnalysisId(hexId)
                 .setAnnotationGroupId(hexId)
                 .setStatus(Status.PENDING);
-        dao.createAnalysisStatus(analysis);
+        dao.createAnalysisInformation(analysis);
         
         boolean updated = dao.updateStatus(analysis.getAnalysisId(), Status.FAILURE);
         
         assertTrue(updated);
-        assertEquals(Status.FAILURE, dao.getAnalysisStatus(analysis.getAnalysisId()).getStatus());
+        assertEquals(Status.FAILURE, dao.getAnalysisInformation(analysis.getAnalysisId()).getStatus());
     }
         
 }

@@ -1,9 +1,9 @@
 package no.digipat.wizard.servlets;
 
 import com.mongodb.MongoClient;
-import no.digipat.wizard.models.AnalysisStatus;
+import no.digipat.wizard.models.AnalysisInformation;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
-import no.digipat.wizard.mongodb.dao.MongoAnalysisStatusDAO;
+import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
 
 import javax.servlet.ServletException;
@@ -24,7 +24,7 @@ public class AnalysisResultsServlet extends HttpServlet {
         String databaseName = getDatabaseName();
         MongoClient client = getDatabaseClient();
         MongoResultsDAO resultsDao = new MongoResultsDAO(client, databaseName);
-        MongoAnalysisStatusDAO analysisStatusDao = new MongoAnalysisStatusDAO(client, databaseName);
+        MongoAnalysisInformationDAO analysisInfoDao = new MongoAnalysisInformationDAO(client, databaseName);
         String requestJson = IOUtils.toString(request.getReader());
         AnnotationGroupResults results;
         try {
@@ -33,8 +33,8 @@ public class AnalysisResultsServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
             return;
         }
-        AnalysisStatus status = analysisStatusDao.getAnalysisStatus(results.getAnalysisId());
-        if (status == null) {
+        AnalysisInformation info = analysisInfoDao.getAnalysisInformation(results.getAnalysisId());
+        if (info == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
             try {
@@ -43,7 +43,7 @@ public class AnalysisResultsServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            analysisStatusDao.updateStatus(results.getAnalysisId(), AnalysisStatus.Status.SUCCESS);
+            analysisInfoDao.updateStatus(results.getAnalysisId(), AnalysisInformation.Status.SUCCESS);
             response.setStatus(HttpServletResponse.SC_CREATED);
         }
     }

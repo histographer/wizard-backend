@@ -1,5 +1,14 @@
 package no.digipat.wizard.models;
 
+import java.io.IOException;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+
 import lombok.EqualsAndHashCode;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
 
@@ -33,11 +42,70 @@ public class AnalysisInformation {
          * Indicates that the analysis failed.
          */
         FAILURE;
+        
+        /**
+         * Gets a string representation of a status.
+         * 
+         * @return the name of the status converted to lower case
+         */
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
     }
     
+    private static final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(Status.class, new TypeAdapter<Status>() {
+                @Override
+                public void write(JsonWriter out, Status value) throws IOException {
+                    if (value == null) {
+                        out.nullValue();
+                    } else {
+                        out.value(value.toString());
+                    }
+                }
+                @Override
+                public Status read(JsonReader in) throws IOException {
+                    try {
+                        return Status.valueOf(in.nextString().toUpperCase());
+                    } catch (IllegalStateException e) {
+                        in.nextNull();
+                        return null;
+                    }
+                }
+            })
+            .serializeNulls().create();
     private String analysisId;
     private String annotationGroupId;
     private Status status;
+    
+    /**
+     * Converts this analysis information to a JSON object whose key-value
+     * pairs consist of this object's property names and values.
+     * 
+     * @return a JSON representation of this object
+     */
+    public String toJson() {
+        return gson.toJson(this);
+    }
+    
+    /**
+     * Converts a JSON object into an analysis information object. If a
+     * key is missing, the corresponding property will be {@code null}.
+     * 
+     * @param json the string containing the JSON object
+     * 
+     * @return the analysis information object
+     * 
+     * @throws IllegalArgumentException if {@code json} is not valid
+     */
+    public static AnalysisInformation fromJson(String json) throws IllegalArgumentException {
+        try {
+            return gson.fromJson(json, AnalysisInformation.class);
+        } catch (JsonSyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
     
     public String getAnalysisId() {
         return analysisId;

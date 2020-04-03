@@ -5,15 +5,16 @@ services:
   mongo:
     env_file:
       - .env
-    image: mongo:latest
     container_name: ${DEV_WIZARD_MONGO_CONTAINER_NAME}
     restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.init_mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${DEV_WIZARD_MONGODB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${DEV_WIZARD_MONGODB_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: wizard
+      MONGO_INITDB_DATABASE: wizard_dev
     volumes:
-      - ./init-mongo-dev.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - mongodevdata:/data/db
     ports:
       - ${DEV_WIZARD_MONGODB_PORT}:27017
@@ -33,7 +34,7 @@ services:
       WIZARD_MONGODB_PORT: 27017
       WIZARD_MONGODB_USERNAME: dev_user
       WIZARD_MONGODB_PASSWORD: dev_password
-      WIZARD_MONGODB_DATABASE: wizard
+      WIZARD_MONGODB_DATABASE: wizard_dev
 
   wizard-mongo-express:
     env_file:
@@ -43,8 +44,8 @@ services:
     ports:
       - 8081:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGODB_INITDB_ROOT_USERNAME}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGODB_INITDB_ROOT_PASSWORD}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${DEV_WIZARD_MONGODB_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${DEV_WIZARD_MONGODB_ROOT_PASSWORD}
 
 volumes:
   mongodevdata:

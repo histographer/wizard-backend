@@ -1,0 +1,3 @@
+FROM mongo:latest
+
+ADD ./init_mongo/init-mongo-dev.js /docker-entrypoint-initdb.d/init-mongo-dev.js

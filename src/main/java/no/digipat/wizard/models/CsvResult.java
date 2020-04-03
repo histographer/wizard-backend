@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
 
 /**
- * The results of an anlysis, represented in CSV format and encoded
+ * The results of an analysis, represented in CSV format and encoded
  * in base 64.
  * 
  * @author Jon Wallem Anundsen
@@ -13,7 +13,7 @@ import no.digipat.wizard.models.results.AnnotationGroupResults;
  *
  */
 @EqualsAndHashCode
-public class ExportedAnalysisResults {
+public class CsvResult {
     
     private String analysisId;
     private String data;
@@ -25,7 +25,7 @@ public class ExportedAnalysisResults {
      * 
      * @return this
      */
-    public ExportedAnalysisResults setAnalysisId(String analysisId) {
+    public CsvResult setAnalysisId(String analysisId) {
         this.analysisId = analysisId;
         return this;
     }
@@ -42,12 +42,12 @@ public class ExportedAnalysisResults {
      * 
      * @return this
      */
-    public ExportedAnalysisResults setBase64Csv(String data) {
+    public CsvResult setData(String data) {
         this.data = data;
         return this;
     }
     
-    public String getBase64Csv() {
+    public String getData() {
         return data;
     }
     

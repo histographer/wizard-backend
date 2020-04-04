@@ -53,7 +53,7 @@ public class AnnotationGroupResults {
     @Override
     public String toString() {
         return "AnnotationGroupResults{" +
-                "groupId='" + analysisId + '\'' +
+                "analysisId='" + analysisId + '\'' +
                 ", annotations=" + annotations +
                 '}';
     }

@@ -18,8 +18,39 @@ import org.apache.commons.io.IOUtils;
 @WebServlet(urlPatterns = "/analysisResults")
 public class AnalysisResultsServlet extends HttpServlet {
     
-    // TODO DOCS
     @Override
+    /**
+     * Inserts  analysis result into the database
+     * object of the following form:
+     *
+     * <pre>
+     * {
+     *   "csvBase64": &lt;string&gt;,
+     *   "analysisId": &lt;string&gt;,
+     *   "annotations": [
+     *     {
+     *       "annotationId": &lt;long&gt;,
+     *       "results": [
+     *         {
+     *           &lt;string&gt;: {
+     *                  &lt;string&gt;: {
+     *                   &lt;string&gt;: &lt;float&gt;,
+     *                   &lt;string&gt;: &lt;float&gt;
+     *                   ...
+     *                  }
+     *                  ...
+     *           }
+     *           ...
+     *           }
+     *         }
+     *       ],
+     *       ...
+     *     }
+     *   ]
+     * }
+     * </pre>
+     *
+     */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String databaseName = getDatabaseName();
         MongoClient client = getDatabaseClient();
@@ -29,7 +60,7 @@ public class AnalysisResultsServlet extends HttpServlet {
         AnnotationGroupResults results;
         try {
             results = MongoResultsDAO.jsonToAnnotationGroupResults(requestJson);
-        } catch (IllegalArgumentException | NullPointerException e) {
+        } catch (IllegalArgumentException | NullPointerException | IllegalStateException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
             return;
         }
@@ -55,17 +86,22 @@ public class AnalysisResultsServlet extends HttpServlet {
      * 
      * <pre>
      * {
+     *   "csvBase64": &lt;string&gt;,
      *   "analysisId": &lt;string&gt;,
      *   "annotations": [
      *     {
      *       "annotationId": &lt;long&gt;,
      *       "results": [
      *         {
-     *           "type": &lt;string&gt;
-     *           "values": {
-     *             "value1": &lt;int&gt;,
-     *             "value2": &lt;int&gt;
-     *             ...
+     *           &lt;string&gt;: {
+     *                  &lt;string&gt;: {
+     *                   &lt;string&gt;: &lt;float&gt;,
+     *                   &lt;string&gt;: &lt;float&gt;
+     *                   ...
+     *                  }
+     *                  ...
+     *           }
+     *           ...
      *           }
      *         }
      *       ],

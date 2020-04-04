@@ -54,19 +54,33 @@ public class AnalysisResultsServletTest {
         infoDao = new MongoAnalysisInformationDAO(client, databaseName);
         conversation = new WebConversation();
         analyzeBodyInvalid = "{\"annotations\":[\"1\",\"2\",\"3\"],\"analysis\":[\"he\",\"rgb\"]}";
-        analyzeBodyValid = "{\"analysisId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"annotations\":[{\"annotationId\":2,\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
+        //analyzeBodyValid = "{\"analysisId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"annotations\":[{\"annotationId\":2,\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
+        analyzeBodyValid = "{\"analysisId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"csvBase64\":\"abc\",\"annotations\":[{\"annotationId\":1,\"results\":{\"he\":{\"H\":{\"mean\":-0.4941735897897377,\"std\":0.04383346025184383},\"E\":{\"mean\":0.20421988842343536,\"std\":0.012792263926458863}}}}]}";
     }
     
     private static PostMethodWebRequest createPostRequest(String path, String messageBody, String contentType) throws Exception {
         return new PostMethodWebRequest(new URL(baseUrl, path).toString(),
                 new ByteArrayInputStream(messageBody.getBytes("UTF-8")), contentType);
     }
-    
+
+    private Results createResults(String resName, Float value) {
+        Map<String, Float> values = new HashMap<>();
+        values.put("mean", 0.333f);
+        values.put("std", 0.555f);
+        Map<String, Map<String, Float>> tempres= new HashMap<>();
+        tempres.put("H", values);
+        tempres.put("E", values);
+        Map<String, Map<String, Map<String, Float>>> results= new HashMap<>();
+        results.put("HE", tempres);
+        return new Results().setAnnotationId(1l).setResults(results);
+    }
+
     @Test
     public void testStatusCode404OnNonexistentAnalysis() throws Exception {
         WebRequest request = createPostRequest("analysisResults", analyzeBodyValid, "application/json");
         
         WebResponse response = conversation.getResponse(request);
+
         
         assertEquals(404, response.getResponseCode());
     }
@@ -146,21 +160,8 @@ public class AnalysisResultsServletTest {
         AnnotationGroupResults results = new AnnotationGroupResults()
                 .setAnalysisId("aaaaaaaaaaaaaaaaaaaaaaaa")
                 .setAnnotations(Arrays.asList(
-                        new Results().setAnnotationId(1L).setAnalysisResults(Arrays.asList(
-                                new AnalysisResult().setType("he").setValues(new HashMap<String, Integer>() {{
-                                    put("hematoxylin", 180);
-                                    put("eosin", 224);
-                                }})
-                        )),
-                        new Results().setAnnotationId(2L).setAnalysisResults(Arrays.asList(
-                                new AnalysisResult().setType("he").setValues(new HashMap<String, Integer>() {{
-                                    put("hematoxylin", 150);
-                                    put("eosin", 200);
-                                }}),
-                                new AnalysisResult().setType("cool-analysis").setValues(new HashMap<String, Integer>() {{
-                                    put("elite", 1337);
-                                }})
-                        ))
+                        createResults("he", 0.44f),
+                        createResults("bc", 0.3f)
                 ));
         resultDao.createAnnotationGroupResults(results);
         

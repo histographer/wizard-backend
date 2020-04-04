@@ -9,10 +9,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,24 +22,21 @@ public class ResultsTests {
         validator = factory.getValidator();
     }
 
-    private AnalysisResult createResult() {
-        AnalysisResult res1 = new AnalysisResult().setType("he")
-                .setValues(new HashMap<String, Integer>(){{
-                    put("hemax", 32);
-                    put("coolcat", 32);
-                }});
-        return res1;
-    }
 
     private Results createResults() {
-        List<AnalysisResult> analysisResultList = new ArrayList<AnalysisResult>() {{ add(createResult()); }};
-        return new Results().setAnnotationId(1l).setAnalysisResults(analysisResultList);
-
+        Map<String, Float> values = new HashMap<>();
+        values.put("mean", 0.333f);
+        values.put("std", 0.555f);
+        Map<String, Map<String, Float>> tempres= new HashMap<>();
+        tempres.put("H", values);
+        tempres.put("E", values);
+        Map<String, Map<String, Map<String, Float>>> results= new HashMap<>();
+        results.put("HE", tempres);
+        return new Results().setAnnotationId(1l).setResults(results);
     }
 
     @Test
     public void ResultsIfAnnotationIdIsNullOrEmpty() {
-
         Results results = createResults();
         results.setAnnotationId(null);
         Set<ConstraintViolation<Results>> violations = validator.validate(results);
@@ -51,17 +45,18 @@ public class ResultsTests {
         Set<ConstraintViolation<Results>> violations2 = validator.validate(results);
         assertEquals(violations2.isEmpty(), true);
     }
+
     @Test
     public void ResultsIfResultsAreNullOrEmpty() {
-
         Results results = createResults();
-        results.setAnalysisResults(null);
+        results.setResults(null);
         Set<ConstraintViolation<Results>> violations = validator.validate(results);
         assertEquals(violations.isEmpty(), false);
-        results.setAnalysisResults(new ArrayList<AnalysisResult>());
+        results.setResults(new HashMap<String, Map<String, Map<String, Float>>>());
         Set<ConstraintViolation<Results>> violations2 = validator.validate(results);
         assertEquals(violations2.isEmpty(), false);
     }
+
     @Test
     public void ResultsIsValid() {
         Set<ConstraintViolation<Results>> violations = validator.validate(createResults());

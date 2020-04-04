@@ -98,15 +98,6 @@ public class MongoResultsDAO {
                    validationsList.add("AnnotationGroupResults.Results["+annotationGroupResultsListIndex+"]: "+ violation.getMessage());
                });
            }
-           results.getAnalysisResults().forEach(result -> {
-               Set<ConstraintViolation<AnalysisResult>> resultViolations = validator.validate(result);
-               if(!resultViolations.isEmpty()) {
-                   resultViolations.forEach(violation -> {
-                       validationsList.add("AnnotationGroupResults["+annotationGroupResultsListIndex+"]["+ resultsIndex.get()+"]: "+violation.getMessage());
-                   });
-               }
-               resultsIndex.getAndSet(resultsIndex.get() + 1);
-           });
            annotationGroupResultsListIndex.getAndSet(annotationGroupResultsListIndex.get() + 1);
        });
        if(!validationsList.isEmpty()) {

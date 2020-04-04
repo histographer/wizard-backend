@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A representation of a group of results connected to an annotation id.
@@ -20,7 +21,7 @@ public class Results {
     @NotNull(message = "Results: annotationId can not be null")
     private Long annotationId;
     @NotEmpty(message = "Results: List can not be null or empty")
-    private List<AnalysisResult> results;
+    private Map<String, Map<String, Map<String, Float>>> results;
 
     public Long getAnnotationId() {
         return annotationId;
@@ -31,12 +32,12 @@ public class Results {
         return this;
     }
 
-    public List<AnalysisResult> getAnalysisResults() {
+    public Map<String, Map<String, Map<String, Float>>> getResults() {
         return results;
     }
 
-    public Results setAnalysisResults(List<AnalysisResult> analysisResults) {
-        this.results= analysisResults;
+    public Results setResults(Map<String, Map<String, Map<String, Float>>> results) {
+        this.results = results;
         return this;
     }
 

@@ -17,19 +17,8 @@ import java.util.Map;
  */
 @EqualsAndHashCode
 public class AnalysisResult {
-    @NotBlank(message = "Result: Type can not be null or empty")
-    private String type;
     @NotEmpty(message = "Result: Values can not be null or empty")
     private Map<String, Integer> values;
-
-    public String getType() {
-        return type;
-    }
-
-    public AnalysisResult setType(String type) {
-        this.type = type;
-        return this;
-    }
 
     public Map<String, Integer> getValues() {
         return values;
@@ -40,11 +29,4 @@ public class AnalysisResult {
         return this;
     }
 
-    @Override
-    public String toString() {
-        return "AnalysisResult{" +
-                "type='" + type + '\'' +
-                ", values=" + values +
-                '}';
-    }
 }

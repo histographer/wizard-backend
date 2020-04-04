@@ -21,7 +21,7 @@ public class ExportAnalysisResultsServlet extends HttpServlet {
     
     /**
      * Gets the results of a given analysis (as determined by the query
-     * parameter {@code analysisId}) in CSV format, encoded in base 64.
+     * parameter {@code analysisId}) in CSV format.
      * Appropriate for downloading results to a file.
      * <p>
      * Response:
@@ -29,7 +29,7 @@ public class ExportAnalysisResultsServlet extends HttpServlet {
      * 
      * <pre>
      * {
-     *   "data": &lt;base 64 string&gt;
+     *   "data": &lt;CSV string&gt;
      * }
      * </pre>
      * 

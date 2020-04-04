@@ -23,7 +23,7 @@ public class ExportAnalysisResultsTest {
     
     private static final CsvResult csvResult = new CsvResult()
             .setAnalysisId("abc")
-            .setData("c29tZSBkYXRh");
+            .setData("some data");
     private static URL baseUrl;
     private static String databaseName;
     private static MongoClient client;

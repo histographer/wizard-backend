@@ -4,8 +4,7 @@ import lombok.EqualsAndHashCode;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
 
 /**
- * The results of an analysis, represented in CSV format and encoded
- * in base 64.
+ * The results of an analysis, represented in CSV format.
  * 
  * @author Jon Wallem Anundsen
  * 
@@ -35,8 +34,7 @@ public class CsvResult {
     }
     
     /**
-     * Sets the string data to be exported, which should be in CSV format
-     * and encoded in base 64.
+     * Sets the string data to be exported, which should be formatted as CSV.
      * 
      * @param data the data
      * 

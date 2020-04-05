@@ -1,4 +1,4 @@
-package no.digipat.wizard.models;
+package no.digipat.wizard.models.startanalysis;
 
 import com.google.gson.Gson;
 
@@ -7,9 +7,9 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,20 +20,21 @@ import java.util.Set;
  *
  */
 public class AnalysisPostBody {
-    @NotBlank
-    private String groupId;
+    @NotBlank(message = "analysisId can not be null or empty")
+    private String analysisId;
 
-    @NotBlank
-    private String projectId;
 
-    @NotEmpty
-    private Map<String, String> callbackURLs;
+    @NotNull(message = "projectId can not be null or empty")
+    private Long projectId;
 
-    @NotEmpty
+    @NotNull(message = "callbackURLs can not be empty")
+    private CallbackURLs callbackURLs;
+
+    @NotEmpty(message = "annotations can not be empty")
     private List<Long> annotations;
-    @NotEmpty
-    private List<String> analysis;
 
+    @NotEmpty(message = "analysis can not be empty")
+    private List<String> analysis;
 
     /**
      * Validates that @code{analysisPostBody} is valid.
@@ -45,7 +46,6 @@ public class AnalysisPostBody {
         Set<ConstraintViolation<AnalysisPostBody>> violations = factory.getValidator().validate(analysisPostBody);
 
         List<String> validationsList = new ArrayList<>();
-
         if(!violations.isEmpty()) {
             violations.forEach(violation -> {
                 validationsList.add(violation.getMessage());
@@ -75,17 +75,18 @@ public class AnalysisPostBody {
             throw new RuntimeException("AnnotationGroupResults: Can not create AnnotationGroupResults from json string. Input: "+json);
         }
 
-        if(analysisPostBody.getGroupId() == null) {
-            throw new NullPointerException("AnnotationGroupResults: GroupId is empty. Input: "+json);
+        if(analysisPostBody.getAnalysisId() == null) {
+            throw new NullPointerException("AnnotationGroupResults: analysisId is empty. Input: "+json);
         }
         return analysisPostBody;
     }
-    public String getGroupId() {
-        return groupId;
+
+    public String getAnalysisId() {
+        return analysisId;
     }
 
-    public AnalysisPostBody setGroupId(String groupId) {
-        this.groupId = groupId;
+    public AnalysisPostBody setAnalysisId(String analysisId) {
+        this.analysisId = analysisId;
         return this;
     }
 
@@ -107,22 +108,33 @@ public class AnalysisPostBody {
         return this;
     }
 
-    public String getProjectId() {
+    public Long getProjectId() {
         return projectId;
     }
 
-    public AnalysisPostBody setProjectId(String projectId) {
+    public AnalysisPostBody setProjectId(Long projectId) {
         this.projectId = projectId;
         return this;
     }
 
-    public Map<String, String> getCallbackURLs() {
+    public CallbackURLs getCallbackURLs() {
         return callbackURLs;
     }
 
-    public AnalysisPostBody setCallbackURLs(Map<String, String> callbackURLs) {
+    public AnalysisPostBody setCallbackURLs(CallbackURLs callbackURLs) {
         this.callbackURLs = callbackURLs;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "AnalysisPostBody{" +
+                "analysisId='" + analysisId + '\'' +
+                ", projectId='" + projectId + '\'' +
+                ", callbackURLs=" + callbackURLs +
+                ", annotations=" + annotations +
+                ", analysis=" + analysis +
+                '}';
     }
 }
 

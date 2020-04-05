@@ -28,5 +28,4 @@ public class AnalysisResult {
         this.values = values;
         return this;
     }
-
 }

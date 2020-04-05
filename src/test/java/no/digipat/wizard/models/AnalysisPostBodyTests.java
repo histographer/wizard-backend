@@ -1,5 +1,7 @@
 package no.digipat.wizard.models;
 
+import no.digipat.wizard.models.startanalysis.AnalysisPostBody;
+import no.digipat.wizard.models.startanalysis.CallbackURLs;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,10 +15,12 @@ public class AnalysisPostBodyTests {
 
     @Before
     public void setUp() {
-     analysisJson= "{\"groupId\":\"abc\",\"annotations\":[1,2,3],\"analysis\":[\"he\",\"rgb\"]}";
-     analysisPostBody = new AnalysisPostBody().setGroupId("abc")
+     analysisJson= "{\"projectId\":4,\"analysisId\":\"abc\",\"annotations\":[1,2,3],\"analysis\":[\"he\",\"rgb\"], \"callbackURLs\":{\"analysisResults\":\"localhost\", \"updateStatus\":\"localhost\"}";
+     analysisPostBody = new AnalysisPostBody().setAnalysisId("abc")
              .setAnnotations(new ArrayList<Long>(){{ add(1l); add(2l); add(3l);}})
-             .setAnalysis(new ArrayList<String>(){{ add("he"); add("rgb");}});
+             .setAnalysis(new ArrayList<String>(){{ add("he"); add("rgb");}})
+             .setProjectId(4l)
+             .setCallbackURLs(new CallbackURLs().setAnalysisResults("localhost").setUpdateStatus("localhost"));
     }
 
     @Test
@@ -30,7 +34,7 @@ public class AnalysisPostBodyTests {
         AnalysisPostBody analysisPostBodyConverted = AnalysisPostBody.fromJsonString(analysisJson);
         assertEquals(analysisPostBody.getAnalysis(), analysisPostBodyConverted.getAnalysis());
         assertEquals(analysisPostBody.getAnnotations(), analysisPostBodyConverted.getAnnotations());
-        assertEquals(analysisPostBody.getGroupId(), analysisPostBodyConverted.getGroupId());
+
     }
 
     @Test(expected=IllegalArgumentException.class)

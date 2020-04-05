@@ -45,8 +45,6 @@ public class MongoDBContextListener implements ServletContextListener {
 
             MongoClient client = new MongoClient(new ServerAddress(host, port), credentials, MongoClientOptions.builder().codecRegistry(pojoCodecRegistry).build());
 
-            //MongoClientURI  MONGO_URI = new MongoClientURI("mongodb://"+username+":"+password+"@"+host+":"+port);
-            // MongoClient client = new MongoClient((List<ServerAddress>) MONGO_URI, MongoClientOptions.builder().codecRegistry(pojoCodecRegistry).build());
             context.log("Mongoclient connected successfully at "+host+":"+port);
             context.setAttribute("MONGO_DATABASE", database);
             context.setAttribute("MONGO_CLIENT", client);

@@ -34,7 +34,6 @@ public class StartAnalysisServlet extends HttpServlet {
             String requestJson = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
             AnalysisPostBody analysisPostBody = AnalysisPostBody.fromJsonString(requestJson);
             AnnotationGroup annotationGroup = dao.getAnnotationGroup(analysisPostBody.getGroupId());
-            String uuid = UUID.randomUUID().toString();
             AnalysisInformation info = new AnalysisInformation().setStatus(AnalysisInformation.Status.PENDING)
                     .setAnnotationGroupId(analysisPostBody.getGroupId());
             String id = analysisInformationDao.createAnalysisInformation(info);

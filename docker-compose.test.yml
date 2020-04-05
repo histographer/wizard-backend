@@ -32,6 +32,7 @@ services:
       WIZARD_MONGODB_DATABASE: wizard
       WIZARD_BACKEND_URL: wizard_backend_test
       WIZARD_BACKEND_PORT: ${DEV_WIZARD_TOMCAT_PORT}
+      WIZARD_BACKEND_PROTOCOL: http
 
 volumes:
   mongodata:

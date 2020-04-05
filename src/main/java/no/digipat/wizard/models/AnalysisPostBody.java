@@ -9,12 +9,27 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+/**
+ *
+ *  Builds the post body that is sent to analysis
+ *
+ * @author Kent Are Torvik
+ *
+ */
 public class AnalysisPostBody {
     @NotBlank
     private String groupId;
 
+    @NotBlank
+    private String projectId;
+
+    @NotEmpty
+    private Map<String, String> callbackURLs;
+
+    @NotEmpty
     private List<Long> annotations;
     @NotEmpty
     private List<String> analysis;
@@ -92,5 +107,22 @@ public class AnalysisPostBody {
         return this;
     }
 
+    public String getProjectId() {
+        return projectId;
+    }
+
+    public AnalysisPostBody setProjectId(String projectId) {
+        this.projectId = projectId;
+        return this;
+    }
+
+    public Map<String, String> getCallbackURLs() {
+        return callbackURLs;
+    }
+
+    public AnalysisPostBody setCallbackURLs(Map<String, String> callbackURLs) {
+        this.callbackURLs = callbackURLs;
+        return this;
+    }
 }
 

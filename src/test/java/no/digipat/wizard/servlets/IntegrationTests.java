@@ -20,7 +20,8 @@ import com.mongodb.MongoClientURI;
     AnnotationGroupServletTest.class,
     StartAnalysisServletTest.class,
     AnalysisResultsServletTest.class,
-    AnalysisInformationServletTest.class
+    AnalysisInformationServletTest.class,
+    ExportAnalysisResultsTest.class
 })
 public class IntegrationTests {
     

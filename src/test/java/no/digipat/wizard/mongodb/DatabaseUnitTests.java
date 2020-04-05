@@ -19,6 +19,7 @@ import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAOTest;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAOTest;
+import no.digipat.wizard.mongodb.dao.MongoCsvResultDAOTest;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
@@ -35,7 +36,8 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 @SuiteClasses({
     MongoAnnotationGroupDAOTest.class,
     MongoAnalysisInformationDAOTest.class,
-    MongoResultsDAOTest.class
+    MongoResultsDAOTest.class,
+    MongoCsvResultDAOTest.class
 })
 public class DatabaseUnitTests {
     

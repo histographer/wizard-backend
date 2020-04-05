@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import no.digipat.wizard.models.AnnotationGroup;
+import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -57,6 +59,7 @@ public class AnalysisInformationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         MongoAnalysisInformationDAO dao = getDao();
+        MongoAnnotationGroupDAO AGdao = getAnnotationGroupDao();
         response.setContentType("application/json");
         String analysisId = request.getParameter("analysisId");
         String annotationGroupId = request.getParameter("annotationGroupId");
@@ -66,6 +69,8 @@ public class AnalysisInformationServlet extends HttpServlet {
                 if (analysisInformation == null) {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 } else {
+                    AnnotationGroup annotationGroupObject = AGdao.getAnnotationGroup(analysisInformation.getAnnotationGroupId());
+                    analysisInformation.setGroupName(annotationGroupObject.getName());
                     response.getWriter().print(analysisInformation.toJson());
                 }
             } else if (annotationGroupId != null) {
@@ -74,7 +79,9 @@ public class AnalysisInformationServlet extends HttpServlet {
                 for (AnalysisInformation info : analyses) {
                     array.put(new JSONObject(info.toJson()));
                 }
+                AnnotationGroup annotationGroupObject = AGdao.getAnnotationGroup(annotationGroupId);
                 JSONObject responseJson = new JSONObject();
+                responseJson.put("groupName", annotationGroupObject.getName());
                 responseJson.put("analyses", array);
                 response.getWriter().print(responseJson);
             } else {
@@ -90,6 +97,13 @@ public class AnalysisInformationServlet extends HttpServlet {
         MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
         String databaseName = (String) context.getAttribute("MONGO_DATABASE");
         return new MongoAnalysisInformationDAO(client, databaseName);
+    }
+
+    private MongoAnnotationGroupDAO getAnnotationGroupDao() {
+        ServletContext context = getServletContext();
+        MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
+        String databaseName = (String) context.getAttribute("MONGO_DATABASE");
+        return new MongoAnnotationGroupDAO(client, databaseName);
     }
     
 }

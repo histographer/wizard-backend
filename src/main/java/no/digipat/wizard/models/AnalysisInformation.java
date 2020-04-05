@@ -78,6 +78,7 @@ public class AnalysisInformation {
     private String analysisId;
     private String annotationGroupId;
     private Status status;
+    private String groupName;
     
     /**
      * Converts this analysis information to a JSON object whose key-value
@@ -157,5 +158,13 @@ public class AnalysisInformation {
         this.status = status;
         return this;
     }
-    
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public AnalysisInformation setGroupName(String groupName) {
+        this.groupName = groupName;
+        return this;
+    }
 }

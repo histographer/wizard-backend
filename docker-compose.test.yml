@@ -21,7 +21,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: wizard_backend_test
     restart: always
     ports:
       - ${WIZARD_TEST_TOMCAT_PORT}:8080
@@ -31,6 +30,8 @@ services:
       WIZARD_MONGODB_USERNAME: test_user
       WIZARD_MONGODB_PASSWORD: test_password
       WIZARD_MONGODB_DATABASE: wizard
-  
+      WIZARD_BACKEND_URL: wizard_backend_test
+      WIZARD_BACKEND_PORT: ${DEV_WIZARD_TOMCAT_PORT}
+
 volumes:
   mongodata:

@@ -35,6 +35,8 @@ services:
       WIZARD_MONGODB_USERNAME: dev_user
       WIZARD_MONGODB_PASSWORD: dev_password
       WIZARD_MONGODB_DATABASE: wizard_dev
+      WIZARD_BACKEND_URL: localhost
+      WIZARD_BACKEND_PORT: ${DEV_WIZARD_TOMCAT_PORT}
 
   wizard-mongo-express:
     env_file:

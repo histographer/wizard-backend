@@ -36,14 +36,16 @@ services:
       WIZARD_BACKEND_PORT: ${WIZARD_TEST_TOMCAT_PORT}
       WIZARD_BACKEND_PROTOCOL: http
       ANALYSIS_PROTOCOL: http
-      ANALYSIS_URL: analysis_backend_test:80
+      ANALYSIS_URL: analysis-backend-test:80
   
   analysis:
     image: docker.pkg.github.com/histographer/analysis-rest-api/analysis-rest-api:latest
-    container_name: analysis_backend_test
+    container_name: analysis-backend-test
     restart: always
-    expose:
-      - 80
+    ports:
+      - 80:80
+    #expose:
+    #  - 80
   
 volumes:
   mongodata:

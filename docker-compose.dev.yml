@@ -18,17 +18,13 @@ services:
       - mongodevdata:/data/db
     ports:
       - ${DEV_WIZARD_MONGODB_PORT}:27017
-  
-  analysis_backend:
-    image: docker.pkg.github.com/histographer/analysis-rest-api/analysis-rest-api:latest
-    container_name: analysis_backend
-    restart: always
-    expose:
-      - 80
-  
+    
+    networks:
+      - wizard
+    
   wizard_backend:
     env_file:
-      - .env.sample
+      - .env
     container_name: ${DEV_WIZARD_BACKEND_CONTAINER_NAME}
     build:
       context: .
@@ -36,6 +32,8 @@ services:
     restart: always
     ports:
       - ${DEV_WIZARD_TOMCAT_PORT}:8080
+    expose:
+      - 8080
     environment:
       WIZARD_MONGODB_HOST: ${DEV_WIZARD_MONGO_CONTAINER_NAME}
       WIZARD_MONGODB_PORT: 27017
@@ -44,11 +42,14 @@ services:
       WIZARD_MONGODB_DATABASE: wizard_dev
       WIZARD_BACKEND_URL: localhost
       WIZARD_BACKEND_PORT: ${DEV_WIZARD_TOMCAT_PORT}
-      COMPARE_ANALYSIS_BASE_URL: http://analysis_backend:80
+      WIZARD_BACKEND_URL: ${DEV_WIZARD_BACKEND_CONTAINER_NAME}
+      WIZARD_BACKEND_PORT: 8080
+    networks:
+      - wizard
 
   wizard-mongo-express:
     env_file:
-      - .env.sample
+      - .env
     image: mongo-express
     restart: always
     ports:
@@ -56,6 +57,22 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${DEV_WIZARD_MONGODB_ROOT_USERNAME}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${DEV_WIZARD_MONGODB_ROOT_PASSWORD}
+    networks:
+      - wizard
+
+  analysis:
+    container_name: analysis
+    env_file:
+      - '.env'
+    image: docker.pkg.github.com/histographer/analysis-rest-api/analysis-rest-api:latest
+    expose:
+      - 80
+    networks:
+      - wizard
+
+networks:
+  wizard:
+    external: true
 
 volumes:
   mongodevdata:

@@ -10,6 +10,7 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -20,6 +21,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 /**
  * Adds environment variables to context
  */
+@WebListener
 public class EnvironmentContextListener implements ServletContextListener {
 
     /**
@@ -32,32 +34,50 @@ public class EnvironmentContextListener implements ServletContextListener {
         Boolean DEV = Boolean.parseBoolean(System.getenv("DEVELOPMENT"));
         String wizardURL = System.getenv("WIZARD_BACKEND_URL");
         String wizardPROTOCOL = System.getenv("WIZARD_BACKEND_PROTOCOL");
-        if(wizardPROTOCOL.isEmpty()) {
+        String analysisURL = System.getenv("ANALYSIS_URL");
+        String analysisPROTOCOL = System.getenv("ANALYSIS_PROTOCOL");
+
+        System.out.println("Environment variables: ");
+        System.out.println("WIZARD_BACKEND_URL="+wizardURL);
+        System.out.println("WIZARD_BACKEND_PROTOCOL="+wizardPROTOCOL);
+        System.out.println("ANALYSIS_URL="+analysisURL);
+        System.out.println("ANALYSIS_PROTOCOL="+analysisPROTOCOL);
+        if(analysisURL == null || analysisURL.isEmpty()) {
+            throw new NullPointerException("ANALYSIS_URL is not initiated. ANALYSIS_URL: "+analysisURL);
+        }
+        if(wizardPROTOCOL == null || wizardPROTOCOL.isEmpty()) {
             throw new NullPointerException("WIZARD_BACKEND_PROTOCOL is not initialized. WIZARD_BACKEND_PROTOCOL: "+wizardPROTOCOL);
         }
         if(wizardURL.isEmpty()) {
             throw new NullPointerException("WIZARD_BACKEND_URL is not initialized. WIZARD_BACKEND_URL: "+ wizardURL);
         }
-        URL url = null;
+        URL builtWizardBackendUrl = null;
+        URL builtAnalysisUrl= null;
         if(DEV) {
             String wizardPORT= System.getenv("WIZARD_BACKEND_PORT");
             if(wizardPORT.isEmpty()) {
                 throw new NullPointerException("WIZARD_BACKEND_PORT is not initialized. WIZARD_BACKEND_PORT: "+ wizardPORT);
             }
             try {
-                url = new URL(wizardPROTOCOL+"://"+wizardURL+":"+wizardPORT);
+                builtWizardBackendUrl = new URL(wizardPROTOCOL+"://"+wizardURL+":"+wizardPORT);
             } catch (MalformedURLException e) {
                 throw new IllegalStateException("Error creating complete WIZARD_BACKEND_URL for development. Protocol: "+wizardPROTOCOL+". URL: "+wizardURL+". PORT: "+wizardPORT);
             }
         } else {
             try {
-                url = new URL(wizardPROTOCOL+"://"+wizardURL);
+                builtWizardBackendUrl= new URL(wizardPROTOCOL+"://"+wizardURL);
             } catch (MalformedURLException e) {
                 throw new IllegalStateException("Error creating complete WIZARD_BACKEND_URL for production. Protocol: "+wizardPROTOCOL+". URL: "+wizardURL);
             }
         }
-        context.setAttribute("WIZARD_BACKEND_URL", url);
-        context.log("Environment variables successfully added to context");
+        try {
+           builtAnalysisUrl = new URL(analysisPROTOCOL+"://"+analysisURL);
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("Error creating complete ANALYSIS_URL . Protocol: "+analysisPROTOCOL+". URL: "+wizardPROTOCOL);
+        }
+        context.setAttribute("ANALYSIS_URL", builtAnalysisUrl);
+        context.setAttribute("WIZARD_BACKEND_URL", builtWizardBackendUrl);
+        System.out.println("Environment variables successfully added to context");
     }
 
     @Override

@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
@@ -32,6 +34,7 @@ public class StartAnalysisServlet extends HttpServlet {
         MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
         MongoAnnotationGroupDAO dao = new MongoAnnotationGroupDAO(client, databaseName);
         MongoAnalysisInformationDAO analysisInformationDao = new MongoAnalysisInformationDAO(client, databaseName);
+        AnalysisPostBody analysisPostBody = null;
         try {
             String requestJson = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
             AnalysisPostRequest analysisPostRequest = AnalysisPostRequest.fromJsonString(requestJson);
@@ -46,7 +49,7 @@ public class StartAnalysisServlet extends HttpServlet {
             }
 
             URL wizardURL = (URL) context.getAttribute("WIZARD_BACKEND_URL");
-            AnalysisPostBody analysisPostBody = new AnalysisPostBody().setAnalysisId(id)
+            analysisPostBody = new AnalysisPostBody().setAnalysisId(id)
                     .setProjectId(annotationGroup.getProjectId())
                     .setAnnotations(annotationGroup.getAnnotationIds())
                     .setAnalysis(analysisPostRequest.getAnalysis())
@@ -54,15 +57,37 @@ public class StartAnalysisServlet extends HttpServlet {
                             .setUpdateStatus(wizardURL+"/analysisInformation"));
 
             AnalysisPostBody.validate(analysisPostBody);
-            response.getWriter().print(new JSONObject(info));
-            // TODO send message to analyze backend
+
 
             //analysisPostBody.setAnnotations(annotationGroup.getAnnotationIds());
         } catch (IllegalArgumentException| NullPointerException | ClassCastException e) {
             context.log(e.toString());
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
         }
-        response.setStatus(HttpServletResponse.SC_ACCEPTED);
 
+        if(analysisPostBody == null) {
+           response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Something went wrong, the post body is null at StartAnalysisServlet. Failure in WIZARD_BACKEND");
+        }
+
+        URL analysisURL = (URL) context.getAttribute("ANALYSIS_URL");
+        analysisURL = new URL(analysisURL, "analysis/analyze/");
+        String requestJsonString = AnalysisPostBody.toJsonString(analysisPostBody);
+        context.log("StartAnalysisServlet tries to connect to: "+analysisURL.toString());
+        context.log("With body: "+requestJsonString);
+        HttpURLConnection connection = (HttpURLConnection) analysisURL.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Accept", "application/json");
+        connection.setDoOutput(true);
+        try (PrintWriter writer = new PrintWriter(connection.getOutputStream())) {
+            writer.print(requestJsonString);
+            writer.flush();
+        }
+        connection.connect();
+        int responseCode = connection.getResponseCode();
+        if (responseCode != 200) {
+            response.sendError(responseCode, "Expected response code 200 from analysis, but got  " + responseCode);
+        }
+        response.setStatus(HttpServletResponse.SC_ACCEPTED);
     }
 }

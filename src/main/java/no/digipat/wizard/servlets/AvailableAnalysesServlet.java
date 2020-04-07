@@ -30,7 +30,7 @@ public class AvailableAnalysesServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        URL baseUrl = (URL) getServletContext().getAttribute("ANALYSIS_BASE_URL");
+        URL baseUrl = (URL) getServletContext().getAttribute("ANALYSIS_URL");
         HttpURLConnection connection = (HttpURLConnection) new URL(baseUrl, "analysis/available/?format=json").openConnection();
         connection.setRequestProperty("Accept", "application/json");
         connection.connect();

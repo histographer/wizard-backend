@@ -36,6 +36,7 @@ public class AnalysisInformationServlet extends HttpServlet {
      * 
      * <pre>
      * {
+     *   "groupName": groupName,
      *   "analysisId": analysisId,
      *   "annotationGroupId": groupId
      *   "status": status

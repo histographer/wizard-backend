@@ -57,6 +57,16 @@ services:
     networks:
       - wizard
 
+  analysis:
+    container_name: analysis
+    env_file:
+      - '.env'
+    image: docker.pkg.github.com/histographer/analysis-rest-api/analysis-rest-api:latest
+    expose:
+      - 80
+    networks:
+      - wizard
+
 networks:
   wizard:
     external: true

@@ -10,6 +10,7 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -20,6 +21,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 /**
  * Adds environment variables to context
  */
+@WebListener
 public class EnvironmentContextListener implements ServletContextListener {
 
     /**
@@ -34,6 +36,12 @@ public class EnvironmentContextListener implements ServletContextListener {
         String wizardPROTOCOL = System.getenv("WIZARD_BACKEND_PROTOCOL");
         String analysisURL = System.getenv("ANALYSIS_URL");
         String analysisPROTOCOL = System.getenv("ANALYSIS_PROTOCOL");
+
+        System.out.println("Environment variables: ");
+        System.out.println("WIZARD_BACKEND_URL="+wizardURL);
+        System.out.println("WIZARD_BACKEND_PROTOCOL="+wizardPROTOCOL);
+        System.out.println("ANALYSIS_URL="+analysisURL);
+        System.out.println("ANALYSIS_PROTOCOL="+analysisPROTOCOL);
         if(analysisURL == null || analysisURL.isEmpty()) {
             throw new NullPointerException("ANALYSIS_URL is not initiated. ANALYSIS_URL: "+analysisURL);
         }
@@ -63,11 +71,13 @@ public class EnvironmentContextListener implements ServletContextListener {
             }
         }
         try {
-           analysis = new URL(analysisPROTOCOL+"://"+analysisURL);
+           builtAnalysisUrl = new URL(analysisPROTOCOL+"://"+analysisURL);
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("Error creating complete ANALYSIS_URL . Protocol: "+analysisPROTOCOL+". URL: "+wizardPROTOCOL);
         }
         context.setAttribute("ANALYSIS_URL", builtAnalysisUrl);
         context.setAttribute("WIZARD_BACKEND_URL", builtWizardBackendUrl);
-        context.log("Environment variables successfully added to context");
+        System.out.println("Environment variables successfully added to context");
     }
 
     @Override

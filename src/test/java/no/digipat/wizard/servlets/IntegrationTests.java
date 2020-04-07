@@ -21,7 +21,8 @@ import com.mongodb.MongoClientURI;
     StartAnalysisServletTest.class,
     AnalysisResultsServletTest.class,
     AnalysisInformationServletTest.class,
-    ExportAnalysisResultsTest.class
+    ExportAnalysisResultsTest.class,
+    AvailableAnalysesTest.class
 })
 public class IntegrationTests {
     

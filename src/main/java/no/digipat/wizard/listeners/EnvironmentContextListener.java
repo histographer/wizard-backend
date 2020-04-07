@@ -32,31 +32,41 @@ public class EnvironmentContextListener implements ServletContextListener {
         Boolean DEV = Boolean.parseBoolean(System.getenv("DEVELOPMENT"));
         String wizardURL = System.getenv("WIZARD_BACKEND_URL");
         String wizardPROTOCOL = System.getenv("WIZARD_BACKEND_PROTOCOL");
-        if(wizardPROTOCOL.isEmpty()) {
+        String analysisURL = System.getenv("ANALYSIS_URL");
+        String analysisPROTOCOL = System.getenv("ANALYSIS_PROTOCOL");
+        if(analysisURL == null || analysisURL.isEmpty()) {
+            throw new NullPointerException("ANALYSIS_URL is not initiated. ANALYSIS_URL: "+analysisURL);
+        }
+        if(wizardPROTOCOL == null || wizardPROTOCOL.isEmpty()) {
             throw new NullPointerException("WIZARD_BACKEND_PROTOCOL is not initialized. WIZARD_BACKEND_PROTOCOL: "+wizardPROTOCOL);
         }
         if(wizardURL.isEmpty()) {
             throw new NullPointerException("WIZARD_BACKEND_URL is not initialized. WIZARD_BACKEND_URL: "+ wizardURL);
         }
-        URL url = null;
+        URL builtWizardBackendUrl = null;
+        URL builtAnalysisUrl= null;
         if(DEV) {
             String wizardPORT= System.getenv("WIZARD_BACKEND_PORT");
             if(wizardPORT.isEmpty()) {
                 throw new NullPointerException("WIZARD_BACKEND_PORT is not initialized. WIZARD_BACKEND_PORT: "+ wizardPORT);
             }
             try {
-                url = new URL(wizardPROTOCOL+"://"+wizardURL+":"+wizardPORT);
+                builtWizardBackendUrl = new URL(wizardPROTOCOL+"://"+wizardURL+":"+wizardPORT);
             } catch (MalformedURLException e) {
                 throw new IllegalStateException("Error creating complete WIZARD_BACKEND_URL for development. Protocol: "+wizardPROTOCOL+". URL: "+wizardURL+". PORT: "+wizardPORT);
             }
         } else {
             try {
-                url = new URL(wizardPROTOCOL+"://"+wizardURL);
+                builtWizardBackendUrl= new URL(wizardPROTOCOL+"://"+wizardURL);
             } catch (MalformedURLException e) {
                 throw new IllegalStateException("Error creating complete WIZARD_BACKEND_URL for production. Protocol: "+wizardPROTOCOL+". URL: "+wizardURL);
             }
         }
-        context.setAttribute("WIZARD_BACKEND_URL", url);
+        try {
+           analysis = new URL(analysisPROTOCOL+"://"+analysisURL);
+        }
+        context.setAttribute("ANALYSIS_URL", builtAnalysisUrl);
+        context.setAttribute("WIZARD_BACKEND_URL", builtWizardBackendUrl);
         context.log("Environment variables successfully added to context");
     }
 

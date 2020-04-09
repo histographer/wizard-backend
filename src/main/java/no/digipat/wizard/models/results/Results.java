@@ -21,7 +21,7 @@ public class Results {
     @NotNull(message = "Results: annotationId can not be null")
     private Long annotationId;
     @NotEmpty(message = "Results: List can not be null or empty")
-    private Map<String, Map<String, Map<String, Float>>> results;
+    private List<AnalysisResult> results;
 
     public Long getAnnotationId() {
         return annotationId;
@@ -32,11 +32,11 @@ public class Results {
         return this;
     }
 
-    public Map<String, Map<String, Map<String, Float>>> getResults() {
+    public List<AnalysisResult> getResults() {
         return results;
     }
 
-    public Results setResults(Map<String, Map<String, Map<String, Float>>> results) {
+    public Results setResults(List<AnalysisResult> results) {
         this.results = results;
         return this;
     }

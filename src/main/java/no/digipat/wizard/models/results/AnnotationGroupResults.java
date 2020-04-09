@@ -24,18 +24,17 @@ import java.util.List;
 public class AnnotationGroupResults {
     @NotBlank(message = "AnnotationGroupResults: AnalysisId can not be null or empty")
     @BsonId
-    private String analysisId;
+    private String groupId;
 
     @NotEmpty(message = "AnnotationGroupResults: results can not be null or empty")
     private List<Results> annotations;
 
-
-    public String getAnalysisId() {
-        return analysisId;
+    public String getGroupId() {
+        return groupId;
     }
 
-    public AnnotationGroupResults setAnalysisId(String analysisId) {
-        this.analysisId = analysisId;
+    public AnnotationGroupResults setGroupId(String groupId) {
+        this.groupId = groupId;
         return this;
     }
 
@@ -53,7 +52,7 @@ public class AnnotationGroupResults {
     @Override
     public String toString() {
         return "AnnotationGroupResults{" +
-                "analysisId='" + analysisId + '\'' +
+                "analysisId='" + groupId + '\'' +
                 ", annotations=" + annotations +
                 '}';
     }

@@ -18,14 +18,24 @@ import java.util.Map;
 @EqualsAndHashCode
 public class AnalysisResult {
     @NotEmpty(message = "Result: Values can not be null or empty")
-    private Map<String, Integer> values;
+    private List<AnalysisComponent> components;
+    private String name;
 
-    public Map<String, Integer> getValues() {
-        return values;
+    public List<AnalysisComponent> getComponents() {
+        return components;
     }
 
-    public AnalysisResult setValues(Map<String, Integer> values) {
-        this.values = values;
+    public AnalysisResult setComponents(List<AnalysisComponent> components) {
+        this.components = components;
+        return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public AnalysisResult setName(String name) {
+        this.name = name;
         return this;
     }
 }

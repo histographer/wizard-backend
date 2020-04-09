@@ -15,7 +15,7 @@ public class AnalysisPostBodyTests {
 
     @Before
     public void setUp() {
-     analysisJson= "{\"projectId\":4,\"analysisId\":\"abc\",\"annotations\":[1,2,3],\"analysis\":[\"he\",\"rgb\"], \"callbackURLs\":{\"analysisResults\":\"localhost\", \"updateStatus\":\"localhost\"}";
+     analysisJson= "{\"analysisId\":\"abc\",\"projectId\":4,\"annotations\":[1,2,3],\"analysis\":[\"he\",\"rgb\"], \"callbackURLs\":{\"analysisResults\":\"localhost\", \"updateStatus\":\"localhost\"}}";
      analysisPostBody = new AnalysisPostBody().setAnalysisId("abc")
              .setAnnotations(new ArrayList<Long>(){{ add(1l); add(2l); add(3l);}})
              .setAnalysis(new ArrayList<String>(){{ add("he"); add("rgb");}})
@@ -23,18 +23,12 @@ public class AnalysisPostBodyTests {
              .setCallbackURLs(new CallbackURLs().setAnalysisResults("localhost").setUpdateStatus("localhost"));
     }
 
-    @Test
-    public void toJsonFromAnalyzeModel() {
-        String json = AnalysisPostBody.toJsonString(analysisPostBody);
-        assertEquals(json, analysisJson);
-    }
 
     @Test
     public void toAnalyzeFromJsonString() {
         AnalysisPostBody analysisPostBodyConverted = AnalysisPostBody.fromJsonString(analysisJson);
         assertEquals(analysisPostBody.getAnalysis(), analysisPostBodyConverted.getAnalysis());
         assertEquals(analysisPostBody.getAnnotations(), analysisPostBodyConverted.getAnnotations());
-
     }
 
     @Test(expected=IllegalArgumentException.class)

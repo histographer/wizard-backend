@@ -36,12 +36,14 @@ public class EnvironmentContextListener implements ServletContextListener {
         String wizardPROTOCOL = System.getenv("WIZARD_BACKEND_PROTOCOL");
         String analysisURL = System.getenv("ANALYSIS_URL");
         String analysisPROTOCOL = System.getenv("ANALYSIS_PROTOCOL");
+        String tempPath = System.getenv("WIZARD_TEMP_STORAGE_PATH");
 
         System.out.println("Environment variables: ");
         System.out.println("WIZARD_BACKEND_URL="+wizardURL);
         System.out.println("WIZARD_BACKEND_PROTOCOL="+wizardPROTOCOL);
         System.out.println("ANALYSIS_URL="+analysisURL);
         System.out.println("ANALYSIS_PROTOCOL="+analysisPROTOCOL);
+
         if(analysisURL == null || analysisURL.isEmpty()) {
             throw new NullPointerException("ANALYSIS_URL is not initiated. ANALYSIS_URL: "+analysisURL);
         }

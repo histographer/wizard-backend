@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import no.digipat.wizard.models.CSVcreator;
+import no.digipat.wizard.models.results.AnnotationGroupResults;
+import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
 import org.json.JSONObject;
 
 import com.mongodb.MongoClient;
@@ -36,28 +39,44 @@ public class ExportAnalysisResultsServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String analysisId = request.getParameter("analysisId");
-        if (analysisId == null) {
+        String groupId = request.getParameter("groupId");
+        String analyzeType = request.getParameter("analyzeType");
+        //String path = (String) getServletContext().getAttribute("STORAGE_PATH");
+        String path = getServletContext().getRealPath("/");;
+        if (groupId == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-        } else {
-            MongoCsvResultDAO dao = getDao();
-            CsvResult csvResult = dao.getCsvResult(analysisId);
-            if (csvResult == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            } else {
-                JSONObject responseJson = new JSONObject();
-                responseJson.put("data", csvResult.getData());
-                response.setContentType("application/json");
-                response.getWriter().print(responseJson);
+        }
+        MongoResultsDAO dao = getDao();
+        AnnotationGroupResults results = dao.getResults(groupId);
+        String base64 = null;
+        if(analyzeType == null) {
+            try {
+                base64 = CSVcreator.toCSV(results.getAnnotations(), path, null);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        } else {
+            try {
+                base64 = CSVcreator.toCSV(results.getAnnotations(), path, analyzeType);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if(base64 == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        } else {
+            JSONObject responseJson = new JSONObject();
+            responseJson.put("data", base64);
+            response.setContentType("application/json");
+            response.getWriter().print(responseJson);
         }
     }
     
-    private MongoCsvResultDAO getDao() {
+    private MongoResultsDAO getDao() {
         ServletContext context = getServletContext();
         MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
         String databaseName = (String) context.getAttribute("MONGO_DATABASE");
-        return new MongoCsvResultDAO(client, databaseName);
+        return new MongoResultsDAO(client, databaseName);
     }
     
 }

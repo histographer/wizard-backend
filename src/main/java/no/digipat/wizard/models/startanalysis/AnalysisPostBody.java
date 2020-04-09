@@ -61,10 +61,10 @@ public class AnalysisPostBody {
 
     public static AnalysisPostBody fromJsonString(String json) {
         if(json == null) {
-            throw new NullPointerException("Analyze: Json is not set");
+            throw new NullPointerException("AnalysisPostBody: Json is not set");
         }
         if(json.isEmpty()) {
-            throw new NullPointerException("Analyze: Jsonstring is empty");
+            throw new NullPointerException("AnalysisPostBody: Jsonstring is empty");
         }
 
         Gson gson = new Gson();
@@ -72,11 +72,11 @@ public class AnalysisPostBody {
         try {
             analysisPostBody = gson.fromJson(json, AnalysisPostBody.class);
         } catch (Exception e) {
-            throw new RuntimeException("AnnotationGroupResults: Can not create AnnotationGroupResults from json string. Input: "+json);
+            throw new RuntimeException("AnalysisPostBody: Can not create AnalysisPostBody from json string. Input: "+json);
         }
 
         if(analysisPostBody.getAnalysisId() == null) {
-            throw new NullPointerException("AnnotationGroupResults: analysisId is empty. Input: "+json);
+            throw new NullPointerException("AnalysisPostBody: analysisId is empty. Input: "+json);
         }
         return analysisPostBody;
     }

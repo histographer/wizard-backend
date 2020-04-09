@@ -6,6 +6,7 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import no.digipat.wizard.models.AnnotationGroup;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
 import no.digipat.wizard.models.results.AnalysisResult;
 import no.digipat.wizard.models.results.AnnotationGroupResultsRequestBody;
@@ -13,12 +14,15 @@ import no.digipat.wizard.models.results.Results;
 import com.google.gson.Gson;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.conversions.Bson;
 
+import javax.management.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -67,12 +71,43 @@ public class MongoResultsDAO {
             collection.insertOne(annotationGroupResults);
         } catch (MongoWriteException e) {
             if (e.getCode() == 11000) { // Error code 11000 indicates a duplicate key
-                throw new IllegalStateException("Duplicate analysis ID", e);
+                throw new IllegalStateException("Duplicate group ID", e);
             } else {
                 throw e;
             }
         }
     }
+
+    public void createAndUpdateResults(AnnotationGroupResults annotationGroupResults) {
+        AnnotationGroupResults res = collection.find(eq("_id", annotationGroupResults.getGroupId())).first();
+        if(res == null) {
+            createAnnotationGroupResults(annotationGroupResults);
+        }
+        else {
+            List<Results> annotations = res.getAnnotations();
+            List<Results> newAnnotations = annotationGroupResults.getAnnotations();
+            boolean isPresent = false;
+            for (int i = 0; i < annotations.size(); i++) {
+                for (int j = 0; j < newAnnotations.size(); j++) {
+                    // Check if it is the same annotation
+                    if(annotations.get(i).getAnnotationId() == newAnnotations.get(j).getAnnotationId()) {
+                        // Need to check if the annotation exists in the scope
+                        List<AnalysisResult> oldAnalysisResults = annotations.get(i).getResults();
+                        List<AnalysisResult> newAnalysisResults = newAnnotations.get(j).getResults();
+                        Set<AnalysisResult> set = new LinkedHashSet<>(oldAnalysisResults);
+                        set.addAll(newAnalysisResults);
+
+                        List<AnalysisResult> combinedList = new ArrayList<>(set);
+                        annotations.get(i).setResults(combinedList);
+                    }
+                }
+            }
+            res.setAnnotations(annotations);
+            collection.findOneAndReplace(eq("_id", annotationGroupResults.getGroupId()), res);
+        }
+    }
+
+
 
     /**
      * Validate annotation group results data structure is valid.

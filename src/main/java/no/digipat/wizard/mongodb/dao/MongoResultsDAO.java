@@ -1,12 +1,13 @@
 package no.digipat.wizard.mongodb.dao;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoWriteException;
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import no.digipat.wizard.models.AnnotationGroup;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
 import no.digipat.wizard.models.results.AnalysisResult;
 import no.digipat.wizard.models.results.AnnotationGroupResultsRequestBody;
@@ -15,6 +16,7 @@ import com.google.gson.Gson;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
+import org.json.JSONObject;
 
 import javax.management.Query;
 import javax.validation.ConstraintViolation;
@@ -212,9 +214,13 @@ public class MongoResultsDAO {
      * @param annotationGroupResults the annotation group results
      * @return the string
      */
-    public static String annotationGroupResultsToJson(AnnotationGroupResults annotationGroupResults) {
+    public static String annotationGroupResultsToJson(AnnotationGroupResults annotationGroupResults, String annotationGroupName) {
         Gson gson = new Gson();
-        return gson.toJson(annotationGroupResults);
+        String jsonString = gson.toJson(annotationGroupResults);
+        JsonElement element = gson.fromJson(jsonString, JsonElement.class);
+        JsonObject json = element.getAsJsonObject();
+        json.addProperty("groupName", annotationGroupName);
+        return gson.toJson(json);
     }
 
 }

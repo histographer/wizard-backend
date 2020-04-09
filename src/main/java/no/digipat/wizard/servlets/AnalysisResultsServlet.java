@@ -2,9 +2,11 @@ package no.digipat.wizard.servlets;
 
 import com.mongodb.MongoClient;
 import no.digipat.wizard.models.AnalysisInformation;
+import no.digipat.wizard.models.AnnotationGroup;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
 import no.digipat.wizard.models.results.AnnotationGroupResultsRequestBody;
 import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
+import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
 
 import javax.servlet.ServletException;
@@ -117,17 +119,19 @@ public class AnalysisResultsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         MongoResultsDAO dao = new MongoResultsDAO(getDatabaseClient(), getDatabaseName());
+        MongoAnnotationGroupDAO MAGdao = new MongoAnnotationGroupDAO(getDatabaseClient(), getDatabaseName());
         String analysisId = request.getParameter("groupId");
         if (analysisId == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
         AnnotationGroupResults results = dao.getResults(analysisId);
+        AnnotationGroup group = MAGdao.getAnnotationGroup(analysisId);
         if (results == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
             response.setContentType("application/json");
-            response.getWriter().print(MongoResultsDAO.annotationGroupResultsToJson(results));
+            response.getWriter().print(MongoResultsDAO.annotationGroupResultsToJson(results, group.getName()));
         }
     }
     

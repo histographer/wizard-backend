@@ -6,9 +6,7 @@ import junitparams.JUnitParamsRunner;
 import no.digipat.wizard.models.AnalysisInformation;
 import no.digipat.wizard.models.AnalysisInformation.Status;
 import no.digipat.wizard.models.AnnotationGroup;
-import no.digipat.wizard.models.results.AnalysisResult;
-import no.digipat.wizard.models.results.AnnotationGroupResults;
-import no.digipat.wizard.models.results.Results;
+import no.digipat.wizard.models.results.*;
 import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
@@ -55,7 +53,7 @@ public class AnalysisResultsServletTest {
         conversation = new WebConversation();
         analyzeBodyInvalid = "{\"annotations\":[\"1\",\"2\",\"3\"],\"analysis\":[\"he\",\"rgb\"]}";
         //analyzeBodyValid = "{\"analysisId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"annotations\":[{\"annotationId\":2,\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
-        analyzeBodyValid = "{\"analysisId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"csvBase64\":\"abc\",\"annotations\":[{\"annotationId\":1,\"results\":{\"he\":{\"H\":{\"mean\":-0.4941735897897377,\"std\":0.04383346025184383},\"E\":{\"mean\":0.20421988842343536,\"std\":0.012792263926458863}}}}]}";
+        analyzeBodyValid = "{\"analysisId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"annotations\":[{\"annotationId\":1064743,\"results\":[{\"name\":\"HE\",\"components\":[{\"name\":\"H\",\"components\":[{\"name\":\"mean\",\"val\":-0.44739692704068174},{\"name\":\"std\",\"val\":0.08928628449947514}]}]}]}]}";
     }
     
     private static PostMethodWebRequest createPostRequest(String path, String messageBody, String contentType) throws Exception {
@@ -64,15 +62,13 @@ public class AnalysisResultsServletTest {
     }
 
     private Results createResults(String resName, Float value) {
-        Map<String, Float> values = new HashMap<>();
-        values.put("mean", 0.333f);
-        values.put("std", 0.555f);
-        Map<String, Map<String, Float>> tempres= new HashMap<>();
-        tempres.put("H", values);
-        tempres.put("E", values);
-        Map<String, Map<String, Map<String, Float>>> results= new HashMap<>();
-        results.put("HE", tempres);
-        return new Results().setAnnotationId(1l).setResults(results);
+        AnalysisValue value1 = new AnalysisValue().setName("mean").setVal(-0.333f);
+        AnalysisValue value2 = new AnalysisValue().setName("std").setVal(-0.333f);
+        AnalysisComponent analysisComponent1 = new AnalysisComponent().setName("H").setComponents(new ArrayList(){{add(value1); add(value2);}});
+        AnalysisComponent analysisComponent2 = new AnalysisComponent().setName("E").setComponents(new ArrayList(){{add(value1); add(value2);}});
+        AnalysisResult analysisResults = new AnalysisResult().setName("HE").setComponents(new ArrayList(){{add(analysisComponent1); add(analysisComponent2);}});
+        Results results = new Results().setAnnotationId(3l).setResults(new ArrayList(){{add(analysisResults);}});
+        return results;
     }
 
     @Test
@@ -95,6 +91,7 @@ public class AnalysisResultsServletTest {
     @Test
     public void testStatusCode202OnValidPost() throws Exception {
         String grpId = "cccccccccccccccccccccccc";
+        String analysisId = "aaaaaaaaaaaaaaaaaaaaaaaa";
         AnnotationGroup group1 = new AnnotationGroup()
                 .setGroupId(grpId)
                 .setAnnotationIds(Arrays.asList(1L, 2L))
@@ -102,17 +99,19 @@ public class AnalysisResultsServletTest {
                 .setName("group 1")
                 .setProjectId(20L);
         groupDao.createAnnotationGroup(group1);
-        infoDao.createAnalysisInformation(new AnalysisInformation().setAnalysisId("aaaaaaaaaaaaaaaaaaaaaaaa").setAnnotationGroupId(grpId).setStatus(AnalysisInformation.Status.PENDING));
+        infoDao.createAnalysisInformation(new AnalysisInformation().setAnalysisId(analysisId).setAnnotationGroupId(grpId).setStatus(AnalysisInformation.Status.PENDING));
         WebRequest request = createPostRequest("analysisResults",analyzeBodyValid, "application/json");
         WebResponse response = conversation.getResponse(request);
         System.out.println(IOUtils.toString(response.getInputStream(), StandardCharsets.UTF_8));
         assertEquals("Testing with message body: " + analyzeBodyValid + ".", 201, response.getResponseCode());
         AnnotationGroup grp = groupDao.getAnnotationGroup(grpId);
         assertNotEquals(grp, null);
-        AnnotationGroupResults agr = resultDao.getResults("aaaaaaaaaaaaaaaaaaaaaaaa");
-        AnalysisInformation info = infoDao.getAnalysisInformation("aaaaaaaaaaaaaaaaaaaaaaaa");
+        AnnotationGroupResults agr = resultDao.getResults(grpId);
+        AnalysisInformation info = infoDao.getAnalysisInformation(analysisId);
         assertEquals(info.getStatus(), AnalysisInformation.Status.SUCCESS);
-        assertEquals(MongoResultsDAO.jsonToAnnotationGroupResults(analyzeBodyValid), agr);
+        AnnotationGroupResultsRequestBody res = MongoResultsDAO.jsonToAnnotationGroupResultsRequestBody(analyzeBodyValid);
+        AnnotationGroupResults valid = new AnnotationGroupResults().setGroupId(info.getAnnotationGroupId()).setAnnotations(res.getAnnotations());
+        assertEquals(valid, agr);
     }
     
     @Test
@@ -148,7 +147,7 @@ public class AnalysisResultsServletTest {
     
     @Test
     public void testStatusCode404OnGettingNonexistentResults() throws Exception {
-        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisResults?analysisId=aaaaaaaaaaaaaaaaaaaaaaaa");
+        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisResults?groupId=aaaaaaaaaaaaaaaaaaaaaaaa");
         
         WebResponse response = conversation.getResponse(request);
         
@@ -158,14 +157,14 @@ public class AnalysisResultsServletTest {
     @Test
     public void testGetResults() throws Exception {
         AnnotationGroupResults results = new AnnotationGroupResults()
-                .setAnalysisId("aaaaaaaaaaaaaaaaaaaaaaaa")
+                .setGroupId("aaaaaaaaaaaaaaaaaaaaaaaa")
                 .setAnnotations(Arrays.asList(
                         createResults("he", 0.44f),
                         createResults("bc", 0.3f)
                 ));
         resultDao.createAnnotationGroupResults(results);
         
-        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisResults?analysisId=aaaaaaaaaaaaaaaaaaaaaaaa");
+        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisResults?groupId=aaaaaaaaaaaaaaaaaaaaaaaa");
         WebResponse response = conversation.getResponse(request);
         
         assertEquals(200, response.getResponseCode());

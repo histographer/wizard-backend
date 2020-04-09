@@ -3,6 +3,7 @@ package no.digipat.wizard.servlets;
 import com.mongodb.MongoClient;
 import no.digipat.wizard.models.AnalysisInformation;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
+import no.digipat.wizard.models.results.AnnotationGroupResultsRequestBody;
 import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
 
@@ -57,9 +58,9 @@ public class AnalysisResultsServlet extends HttpServlet {
         MongoResultsDAO resultsDao = new MongoResultsDAO(client, databaseName);
         MongoAnalysisInformationDAO analysisInfoDao = new MongoAnalysisInformationDAO(client, databaseName);
         String requestJson = IOUtils.toString(request.getReader());
-        AnnotationGroupResults results;
+        AnnotationGroupResultsRequestBody results;
         try {
-            results = MongoResultsDAO.jsonToAnnotationGroupResults(requestJson);
+            results = MongoResultsDAO.jsonToAnnotationGroupResultsRequestBody(requestJson);
         } catch (IllegalArgumentException | NullPointerException | IllegalStateException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
             return;
@@ -69,7 +70,8 @@ public class AnalysisResultsServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
             try {
-                resultsDao.createAnnotationGroupResults(results);
+                AnnotationGroupResults annotationGroupResults = new AnnotationGroupResults().setGroupId(info.getAnnotationGroupId()).setAnnotations(results.getAnnotations());
+                resultsDao.createAnnotationGroupResults(annotationGroupResults);
             } catch (IllegalStateException e) { // Duplicate analysis ID
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
@@ -115,7 +117,7 @@ public class AnalysisResultsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         MongoResultsDAO dao = new MongoResultsDAO(getDatabaseClient(), getDatabaseName());
-        String analysisId = request.getParameter("analysisId");
+        String analysisId = request.getParameter("groupId");
         if (analysisId == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;

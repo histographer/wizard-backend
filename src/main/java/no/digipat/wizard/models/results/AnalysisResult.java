@@ -38,4 +38,12 @@ public class AnalysisResult {
         this.name = name;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "AnalysisResult{" +
+                "components=" + components +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

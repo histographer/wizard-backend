@@ -1,7 +1,10 @@
 package no.digipat.wizard.models.results;
 
+import lombok.EqualsAndHashCode;
+
 import java.util.List;
 
+@EqualsAndHashCode
 public class AnalysisComponent {
     private String name;
 
@@ -23,5 +26,13 @@ public class AnalysisComponent {
     public AnalysisComponent setComponents(List<AnalysisValue> components) {
         this.components = components;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "AnalysisComponent{" +
+                "name='" + name + '\'' +
+                ", components=" + components +
+                '}';
     }
 }

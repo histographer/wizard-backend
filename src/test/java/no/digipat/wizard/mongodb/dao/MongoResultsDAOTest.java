@@ -1,8 +1,6 @@
 package no.digipat.wizard.mongodb.dao;
 
-import no.digipat.wizard.models.results.AnnotationGroupResults;
-import no.digipat.wizard.models.results.AnalysisResult;
-import no.digipat.wizard.models.results.Results;
+import no.digipat.wizard.models.results.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -43,61 +41,60 @@ public class MongoResultsDAOTest {
     @Before
     public void setUp() {
         dao = new MongoResultsDAO(client, databaseName);
-        analysisResultJsonString = "{\"analysisId\":32,\"csvBase64\":\"abc\",\"annotations\":[{\"annotationId\":1,\"results\":{\"he\":{\"H\":{\"mean\":-0.4941735897897377,\"std\":0.04383346025184383},\"E\":{\"mean\":0.20421988842343536,\"std\":0.012792263926458863}}}}]}";
-        analysisResultJsonStringNoGroupId = "{\"annotations\":[{\"annotationId\":1,\"results\":[{\"type\": \"he\",\"values\":{\"hematoxylin\":180,\"eosin\": 224}}]}]}";
-        analysisResultJsonStringNoGroupId = "{\"csvBase64\":\"abc\",\"annotations\":[{\"annotationId\":1,\"results\":{\"he\":{\"H\":{\"mean\":-0.4941735897897377,\"std\":0.04383346025184383},\"E\":{\"mean\":0.20421988842343536,\"std\":0.012792263926458863}}}}]}";
+
+        analysisResultJsonString = "{\"analysisId\":\"aaaaaaaaaaaaaaaaa\",\"annotations\":[{\"annotationId\":1064743,\"results\":[{\"name\":\"HE\",\"components\":[{\"name\":\"H\",\"components\":[{\"name\":\"mean\",\"val\":-0.44739692704068174},{\"name\":\"std\",\"val\":0.08928628449947514}]}]}]}]}";
+        //analysisResultJsonString = "{\"analysisId\":32,\"csvBase64\":\"abc\",\"annotations\":[{\"annotationId\":1,\"results\":{\"he\":{\"H\":{\"mean\":-0.4941735897897377,\"std\":0.04383346025184383},\"E\":{\"mean\":0.20421988842343536,\"std\":0.012792263926458863}}}}]}";
+        analysisResultJsonStringNoGroupId = "{\"annotations\":[{\"annotationId\":1064743,\"results\":[{\"name\":\"HE\",\"components\":[{\"name\":\"H\",\"components\":[{\"name\":\"mean\",\"val\":-0.44739692704068174},{\"name\":\"std\",\"val\":0.08928628449947514}]}]}]}]}";
         analysisResultJsonStringNoResults = "{\"analysisId\":\"testGroupdId\"";
         analysisResultJsonStringResultsNoLength = "{\"analysisId\":\"testGroupdId\",\"results\":[]}]}";
 
         Results res3 = createResults("he", 0.33f);
-        annotationGroupResults = new AnnotationGroupResults().setAnalysisId("1").setAnnotations(new ArrayList<Results>() {{ add(res3); }});
+        annotationGroupResults = new AnnotationGroupResults().setGroupId("1").setAnnotations(new ArrayList<Results>() {{ add(res3); }});
     }
 
 
     private Results createResults(String resName, Float value) {
-        Map<String, Float> values = new HashMap<>();
-        values.put("mean", 0.333f);
-        values.put("std", 0.555f);
-        Map<String, Map<String, Float>> tempres= new HashMap<>();
-        tempres.put("H", values);
-        tempres.put("E", values);
-        Map<String, Map<String, Map<String, Float>>> results= new HashMap<>();
-        results.put("HE", tempres);
-        return new Results().setAnnotationId(1l).setResults(results);
+        AnalysisValue value1 = new AnalysisValue().setName("mean").setVal(-0.333f);
+        AnalysisValue value2 = new AnalysisValue().setName("std").setVal(-0.333f);
+        AnalysisComponent analysisComponent1 = new AnalysisComponent().setName("H").setComponents(new ArrayList(){{add(value1); add(value2);}});
+        AnalysisComponent analysisComponent2 = new AnalysisComponent().setName("E").setComponents(new ArrayList(){{add(value1); add(value2);}});
+        AnalysisResult analysisResults = new AnalysisResult().setName("HE").setComponents(new ArrayList(){{add(analysisComponent1); add(analysisComponent2);}});
+        Results results = new Results().setAnnotationId(3l).setResults(new ArrayList(){{add(analysisResults);}});
+        return results;
     }
 
     private AnnotationGroupResults createAnnotationGroupResultsForTests() {
         Results res3 = createResults("yo", 30f);
         Results res4 = createResults("HE", -0.99f);
-        return new AnnotationGroupResults().setAnalysisId("1ask").setAnnotations(new ArrayList<Results>() {{ add(res3); add(res4);}});
+        return new AnnotationGroupResults().setGroupId("1ask").setAnnotations(new ArrayList<Results>() {{ add(res3); add(res4);}});
     }
 
 
 
     @Test(expected=NullPointerException.class)
     public void jsonToAnnotationGroupResultsNoAnalysisId() {
-        dao.jsonToAnnotationGroupResults(analysisResultJsonStringNoGroupId);
+        dao.jsonToAnnotationGroupResultsRequestBody(analysisResultJsonStringNoGroupId);
     }
     @Test(expected=RuntimeException.class)
     public void jsonToAnnotationGroupResultsNoResults() {
-        dao.jsonToAnnotationGroupResults(analysisResultJsonStringNoResults);
+        dao.jsonToAnnotationGroupResultsRequestBody(analysisResultJsonStringNoResults);
     }
     @Test(expected=NullPointerException.class)
     public void jsonToAnnotationGroupResultsNull() {
-        dao.jsonToAnnotationGroupResults(null);
+        dao.jsonToAnnotationGroupResultsRequestBody(null);
     }
     @Test(expected=IllegalArgumentException.class)
     public void jsonToAnnotationGroupResultsEmptyString() {
-        dao.jsonToAnnotationGroupResults("");
+        dao.jsonToAnnotationGroupResultsRequestBody("");
     }
     @Test(expected=IllegalArgumentException.class)
     public void jsonToAnnotationGroupResultsResultsNoLength() {
-        dao.jsonToAnnotationGroupResults(analysisResultJsonStringResultsNoLength);
+        dao.jsonToAnnotationGroupResultsRequestBody(analysisResultJsonStringResultsNoLength);
     }
 
     @Test
     public void jsonToAnnotationGroupResults() {
-        AnnotationGroupResults res = dao.jsonToAnnotationGroupResults(analysisResultJsonString);
+        AnnotationGroupResultsRequestBody res = dao.jsonToAnnotationGroupResultsRequestBody(analysisResultJsonString);
         System.out.println(res);
     }
 
@@ -114,7 +111,7 @@ public class MongoResultsDAOTest {
     @Test(expected=IllegalArgumentException.class)
     public void validationTestAnnotationGroupFail() {
        AnnotationGroupResults res = createAnnotationGroupResultsForTests();
-       res.setAnalysisId("");
+       res.setGroupId("");
        dao.validateAnnotationGroupResults(res);
     }
     @Test(expected=IllegalArgumentException.class)
@@ -133,7 +130,7 @@ public class MongoResultsDAOTest {
     @Test(expected=IllegalArgumentException.class)
     public void validationTestAnnotationResultsResultListFail() {
         AnnotationGroupResults res = createAnnotationGroupResultsForTests();
-        res.getAnnotations().get(0).setResults(new HashMap<String, Map<String, Map<String, Float>>>());
+        res.getAnnotations().get(0).setResults(new ArrayList<>());
         dao.validateAnnotationGroupResults(res);
     }
 
@@ -147,7 +144,7 @@ public class MongoResultsDAOTest {
     @Test(expected=IllegalArgumentException.class)
     public void createAnnotationGroupResultsFail() {
         AnnotationGroupResults res = createAnnotationGroupResultsForTests();
-        res.setAnalysisId("");
+        res.setGroupId("");
         dao.createAnnotationGroupResults(res);
     }
 
@@ -156,7 +153,7 @@ public class MongoResultsDAOTest {
 
         AnnotationGroupResults res = createAnnotationGroupResultsForTests();
         dao.createAnnotationGroupResults(res);
-        AnnotationGroupResults res1 = dao.getResults(res.getAnalysisId());
+        AnnotationGroupResults res1 = dao.getResults(res.getGroupId());
         System.out.println(res1);
     }
 
@@ -164,7 +161,7 @@ public class MongoResultsDAOTest {
     public void getResultsSuccess() {
         AnnotationGroupResults agr = createAnnotationGroupResultsForTests();
         dao.createAnnotationGroupResults(agr);
-        AnnotationGroupResults res = dao.getResults(agr.getAnalysisId());
+        AnnotationGroupResults res = dao.getResults(agr.getGroupId());
         assertEquals(agr, res);
     }
 

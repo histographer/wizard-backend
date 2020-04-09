@@ -1,6 +1,8 @@
 package no.digipat.wizard.models;
 
+import no.digipat.wizard.models.results.AnalysisComponent;
 import no.digipat.wizard.models.results.AnalysisResult;
+import no.digipat.wizard.models.results.AnalysisValue;
 import no.digipat.wizard.models.results.Results;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,15 +26,13 @@ public class ResultsTests {
 
 
     private Results createResults() {
-        Map<String, Float> values = new HashMap<>();
-        values.put("mean", 0.333f);
-        values.put("std", 0.555f);
-        Map<String, Map<String, Float>> tempres= new HashMap<>();
-        tempres.put("H", values);
-        tempres.put("E", values);
-        Map<String, Map<String, Map<String, Float>>> results= new HashMap<>();
-        results.put("HE", tempres);
-        return new Results().setAnnotationId(1l).setResults(results);
+        AnalysisValue value1 = new AnalysisValue().setName("mean").setVal(-0.333f);
+        AnalysisValue value2 = new AnalysisValue().setName("std").setVal(-0.333f);
+        AnalysisComponent analysisComponent1 = new AnalysisComponent().setName("H").setComponents(new ArrayList(){{add(value1); add(value2);}});
+        AnalysisComponent analysisComponent2 = new AnalysisComponent().setName("E").setComponents(new ArrayList(){{add(value1); add(value2);}});
+        AnalysisResult analysisResults = new AnalysisResult().setName("HE").setComponents(new ArrayList(){{add(analysisComponent1); add(analysisComponent2);}});
+        Results results = new Results().setAnnotationId(3l).setResults(new ArrayList(){{add(analysisResults);}});
+        return results;
     }
 
     @Test
@@ -52,7 +52,7 @@ public class ResultsTests {
         results.setResults(null);
         Set<ConstraintViolation<Results>> violations = validator.validate(results);
         assertEquals(violations.isEmpty(), false);
-        results.setResults(new HashMap<String, Map<String, Map<String, Float>>>());
+        results.setResults(new ArrayList<>());
         Set<ConstraintViolation<Results>> violations2 = validator.validate(results);
         assertEquals(violations2.isEmpty(), false);
     }

@@ -8,6 +8,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
 import no.digipat.wizard.models.results.AnalysisResult;
+import no.digipat.wizard.models.results.AnnotationGroupResultsRequestBody;
 import no.digipat.wizard.models.results.Results;
 import com.google.gson.Gson;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -108,11 +109,11 @@ public class MongoResultsDAO {
     /**
      * Gets an instance of {@code AnnotationGroupResults} from the database.
      *
-     * @param analysisId the analysisId
+     * @param groupId the analysisId
      * @return the results, or {@code null} if the results don't exist
      */
-    public AnnotationGroupResults getResults(String analysisId) {
-        return collection.find(eq("_id", analysisId)).first();
+    public AnnotationGroupResults getResults(String groupId) {
+        return collection.find(eq("_id", groupId)).first();
     }
 
     /**
@@ -139,8 +140,32 @@ public class MongoResultsDAO {
             throw new IllegalArgumentException("AnnotationGroupResults: Can not create AnnotationGroupResults from json string. Input: "+json+". Error: "+e);
         }
 
-        if(annotationGroupResults.getAnalysisId() == null) {
+        if(annotationGroupResults.getGroupId() == null) {
             throw new NullPointerException("AnnotationGroupResults: GroupId is empty. Input: "+json);
+        }
+
+        return annotationGroupResults;
+    }
+
+    public static AnnotationGroupResultsRequestBody jsonToAnnotationGroupResultsRequestBody(String json)
+            throws IllegalArgumentException, NullPointerException {
+        if(json == null) {
+            throw new NullPointerException("AnnotationGroupResultsRequestBody: Json is not set");
+        }
+        if(json.isEmpty()) {
+            throw new IllegalArgumentException("AnnotationGroupResultsRequestBody: Jsonstring is empty");
+        }
+
+        Gson gson = new Gson();
+        AnnotationGroupResultsRequestBody annotationGroupResults = null;
+        try {
+            annotationGroupResults = gson.fromJson(json, AnnotationGroupResultsRequestBody.class);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("AnnotationGroupResultsRequestBody: Can not create AnnotationGroupResults from json string. Input: "+json+". Error: "+e);
+        }
+
+        if(annotationGroupResults.getAnalysisId() == null) {
+            throw new NullPointerException("AnnotationGroupResultsRequestBody: analysisId is empty. Input: "+json);
         }
 
         return annotationGroupResults;

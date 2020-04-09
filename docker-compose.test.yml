@@ -33,6 +33,8 @@ services:
       WIZARD_BACKEND_URL: wizard_backend_test
       WIZARD_BACKEND_PORT: ${WIZARD_TEST_TOMCAT_PORT}
       WIZARD_BACKEND_PROTOCOL: http
+      ANALYSIS_URL: analysis
+      ANALYSIS_PROTOCOL: http
 
 volumes:
   mongodata:

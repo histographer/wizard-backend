@@ -4,7 +4,7 @@
   <groupId>no.digipat</groupId>
   <artifactId>wizard-backend</artifactId>
   <packaging>war</packaging>
-  <version>0.0.0-SNAPSHOT</version>
+  <version>0.0.1</version>
   <name>Wizard Backend</name>
   
   <properties>

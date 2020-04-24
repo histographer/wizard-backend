@@ -21,7 +21,6 @@ import org.apache.commons.io.IOUtils;
 @WebServlet(urlPatterns = "/analysisResults")
 public class AnalysisResultsServlet extends HttpServlet {
     
-    @Override
     /**
      * Inserts  analysis result into the database
      * object of the following form:
@@ -54,6 +53,7 @@ public class AnalysisResultsServlet extends HttpServlet {
      * </pre>
      *
      */
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String databaseName = getDatabaseName();
         MongoClient client = getDatabaseClient();
@@ -130,7 +130,6 @@ public class AnalysisResultsServlet extends HttpServlet {
         if (results == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
-            response.setContentType("application/json");
             response.getWriter().print(MongoResultsDAO.annotationGroupResultsToJson(results, group.getName()));
         }
     }

@@ -61,7 +61,6 @@ public class AnalysisInformationServlet extends HttpServlet {
             throws ServletException, IOException {
         MongoAnalysisInformationDAO dao = getDao();
         MongoAnnotationGroupDAO AGdao = getAnnotationGroupDao();
-        response.setContentType("application/json");
         String analysisId = request.getParameter("analysisId");
         String annotationGroupId = request.getParameter("annotationGroupId");
         try {

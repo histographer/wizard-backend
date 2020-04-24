@@ -64,7 +64,6 @@ public class AnnotationGroupServlet extends HttpServlet {
         
         JSONObject responseJson = new JSONObject();
         responseJson.put("groupId", groupId);
-        response.setContentType("application/json");
         response.getWriter().print(responseJson);
     }
     
@@ -106,7 +105,6 @@ public class AnnotationGroupServlet extends HttpServlet {
             array.put(groupJson);
         }
         responseJson.put("groups", array);
-        response.setContentType("application/json");
         response.getWriter().print(responseJson);
     }
     
@@ -124,8 +122,8 @@ public class AnnotationGroupServlet extends HttpServlet {
         String name = requestJson.getString("name");
         Long projectId = requestJson.getLong("projectId");
         Long[] idArray = annotationIds.toList().stream().<Long>map(id -> {
-            // The JSON array will represent integers using the Integer class, unless they're too big, in which
-            // case it uses the Long class
+            // The JSON array will represent integers using the Integer class, unless they're too big,
+            // in which case it uses the Long class
             if (id instanceof Long) {
                 return (Long) id;
             } else {

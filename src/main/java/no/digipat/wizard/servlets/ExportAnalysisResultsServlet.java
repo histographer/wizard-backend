@@ -67,7 +67,6 @@ public class ExportAnalysisResultsServlet extends HttpServlet {
         } else {
             JSONObject responseJson = new JSONObject();
             responseJson.put("data", base64);
-            response.setContentType("application/json");
             response.getWriter().print(responseJson);
         }
     }

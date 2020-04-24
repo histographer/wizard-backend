@@ -44,7 +44,6 @@ public class AvailableAnalysesServlet extends HttpServlet {
         }
         JSONObject jsonForResponse = new JSONObject();
         jsonForResponse.put("analysisTypes", jsonFromAnalysis.get("names"));
-        response.setContentType("application/json");
         response.getWriter().print(jsonForResponse);
     }
     

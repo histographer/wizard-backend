@@ -116,9 +116,15 @@
       <version>1.0.3</version>
     </dependency>
   </dependencies>
-    
+  
   <build>
     <plugins>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.0.0</version>
+      </plugin>
       
       <plugin>
         <!-- Unit test config -->

@@ -134,11 +134,9 @@
         <configuration>
           <includes>
             <include>DatabaseUnitTests.java</include>
-            <include>ResultTests.java</include>
             <include>ResultsTests.java</include>
             <include>CSVcreatorTest.java</include>
             <include>AnalysisPostBodyTests.java</include>
-            <include>AnalyzeTests.java</include>
             <include>AnalysisInformationTest.java</include>
           </includes>
           <skipTests>${skip.unit.tests}</skipTests>

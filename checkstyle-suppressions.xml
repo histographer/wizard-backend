@@ -3,6 +3,7 @@
   "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
   "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 <suppressions>
-  <suppress checks="MissingJavadocMethod|MissingJavadocType|HideUtilityClassConstructor"
+  <suppress
+  checks="MissingJavadocMethod|MissingJavadocType|JavadocVariable|HideUtilityClassConstructor"
   files="src/test/.*"/>
 </suppressions>

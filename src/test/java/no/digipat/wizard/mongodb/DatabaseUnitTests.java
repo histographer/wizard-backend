@@ -1,9 +1,7 @@
 package no.digipat.wizard.mongodb;
 
 import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
-import no.digipat.wizard.mongodb.dao.MongoResultsDAOTest;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAOTest;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
@@ -50,9 +48,14 @@ public class DatabaseUnitTests {
         server = new MongoServer(new MemoryBackend());
         server.bind("localhost", 27017);
 
-        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
-                fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-        client = new MongoClient(new ServerAddress("localhost", 27017), MongoClientOptions.builder().codecRegistry(pojoCodecRegistry).build());
+        CodecRegistry pojoCodecRegistry = fromRegistries(
+                MongoClient.getDefaultCodecRegistry(),
+                fromProviders(PojoCodecProvider.builder().automatic(true).build())
+        );
+        client = new MongoClient(
+                new ServerAddress("localhost", 27017),
+                MongoClientOptions.builder().codecRegistry(pojoCodecRegistry).build()
+        );
     }
     
     /**

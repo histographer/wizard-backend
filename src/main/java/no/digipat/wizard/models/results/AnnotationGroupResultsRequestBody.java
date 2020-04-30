@@ -36,9 +36,9 @@ public class AnnotationGroupResultsRequestBody {
 
     @Override
     public String toString() {
-        return "AnnotationGroupResultsRequestBody{" +
-                "analysisId='" + analysisId + '\'' +
-                ", annotations=" + annotations +
-                '}';
+        return "AnnotationGroupResultsRequestBody{"
+                + "analysisId='" + analysisId + '\''
+                + ", annotations=" + annotations
+                + '}';
     }
 }

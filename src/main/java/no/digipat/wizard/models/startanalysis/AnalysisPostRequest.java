@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  *
- *  Model to parse startAnalysis request
+ * Model to parse startAnalysis request.
  *
  * @author Kent Are Torvik
  *
@@ -29,13 +29,16 @@ public class AnalysisPostRequest {
 
     public static void validate(AnalysisPostRequest analysisPostRequest) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Set<ConstraintViolation<AnalysisPostRequest>> violations = factory.getValidator().validate(analysisPostRequest);
+        Set<ConstraintViolation<AnalysisPostRequest>> violations = factory
+                .getValidator().validate(analysisPostRequest);
         List<String> validationsList = new ArrayList<>();
-        if(!violations.isEmpty()) {
+        if (!violations.isEmpty()) {
             violations.forEach(violation -> {
                 validationsList.add(violation.getMessage());
             });
-            throw new IllegalArgumentException(String.join("Something went wrong with validating Analyze object: ",validationsList));
+            throw new IllegalArgumentException(
+                    "Something went wrong with validating Analyze object: " + validationsList
+            );
         }
     }
     public String getGroupId() {
@@ -57,10 +60,10 @@ public class AnalysisPostRequest {
     }
 
     public static AnalysisPostRequest fromJsonString(String json) {
-        if(json == null) {
+        if (json == null) {
             throw new NullPointerException("Analyze: Json is not set");
         }
-        if(json.isEmpty()) {
+        if (json.isEmpty()) {
             throw new NullPointerException("Analyze: Jsonstring is empty");
         }
 
@@ -69,11 +72,13 @@ public class AnalysisPostRequest {
         try {
             analysisPostRequest = gson.fromJson(json, AnalysisPostRequest.class);
         } catch (Exception e) {
-            throw new RuntimeException("AnnotationGroupResults: Can not create AnnotationGroupResults from json string. Input: "+json);
+            throw new RuntimeException("AnnotationGroupResults: Can not create"
+                    + " AnnotationGroupResults from json string. Input: " + json);
         }
 
-        if(analysisPostRequest.getAnalysis() == null) {
-            throw new NullPointerException("AnnotationGroupResults: analysisId is empty. Input: "+json);
+        if (analysisPostRequest.getAnalysis() == null) {
+            throw new NullPointerException("AnnotationGroupResults: analysisId is empty."
+                    + " Input: " + json);
         }
         return analysisPostRequest;
     }

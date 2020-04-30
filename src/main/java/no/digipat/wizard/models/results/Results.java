@@ -6,7 +6,6 @@ import javax.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * A representation of a group of results connected to an annotation id.
@@ -43,9 +42,9 @@ public class Results {
 
     @Override
     public String toString() {
-        return "Results{" +
-                "annotationId=" + annotationId +
-                ", results=" + results +
-                '}';
+        return "Results{"
+                + "annotationId=" + annotationId
+                + ", results=" + results
+                + "}";
     }
 }

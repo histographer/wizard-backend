@@ -16,17 +16,17 @@ import no.digipat.wizard.models.AnalysisInformation.Status;
 public class AnalysisInformationTest {
     
     @Test
-    @Parameters(method="getStatuses")
+    @Parameters(method = "getStatuses")
     public void testStatusToString(Status status) throws Exception {
         assertEquals(status.name().toLowerCase(), status.toString());
     }
     
-    private static final Status[] getStatuses() {
+    private static Status[] getStatuses() {
         return Status.values();
     }
     
     @Test
-    @Parameters(method="getStatusesPlusNull")
+    @Parameters(method = "getStatusesPlusNull")
     public void testToJson(Status status) throws Exception {
         AnalysisInformation info = new AnalysisInformation()
                 .setAnalysisId("abc")
@@ -44,23 +44,24 @@ public class AnalysisInformationTest {
         return obj == null ? JSONObject.NULL : obj;
     }
     
-    @Test(expected=IllegalArgumentException.class)
-    @Parameters(method="getInvalidJson")
+    @Test(expected = IllegalArgumentException.class)
+    @Parameters(method = "getInvalidJson")
     public void testInvalidJson(String invalidJson) throws Exception {
         AnalysisInformation.fromJson(invalidJson);
     }
     
-    private static final String[][] getInvalidJson() {
+    private static String[][] getInvalidJson() {
         return new String[][] {
             {"Not JSON"},
-            {"{\"analysisId\": \"abc\", \"annotationGroupId\": \"def\", \"status\": \"total nonsense\"}"},
+            {"{\"analysisId\": \"abc\", \"annotationGroupId\": "
+                    + "\"def\", \"status\": \"total nonsense\"}"},
             {"{\"analysisId\": \"abc\", \"annotationGroupId\": \"def\", \"status\": 1}"},
             {"{\"analysisId\": \"abc\", \"annotationGroupId\": \"def\", \"status\": [\"array\"]}"},
         };
     }
     
     @Test
-    @Parameters(method="getStatusesPlusNull")
+    @Parameters(method = "getStatusesPlusNull")
     public void testFromJson(Status status) throws Exception {
         AnalysisInformation info = new AnalysisInformation()
                 .setStatus(status)

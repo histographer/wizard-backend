@@ -4,7 +4,7 @@ import no.digipat.wizard.models.results.AnalysisComponent;
 import no.digipat.wizard.models.results.AnalysisResult;
 import no.digipat.wizard.models.results.AnalysisValue;
 import no.digipat.wizard.models.results.Results;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.validation.ConstraintViolation;
@@ -16,10 +16,10 @@ import java.util.*;
 import static org.junit.Assert.assertEquals;
 
 public class ResultsTests {
-    private Validator validator;
+    private static Validator validator;
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUpClass() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
@@ -28,26 +28,49 @@ public class ResultsTests {
     private Results createResults() {
         AnalysisValue value1 = new AnalysisValue().setName("mean").setVal(-0.333f);
         AnalysisValue value2 = new AnalysisValue().setName("std").setVal(-0.333f);
-        AnalysisComponent analysisComponent1 = new AnalysisComponent().setName("H").setComponents(new ArrayList(){{add(value1); add(value2);}});
-        AnalysisComponent analysisComponent2 = new AnalysisComponent().setName("E").setComponents(new ArrayList(){{add(value1); add(value2);}});
-        AnalysisResult analysisResults = new AnalysisResult().setName("HE").setComponents(new ArrayList(){{add(analysisComponent1); add(analysisComponent2);}});
-        Results results = new Results().setAnnotationId(3l).setResults(new ArrayList(){{add(analysisResults);}});
+        AnalysisComponent analysisComponent1 = new AnalysisComponent().setName("H")
+                .setComponents(new ArrayList<AnalysisValue>() {
+                    {
+                        add(value1);
+                        add(value2);
+                    }
+                });
+        AnalysisComponent analysisComponent2 = new AnalysisComponent().setName("E")
+                .setComponents(new ArrayList<AnalysisValue>() {
+                    {
+                        add(value1);
+                        add(value2);
+                    }
+                });
+        AnalysisResult analysisResults = new AnalysisResult().setName("HE")
+                .setComponents(new ArrayList<AnalysisComponent>() {
+                    {
+                        add(analysisComponent1);
+                        add(analysisComponent2);
+                    }
+                });
+        Results results = new Results().setAnnotationId(3L)
+                .setResults(new ArrayList<AnalysisResult>() {
+                    {
+                        add(analysisResults);
+                    }
+                });
         return results;
     }
 
     @Test
-    public void ResultsIfAnnotationIdIsNullOrEmpty() {
+    public void testResultsIfAnnotationIdIsNullOrEmpty() {
         Results results = createResults();
         results.setAnnotationId(null);
         Set<ConstraintViolation<Results>> violations = validator.validate(results);
         assertEquals(violations.isEmpty(), false);
-        results.setAnnotationId(1l);
+        results.setAnnotationId(1L);
         Set<ConstraintViolation<Results>> violations2 = validator.validate(results);
         assertEquals(violations2.isEmpty(), true);
     }
 
     @Test
-    public void ResultsIfResultsAreNullOrEmpty() {
+    public void testResultsIfResultsAreNullOrEmpty() {
         Results results = createResults();
         results.setResults(null);
         Set<ConstraintViolation<Results>> violations = validator.validate(results);
@@ -58,7 +81,7 @@ public class ResultsTests {
     }
 
     @Test
-    public void ResultsIsValid() {
+    public void testResultsIsValid() {
         Set<ConstraintViolation<Results>> violations = validator.validate(createResults());
         assertEquals(violations.isEmpty(), true);
     }

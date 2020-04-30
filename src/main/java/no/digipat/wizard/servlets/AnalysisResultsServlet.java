@@ -54,11 +54,13 @@ public class AnalysisResultsServlet extends HttpServlet {
      *
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String databaseName = getDatabaseName();
         MongoClient client = getDatabaseClient();
         MongoResultsDAO resultsDao = new MongoResultsDAO(client, databaseName);
-        MongoAnalysisInformationDAO analysisInfoDao = new MongoAnalysisInformationDAO(client, databaseName);
+        MongoAnalysisInformationDAO analysisInfoDao =
+                new MongoAnalysisInformationDAO(client, databaseName);
         String requestJson = IOUtils.toString(request.getReader());
         AnnotationGroupResultsRequestBody results;
         try {
@@ -72,13 +74,16 @@ public class AnalysisResultsServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
             try {
-                AnnotationGroupResults annotationGroupResults = new AnnotationGroupResults().setGroupId(info.getAnnotationGroupId()).setAnnotations(results.getAnnotations());
+                AnnotationGroupResults annotationGroupResults = new AnnotationGroupResults()
+                        .setGroupId(info.getAnnotationGroupId())
+                        .setAnnotations(results.getAnnotations());
                 resultsDao.createAnnotationGroupResults(annotationGroupResults);
             } catch (IllegalStateException e) { // Duplicate analysis ID
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            analysisInfoDao.updateStatus(results.getAnalysisId(), AnalysisInformation.Status.SUCCESS);
+            analysisInfoDao.updateStatus(results.getAnalysisId(),
+                    AnalysisInformation.Status.SUCCESS);
             response.setStatus(HttpServletResponse.SC_CREATED);
         }
     }
@@ -117,20 +122,24 @@ public class AnalysisResultsServlet extends HttpServlet {
      * 
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        MongoResultsDAO dao = new MongoResultsDAO(getDatabaseClient(), getDatabaseName());
-        MongoAnnotationGroupDAO MAGdao = new MongoAnnotationGroupDAO(getDatabaseClient(), getDatabaseName());
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        MongoResultsDAO resultsDao = new MongoResultsDAO(getDatabaseClient(), getDatabaseName());
+        MongoAnnotationGroupDAO groupDao =
+            new MongoAnnotationGroupDAO(getDatabaseClient(), getDatabaseName());
         String analysisId = request.getParameter("groupId");
         if (analysisId == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        AnnotationGroupResults results = dao.getResults(analysisId);
-        AnnotationGroup group = MAGdao.getAnnotationGroup(analysisId);
+        AnnotationGroupResults results = resultsDao.getResults(analysisId);
+        AnnotationGroup group = groupDao.getAnnotationGroup(analysisId);
         if (results == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
-            response.getWriter().print(MongoResultsDAO.annotationGroupResultsToJson(results, group.getName()));
+            response.getWriter().print(
+                    MongoResultsDAO.annotationGroupResultsToJson(results, group.getName())
+            );
         }
     }
     

@@ -10,7 +10,6 @@ import no.digipat.wizard.models.AnalysisInformation;
 import no.digipat.wizard.models.AnnotationGroup;
 import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
-import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +21,6 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -49,27 +47,33 @@ public class StartAnalysisServletTest {
     public void setUp() {
         dao = new MongoAnnotationGroupDAO(client, databaseName);
         conversation = new WebConversation();
-        analyzeBodyValid = "{\"groupId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\",\"analysis\":[\"he\",\"rgb\"]}";
-        analyzeBodyInvalid = "{\"annotations\":[\"1\",\"2\",\"3\"],\"analysis\":[\"he\",\"rgb\"]}";
+        analyzeBodyValid = "{\"groupId\":\"aaaaaaaaaaaaaaaaaaaaaaaa\","
+                + "\"analysis\":[\"he\",\"rgb\"]}";
+        analyzeBodyInvalid = "{\"annotations\":[\"1\",\"2\",\"3\"],"
+                + "\"analysis\":[\"he\",\"rgb\"]}";
         infoDao = new MongoAnalysisInformationDAO(client, databaseName);
 
     }
     
-    private static PostMethodWebRequest createPostRequest(String path, String messageBody, String contentType) throws Exception {
+    private static PostMethodWebRequest createPostRequest(String path,
+            String messageBody, String contentType) throws Exception {
         return new PostMethodWebRequest(new URL(baseUrl, path).toString(),
                 new ByteArrayInputStream(messageBody.getBytes("UTF-8")), contentType);
     }
     
     @Test
     public void testStatusCode400OnInvalidInput() throws Exception {
-        WebRequest request = createPostRequest("startAnalysis",analyzeBodyInvalid, "application/json");
+        WebRequest request = createPostRequest("startAnalysis", analyzeBodyInvalid,
+                "application/json");
         WebResponse response = conversation.getResponse(request);
-        assertEquals("Testing with message body: " + analyzeBodyInvalid + ".", 400, response.getResponseCode());
+        assertEquals("Testing with message body: " + analyzeBodyInvalid + ".",
+                400, response.getResponseCode());
     }
     
     @Test
     public void testStatusCode404OnNonexistentAnnotationGroup() throws Exception {
-        WebRequest request = createPostRequest("startAnalysis",analyzeBodyValid, "application/json");
+        WebRequest request = createPostRequest("startAnalysis",
+                analyzeBodyValid, "application/json");
         
         WebResponse response = conversation.getResponse(request);
         
@@ -85,11 +89,14 @@ public class StartAnalysisServletTest {
                 .setName("group 1")
                 .setProjectId(20L);
         dao.createAnnotationGroup(group1);
-        WebRequest request = createPostRequest("startAnalysis",analyzeBodyValid, "application/json");
+        WebRequest request = createPostRequest("startAnalysis",
+                analyzeBodyValid, "application/json");
         WebResponse response = conversation.getResponse(request);
-        assertEquals("Testing with message body: " + analyzeBodyValid + ".", 202, response.getResponseCode());
+        assertEquals("Testing with message body: " + analyzeBodyValid + ".",
+                202, response.getResponseCode());
         JSONObject jsonObject = new JSONObject(response.getText());
-        AnalysisInformation info = infoDao.getAnalysisInformation(jsonObject.getString("analysisId"));
+        AnalysisInformation info = infoDao.getAnalysisInformation(
+                jsonObject.getString("analysisId"));
         assertNotNull(info);
     }
 

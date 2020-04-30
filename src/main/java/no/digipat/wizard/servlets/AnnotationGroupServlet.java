@@ -51,7 +51,8 @@ public class AnnotationGroupServlet extends HttpServlet {
      * 
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         AnnotationGroup group;
         try {
             group = inputToAnnotationGroup(request.getInputStream());
@@ -86,7 +87,8 @@ public class AnnotationGroupServlet extends HttpServlet {
      * 
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         MongoAnnotationGroupDAO dao = getDao();
         long projectId;
         try {
@@ -122,8 +124,8 @@ public class AnnotationGroupServlet extends HttpServlet {
         String name = requestJson.getString("name");
         Long projectId = requestJson.getLong("projectId");
         Long[] idArray = annotationIds.toList().stream().<Long>map(id -> {
-            // The JSON array will represent integers using the Integer class, unless they're too big,
-            // in which case it uses the Long class
+            // The JSON array will represent integers using the Integer class,
+            // unless they're too big, in which case it uses the Long class
             if (id instanceof Long) {
                 return (Long) id;
             } else {

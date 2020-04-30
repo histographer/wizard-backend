@@ -59,18 +59,21 @@ public class AnnotationGroupServletTest {
         client.getDatabase(databaseName).drop();
     }
     
-    private static PostMethodWebRequest createPostRequest(String path, String messageBody, String contentType) throws Exception {
+    private static PostMethodWebRequest createPostRequest(String path,
+            String messageBody, String contentType) throws Exception {
         return new PostMethodWebRequest(new URL(baseUrl, path).toString(),
                 new ByteArrayInputStream(messageBody.getBytes("UTF-8")), contentType);
     }
     
     @Test
-    @Parameters(method="getInvalidGroupCreationRequestBodies")
+    @Parameters(method = "getInvalidGroupCreationRequestBodies")
     public void testStatusCode400OnGroupCreation(String messageBody) throws Exception {
-        WebRequest request = createPostRequest("annotationGroup", messageBody, "application/json");
+        WebRequest request = createPostRequest("annotationGroup",
+                messageBody, "application/json");
         WebResponse response = conversation.getResponse(request);
         
-        assertEquals("Testing with message body: " + messageBody + ".", 400, response.getResponseCode());
+        assertEquals("Testing with message body: " + messageBody + ".",
+                400, response.getResponseCode());
     }
     
     private static String[][] getInvalidGroupCreationRequestBodies() {
@@ -79,8 +82,10 @@ public class AnnotationGroupServletTest {
                 {"{}"},
                 // Invalid or missing array of annotations:
                 {"{\"name\": \"group name\", \"projectId\": 1}"},
-                {"{\"annotations\": \"not an array\", \"name\": \"group name\", \"projectId\": 1}"},
-                {"{\"annotations\": [\"not a number\"], \"name\": \"group name\", \"projectId\": 1}"},
+                {"{\"annotations\": \"not an array\", \"name\": \"group name\", "
+                        + "\"projectId\": 1}"},
+                {"{\"annotations\": [\"not a number\"], \"name\": \"group name\", "
+                        + "\"projectId\": 1}"},
                 {"{\"annotations\": null, \"name\": \"group name\"}, \"projectId\": 1"},
                 {"{\"annotations\": [null], \"name\": \"group name\"}, \"projectId\": 1"},
                 // Invalid or missing group name:
@@ -90,7 +95,8 @@ public class AnnotationGroupServletTest {
                 // Invalid or missing project name:
                 {"{\"annotations\": [1], \"name\": \"group name\"}"},
                 {"{\"annotations\": [1], \"name\": \"group name\", \"projectId\": null}"},
-                {"{\"annotations\": [1], \"name\": \"group name\", \"projectId\": \"this is a string\"}"}
+                {"{\"annotations\": [1], \"name\": \"group name\", "
+                        + "\"projectId\": \"this is a string\"}"}
         };
     }
     
@@ -102,7 +108,8 @@ public class AnnotationGroupServletTest {
         requestJson.put("name", "foo");
         requestJson.put("projectId", 20);
         
-        WebRequest request = createPostRequest("annotationGroup", requestJson.toString(), "application/json");
+        WebRequest request = createPostRequest("annotationGroup", requestJson.toString(),
+                "application/json");
         WebResponse response = conversation.getResponse(request);
         
         assertEquals(200, response.getResponseCode());
@@ -115,8 +122,8 @@ public class AnnotationGroupServletTest {
         assertEquals(annotationIds, group.getAnnotationIds());
         Date now = new Date();
         long nowMilliseconds = now.getTime();
-        long earliestMilliseconds = nowMilliseconds - 60*1000; // One minute ago
-        long latestMilliseconds = nowMilliseconds + 60*1000; // One minute into the future
+        long earliestMilliseconds = nowMilliseconds - 60 * 1000; // One minute ago
+        long latestMilliseconds = nowMilliseconds + 60 * 1000; // One minute into the future
         long creationMilliseconds = group.getCreationDate().getTime();
         // We can't really expect the creation time to be an exact value,
         // but it certainly shouldn't be off by more than a minute
@@ -190,7 +197,8 @@ public class AnnotationGroupServletTest {
         requestJson.put("name", groupName);
         requestJson.put("projectId", 20);
         
-        WebRequest request = createPostRequest("annotationGroup", requestJson.toString(), "application/json");
+        WebRequest request = createPostRequest("annotationGroup",
+                requestJson.toString(), "application/json");
         WebResponse response = conversation.getResponse(request);
         
         assertEquals(200, response.getResponseCode());

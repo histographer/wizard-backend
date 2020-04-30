@@ -50,17 +50,19 @@ public class MongoAnalysisInformationDAOTest {
                 .setStatus(Status.PENDING);
     }
     
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void testCreateAnalysisWithNullStatus() {
         dao.createAnalysisInformation(createAnalysisInfoWithNonNullFields().setStatus(null));
     }
     
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void testCreateAnalysisWithNullGroupId() {
-        dao.createAnalysisInformation(createAnalysisInfoWithNonNullFields().setAnnotationGroupId(null));
+        dao.createAnalysisInformation(
+                createAnalysisInfoWithNonNullFields().setAnnotationGroupId(null)
+        );
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     @Parameters({
         "abc",
         "oooooooooooooooooooooooo"
@@ -69,7 +71,7 @@ public class MongoAnalysisInformationDAOTest {
         dao.createAnalysisInformation(createAnalysisInfoWithNonNullFields().setAnalysisId(id));
     }
     
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void testCreateAnalysisWithDuplicateId() {
         AnalysisInformation analysisInformation = createAnalysisInfoWithNonNullFields();
         dao.createAnalysisInformation(analysisInformation);
@@ -104,7 +106,7 @@ public class MongoAnalysisInformationDAOTest {
         assertEquals(analysis, retrievedAnalysis);
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     @Parameters({
         "abc",
         "oooooooooooooooooooooooo"
@@ -113,7 +115,7 @@ public class MongoAnalysisInformationDAOTest {
         dao.getAnalysisInformation(id);
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testGetAnalysisWithNullId() {
         dao.getAnalysisInformation(null);
     }
@@ -123,22 +125,22 @@ public class MongoAnalysisInformationDAOTest {
         assertNull(dao.getAnalysisInformation(hexId));
     }
     
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void testUpdateNullStatus() {
         dao.updateStatus(hexId, null);
     }
     
-    @Test(expected=IllegalArgumentException.class)
-    @Parameters(method="getInvalidIds")
+    @Test(expected = IllegalArgumentException.class)
+    @Parameters(method = "getInvalidIds")
     public void testUpdateInvalidId(String id) {
         dao.updateStatus(id, Status.SUCCESS);
     }
     
     private static String[] getInvalidIds() {
         return new String[] {
-                "abc",
-                "oooooooooooooooooooooooo",
-                null
+            "abc",
+            "oooooooooooooooooooooooo",
+            null
         };
     }
     
@@ -158,7 +160,10 @@ public class MongoAnalysisInformationDAOTest {
         boolean updated = dao.updateStatus(analysis.getAnalysisId(), Status.FAILURE);
         
         assertTrue(updated);
-        assertEquals(Status.FAILURE, dao.getAnalysisInformation(analysis.getAnalysisId()).getStatus());
+        assertEquals(
+                Status.FAILURE,
+                dao.getAnalysisInformation(analysis.getAnalysisId()).getStatus()
+        );
     }
     
     @Test
@@ -176,9 +181,13 @@ public class MongoAnalysisInformationDAOTest {
                 .setStatus(Status.FAILURE);
         dao.createAnalysisInformation(info3);
         
-        List<AnalysisInformation> analyses = dao.getAnalysisInformationForAnnotationGroup("abcdef0123456789abcdef12");
+        List<AnalysisInformation> analyses = dao
+                .getAnalysisInformationForAnnotationGroup("abcdef0123456789abcdef12");
         
-        assertEquals(Arrays.asList(info1.setAnalysisId(id1), info2.setAnalysisId(id2)), analyses);
+        assertEquals(
+                Arrays.asList(info1.setAnalysisId(id1), info2.setAnalysisId(id2)),
+                analyses
+        );
     }
     
     @Test

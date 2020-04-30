@@ -29,9 +29,9 @@ public class CallbackURLs {
 
     @Override
     public String toString() {
-        return "CallbackURLs{" +
-                "analysisResults='" + analysisResults + '\'' +
-                ", updateStatus='" + updateStatus + '\'' +
-                '}';
+        return "CallbackURLs{"
+                + "analysisResults='" + analysisResults + '\''
+                + ", updateStatus='" + updateStatus + '\''
+                + '}';
     }
 }

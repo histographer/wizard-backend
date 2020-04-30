@@ -51,8 +51,10 @@ public class ExportAnalysisResultsTest {
     
     @Test
     public void testStatusCode404() throws Exception {
-        WebRequest request = new GetMethodWebRequest(baseUrl, "exportAnalysisResults?analysisId=def");
-        // Note that the analysis ID is different from that of the result we've inserted into the database
+        WebRequest request = new GetMethodWebRequest(baseUrl,
+                "exportAnalysisResults?analysisId=def");
+        // Note that the analysis ID is different from that of
+        // the result we've inserted into the database
         WebResponse response = conversation.getResponse(request);
         
         assertEquals(404, response.getResponseCode());
@@ -68,7 +70,8 @@ public class ExportAnalysisResultsTest {
     
     @Test
     public void testExportResults() throws Exception {
-        WebRequest request = new GetMethodWebRequest(baseUrl, "exportAnalysisResults?analysisId=abc");
+        WebRequest request = new GetMethodWebRequest(baseUrl,
+                "exportAnalysisResults?analysisId=abc");
         WebResponse response = conversation.getResponse(request);
         
         assertEquals(200, response.getResponseCode());

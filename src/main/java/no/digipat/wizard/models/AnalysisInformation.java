@@ -29,7 +29,7 @@ public class AnalysisInformation {
      * @author Jon Wallem Anundsen
      *
      */
-    public static enum Status {
+    public enum Status {
         /**
          * Indicates that the analysis has not yet been completed.
          */

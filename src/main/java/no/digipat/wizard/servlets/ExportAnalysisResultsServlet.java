@@ -9,15 +9,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import no.digipat.wizard.models.CSVcreator;
+import no.digipat.wizard.models.CSVCreator;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
 import org.json.JSONObject;
 
 import com.mongodb.MongoClient;
-
-import no.digipat.wizard.models.CsvResult;
-import no.digipat.wizard.mongodb.dao.MongoCsvResultDAO;
 
 @WebServlet("/exportAnalysisResults")
 public class ExportAnalysisResultsServlet extends HttpServlet {
@@ -38,31 +35,31 @@ public class ExportAnalysisResultsServlet extends HttpServlet {
      * 
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String groupId = request.getParameter("groupId");
         String analyzeType = request.getParameter("analyzeType");
-        //String path = (String) getServletContext().getAttribute("STORAGE_PATH");
-        String path = getServletContext().getRealPath("/");;
+        String path = getServletContext().getRealPath("/");
         if (groupId == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
         MongoResultsDAO dao = getDao();
         AnnotationGroupResults results = dao.getResults(groupId);
         String base64 = null;
-        if(analyzeType == null) {
+        if (analyzeType == null) {
             try {
-                base64 = CSVcreator.toCSV(results.getAnnotations(), path, null);
+                base64 = CSVCreator.toCSV(results.getAnnotations(), path, null);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                base64 = CSVcreator.toCSV(results.getAnnotations(), path, analyzeType);
+                base64 = CSVCreator.toCSV(results.getAnnotations(), path, analyzeType);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        if(base64 == null) {
+        if (base64 == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
             JSONObject responseJson = new JSONObject();

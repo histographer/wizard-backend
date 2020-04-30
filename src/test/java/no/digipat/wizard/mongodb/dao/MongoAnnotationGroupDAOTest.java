@@ -52,32 +52,32 @@ public class MongoAnnotationGroupDAOTest {
                 .setProjectId(1L);
     }
     
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void testCreateNullAnnotationGroup() {
         dao.createAnnotationGroup(null);
     }
     
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void testCreateAnnotationGroupWithNullAnnotationIds() {
         dao.createAnnotationGroup(createGroupWithNonNullFields().setAnnotationIds(null));
     }
     
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void testCreateAnnotationGroupWithNullCreationDate() {
         dao.createAnnotationGroup(createGroupWithNonNullFields().setCreationDate(null));
     }
     
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void testCreateAnnotationGroupWithNullName() {
         dao.createAnnotationGroup(createGroupWithNonNullFields().setName(null));
     }
     
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void testCreateAnnotationGroupWithNullProjectId() {
         dao.createAnnotationGroup(createGroupWithNonNullFields().setProjectId(null));
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     @Parameters({
         "abc", // Too short
         "oooooooooooooooooooooooo" // 24 non-hexadecimal characters
@@ -87,7 +87,7 @@ public class MongoAnnotationGroupDAOTest {
             .setCreationDate(new Date()).setName("blarg"));
     }
     
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void testCreateAnnotationGroupWithDuplicateId() {
         dao.createAnnotationGroup(createGroupWithNonNullFields().setGroupId(hexId));
         dao.createAnnotationGroup(createGroupWithNonNullFields().setGroupId(hexId));
@@ -132,7 +132,7 @@ public class MongoAnnotationGroupDAOTest {
         assertNull(group);
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     @Parameters({
         "abc", // Too short
         "oooooooooooooooooooooooo" // 24 non-hexadecimal characters
@@ -141,7 +141,7 @@ public class MongoAnnotationGroupDAOTest {
         dao.getAnnotationGroup(id);
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testGetAnnotationGroupWithNullId() {
         dao.getAnnotationGroup(null);
     }

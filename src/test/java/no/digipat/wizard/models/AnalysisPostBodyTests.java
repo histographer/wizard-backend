@@ -15,12 +15,29 @@ public class AnalysisPostBodyTests {
 
     @Before
     public void setUp() {
-     analysisJson= "{\"analysisId\":\"abc\",\"projectId\":4,\"annotations\":[1,2,3],\"analysis\":[\"he\",\"rgb\"], \"callbackURLs\":{\"analysisResults\":\"localhost\", \"updateStatus\":\"localhost\"}}";
-     analysisPostBody = new AnalysisPostBody().setAnalysisId("abc")
-             .setAnnotations(new ArrayList<Long>(){{ add(1l); add(2l); add(3l);}})
-             .setAnalysis(new ArrayList<String>(){{ add("he"); add("rgb");}})
-             .setProjectId(4l)
-             .setCallbackURLs(new CallbackURLs().setAnalysisResults("localhost").setUpdateStatus("localhost"));
+        analysisJson = "{\"analysisId\":\"abc\",\"projectId\":4,\"annotations\":[1,2,3],"
+                + "\"analysis\":[\"he\",\"rgb\"], \"callbackURLs\":"
+                + "{\"analysisResults\":\"localhost\", \"updateStatus\":\"localhost\"}}";
+        analysisPostBody = new AnalysisPostBody().setAnalysisId("abc")
+                .setAnnotations(new ArrayList<Long>() {
+                    {
+                        add(1L);
+                        add(2L);
+                        add(3L);
+                    }
+                })
+                .setAnalysis(new ArrayList<String>() {
+                    {
+                        add("he");
+                        add("rgb");
+                    }
+                })
+                .setProjectId(4L)
+                .setCallbackURLs(
+                        new CallbackURLs()
+                        .setAnalysisResults("localhost")
+                        .setUpdateStatus("localhost")
+                );
     }
 
 
@@ -28,10 +45,11 @@ public class AnalysisPostBodyTests {
     public void toAnalyzeFromJsonString() {
         AnalysisPostBody analysisPostBodyConverted = AnalysisPostBody.fromJsonString(analysisJson);
         assertEquals(analysisPostBody.getAnalysis(), analysisPostBodyConverted.getAnalysis());
-        assertEquals(analysisPostBody.getAnnotations(), analysisPostBodyConverted.getAnnotations());
+        assertEquals(analysisPostBody.getAnnotations(),
+                analysisPostBodyConverted.getAnnotations());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void validationTestFail() {
         AnalysisPostBody analysisPostBodyFail = new AnalysisPostBody();
         AnalysisPostBody.validate(analysisPostBodyFail);

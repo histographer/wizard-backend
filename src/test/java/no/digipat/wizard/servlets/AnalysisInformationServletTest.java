@@ -3,7 +3,6 @@ package no.digipat.wizard.servlets;
 import static org.junit.Assert.*;
 
 import java.net.URL;
-import java.rmi.activation.ActivationGroupDesc;
 import java.util.*;
 
 import static java.util.Comparator.comparing;
@@ -37,8 +36,8 @@ public class AnalysisInformationServletTest {
     private static URL baseUrl;
     private static String databaseName;
     private static MongoClient client;
-    private MongoAnalysisInformationDAO dao;
-    private MongoAnnotationGroupDAO AGdao;
+    private MongoAnalysisInformationDAO infoDao;
+    private MongoAnnotationGroupDAO groupDao;
     private WebConversation conversation;
     private String annotationGroupId;
     
@@ -51,15 +50,19 @@ public class AnalysisInformationServletTest {
     
     @Before
     public void setUp() {
-        dao = new MongoAnalysisInformationDAO(client, databaseName);
-        AGdao = new MongoAnnotationGroupDAO(client, databaseName);
+        infoDao = new MongoAnalysisInformationDAO(client, databaseName);
+        groupDao = new MongoAnnotationGroupDAO(client, databaseName);
         conversation = new WebConversation();
         AnnotationGroup annotationGroup = new AnnotationGroup()
                 .setName("Test")
-                .setAnnotationIds(new ArrayList<Long>() {{ add(1l);}})
+                .setAnnotationIds(new ArrayList<Long>() {
+                    {
+                        add(1L);
+                    }
+                })
                 .setCreationDate(new Date())
-                .setProjectId(3l);
-        annotationGroupId =  AGdao.createAnnotationGroup(annotationGroup);
+                .setProjectId(3L);
+        annotationGroupId =  groupDao.createAnnotationGroup(annotationGroup);
     }
     
     @After
@@ -68,7 +71,7 @@ public class AnalysisInformationServletTest {
     }
     
     @Test
-    @Parameters(method="getStatusValues")
+    @Parameters(method = "getStatusValues")
     public void testGetInformationForOneAnalysis(Status status) throws Exception {
         AnalysisInformation info = new AnalysisInformation()
                 .setAnnotationGroupId(annotationGroupId)
@@ -76,8 +79,9 @@ public class AnalysisInformationServletTest {
                 .setGroupName("Test");
 
 
-        String analysisId = dao.createAnalysisInformation(info);
-        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisInformation?analysisId=" + analysisId);
+        String analysisId = infoDao.createAnalysisInformation(info);
+        WebRequest request = new GetMethodWebRequest(baseUrl,
+                "analysisInformation?analysisId=" + analysisId);
         
         WebResponse response = conversation.getResponse(request);
         
@@ -93,7 +97,8 @@ public class AnalysisInformationServletTest {
     
     @Test
     public void testStatusCode404OnNonexistentAnalysis() throws Exception {
-        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisInformation?analysisId=" + hexId);
+        WebRequest request = new GetMethodWebRequest(baseUrl,
+                "analysisInformation?analysisId=" + hexId);
         
         WebResponse response = conversation.getResponse(request);
         
@@ -121,18 +126,19 @@ public class AnalysisInformationServletTest {
                 .setAnalysisId("aaaaaaaaaaaaaaaaaaaaaaaa")
                 .setAnnotationGroupId(annotationGroupId)
                 .setStatus(Status.PENDING);
-        dao.createAnalysisInformation(info1);
+        infoDao.createAnalysisInformation(info1);
         AnalysisInformation info2 = new AnalysisInformation()
                 .setAnalysisId("bbbbbbbbbbbbbbbbbbbbbbbb")
                 .setAnnotationGroupId(annotationGroupId)
                 .setStatus(Status.SUCCESS);
-        dao.createAnalysisInformation(info2);
+        infoDao.createAnalysisInformation(info2);
         AnalysisInformation info3 = new AnalysisInformation()
                 .setAnnotationGroupId("0123456789abcdef01234567")
                 .setStatus(Status.FAILURE);
-        dao.createAnalysisInformation(info3);
+        infoDao.createAnalysisInformation(info3);
         
-        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisInformation?annotationGroupId="+annotationGroupId);
+        WebRequest request = new GetMethodWebRequest(baseUrl,
+                "analysisInformation?annotationGroupId=" + annotationGroupId);
         WebResponse response = conversation.getResponse(request);
         
         assertEquals(200, response.getResponseCode());

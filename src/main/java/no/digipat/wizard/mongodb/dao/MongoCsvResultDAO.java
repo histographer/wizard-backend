@@ -34,11 +34,13 @@ public class MongoCsvResultDAO {
      * 
      * @param csvResult the CSV results
      * 
-     * @throws NullPointerException if {@code csvResults} or any of its attributes is {@code null}
-     * @throws IllegalStateException if the database already contains a CSV result with the same
-     * ID as {@code csvResult}
+     * @throws NullPointerException if {@code csvResults}
+     * or any of its attributes is {@code null}
+     * @throws IllegalStateException if the database already contains
+     * a CSV result with the same ID as {@code csvResult}
      */
-    public void createCsvResult(CsvResult csvResult) throws NullPointerException, IllegalStateException {
+    public void createCsvResult(CsvResult csvResult)
+            throws NullPointerException, IllegalStateException {
         try {
             collection.insertOne(csvResultToDocument(csvResult));
         } catch (MongoWriteException e) {

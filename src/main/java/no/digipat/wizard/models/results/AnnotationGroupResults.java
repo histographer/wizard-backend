@@ -50,9 +50,9 @@ public class AnnotationGroupResults {
 
     @Override
     public String toString() {
-        return "AnnotationGroupResults{" +
-                "groupId='" + groupId + '\'' +
-                ", annotations=" + annotations +
-                '}';
+        return "AnnotationGroupResults{"
+                + "groupId='" + groupId + "'"
+                + ", annotations=" + annotations
+                + "}";
     }
 }

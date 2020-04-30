@@ -39,21 +39,21 @@ public class MongoCsvResultDAOTest {
         client.getDatabase(databaseName).drop();
     }
     
-    @Test(expected=NullPointerException.class)
-    @Parameters(method="getNullpointerResults")
+    @Test(expected = NullPointerException.class)
+    @Parameters(method = "getNullpointerResults")
     public void testNullPointerException(CsvResult csvResult) {
         dao.createCsvResult(csvResult);
     }
     
     private static CsvResult[] getNullpointerResults() {
         return new CsvResult[] {
-                null,
-                new CsvResult().setAnalysisId("abc"),
-                new CsvResult().setData("datadatadata")
+            null,
+            new CsvResult().setAnalysisId("abc"),
+            new CsvResult().setData("datadatadata")
         };
     }
     
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void testCreateDuplicateCsvResult() throws Exception {
         dao.createCsvResult(new CsvResult().setAnalysisId(hexId).setData("blah"));
         dao.createCsvResult(new CsvResult().setAnalysisId(hexId).setData("bleh"));

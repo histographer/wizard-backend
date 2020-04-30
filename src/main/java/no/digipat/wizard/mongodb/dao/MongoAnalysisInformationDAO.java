@@ -62,7 +62,8 @@ public class MongoAnalysisInformationDAO {
         return document.getObjectId("_id").toHexString();
     }
     
-    private static Document analysisInformationToDocument(AnalysisInformation analysisInformation) {
+    private static Document analysisInformationToDocument(
+            AnalysisInformation analysisInformation) {
         Document document = new Document();
         String id = analysisInformation.getAnalysisId();
         if (id != null) {
@@ -87,7 +88,8 @@ public class MongoAnalysisInformationDAO {
      * @throws IllegalArgumentException if {@code analysisId} is not a
      * 24-character hexadecimal string
      */
-    public AnalysisInformation getAnalysisInformation(String analysisId) throws IllegalArgumentException {
+    public AnalysisInformation getAnalysisInformation(String analysisId)
+            throws IllegalArgumentException {
         Document document = collection.find(eq("_id", new ObjectId(analysisId))).first();
         if (document == null) {
             return null;
@@ -106,7 +108,8 @@ public class MongoAnalysisInformationDAO {
      * 
      * @see AnnotationGroup
      */
-    public List<AnalysisInformation> getAnalysisInformationForAnnotationGroup(String annotationGroupId) {
+    public List<AnalysisInformation> getAnalysisInformationForAnnotationGroup(
+            String annotationGroupId) {
         List<AnalysisInformation> analyses = new ArrayList<>();
         for (Document document : collection.find(eq("annotationGroupId", annotationGroupId))) {
             analyses.add(documentToAnalysisInformation(document));

@@ -27,9 +27,9 @@ public class AnalysisValue {
 
     @Override
     public String toString() {
-        return "AnalysisValue{" +
-                "name='" + name + '\'' +
-                ", val=" + val +
-                '}';
+        return "AnalysisValue{"
+                + "name='" + name + "'"
+                + ", val=" + val
+                + "}";
     }
 }

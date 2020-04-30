@@ -14,7 +14,7 @@ import java.util.Set;
 
 /**
  *
- *  Builds the post body that is sent to analysis
+ * Represents the POST body that is sent to analysis.
  *
  * @author Kent Are Torvik
  *
@@ -43,14 +43,17 @@ public class AnalysisPostBody {
      */
     public static void validate(AnalysisPostBody analysisPostBody) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Set<ConstraintViolation<AnalysisPostBody>> violations = factory.getValidator().validate(analysisPostBody);
+        Set<ConstraintViolation<AnalysisPostBody>> violations = factory
+                .getValidator().validate(analysisPostBody);
 
         List<String> validationsList = new ArrayList<>();
-        if(!violations.isEmpty()) {
+        if (!violations.isEmpty()) {
             violations.forEach(violation -> {
                 validationsList.add(violation.getMessage());
             });
-            throw new IllegalArgumentException(String.join("Something went wrong with validating Analyze object: ",validationsList));
+            throw new IllegalArgumentException(
+                    "Something went wrong with validating Analyze object: " + validationsList
+            );
         }
     }
 
@@ -60,10 +63,10 @@ public class AnalysisPostBody {
     }
 
     public static AnalysisPostBody fromJsonString(String json) {
-        if(json == null) {
+        if (json == null) {
             throw new NullPointerException("AnalysisPostBody: Json is not set");
         }
-        if(json.isEmpty()) {
+        if (json.isEmpty()) {
             throw new NullPointerException("AnalysisPostBody: Jsonstring is empty");
         }
 
@@ -72,11 +75,13 @@ public class AnalysisPostBody {
         try {
             analysisPostBody = gson.fromJson(json, AnalysisPostBody.class);
         } catch (Exception e) {
-            throw new RuntimeException("AnalysisPostBody: Can not create AnalysisPostBody from json string. Input: "+json);
+            throw new RuntimeException("AnalysisPostBody: Can not create"
+                    + " AnalysisPostBody from json string. Input: " + json);
         }
 
-        if(analysisPostBody.getAnalysisId() == null) {
-            throw new NullPointerException("AnalysisPostBody: analysisId is empty. Input: "+json);
+        if (analysisPostBody.getAnalysisId() == null) {
+            throw new NullPointerException("AnalysisPostBody: analysisId is empty. Input: "
+                    + json);
         }
         return analysisPostBody;
     }
@@ -128,13 +133,13 @@ public class AnalysisPostBody {
 
     @Override
     public String toString() {
-        return "AnalysisPostBody{" +
-                "analysisId='" + analysisId + '\'' +
-                ", projectId='" + projectId + '\'' +
-                ", callbackURLs=" + callbackURLs +
-                ", annotations=" + annotations +
-                ", analysis=" + analysis +
-                '}';
+        return "AnalysisPostBody{"
+                + "analysisId='" + analysisId + "'"
+                + ", projectId='" + projectId + "'"
+                + ", callbackURLs=" + callbackURLs
+                + ", annotations=" + annotations
+                + ", analysis=" + analysis
+                + "}";
     }
 }
 

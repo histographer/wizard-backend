@@ -2,7 +2,6 @@ package no.digipat.wizard.mongodb.dao;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoWriteException;
@@ -15,10 +14,7 @@ import no.digipat.wizard.models.results.Results;
 import com.google.gson.Gson;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
-import org.bson.conversions.Bson;
-import org.json.JSONObject;
 
-import javax.management.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -49,10 +45,13 @@ public class MongoResultsDAO {
      * @param databaseName the name of the database
      */
     public MongoResultsDAO(MongoClient client, String databaseName) {
-        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
+        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings
+                .getDefaultCodecRegistry(),
                 fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-        MongoDatabase database = client.getDatabase(databaseName).withCodecRegistry(pojoCodecRegistry);
-        this.collection = database.getCollection("AnnotationGroupResults", AnnotationGroupResults.class);
+        MongoDatabase database = client.getDatabase(databaseName)
+                .withCodecRegistry(pojoCodecRegistry);
+        this.collection = database.getCollection("AnnotationGroupResults",
+                AnnotationGroupResults.class);
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
@@ -81,21 +80,24 @@ public class MongoResultsDAO {
     }
 
     public void createAndUpdateResults(AnnotationGroupResults annotationGroupResults) {
-        AnnotationGroupResults res = collection.find(eq("_id", annotationGroupResults.getGroupId())).first();
-        if(res == null) {
+        AnnotationGroupResults res = collection.find(
+                eq("_id", annotationGroupResults.getGroupId())
+            ).first();
+        if (res == null) {
             createAnnotationGroupResults(annotationGroupResults);
-        }
-        else {
+        } else {
             List<Results> annotations = res.getAnnotations();
             List<Results> newAnnotations = annotationGroupResults.getAnnotations();
-            boolean isPresent = false;
             for (int i = 0; i < annotations.size(); i++) {
                 for (int j = 0; j < newAnnotations.size(); j++) {
                     // Check if it is the same annotation
-                    if(annotations.get(i).getAnnotationId() == newAnnotations.get(j).getAnnotationId()) {
+                    if (annotations.get(i).getAnnotationId()
+                            == newAnnotations.get(j).getAnnotationId()) {
                         // Need to check if the annotation exists in the scope
-                        List<AnalysisResult> oldAnalysisResults = annotations.get(i).getResults();
-                        List<AnalysisResult> newAnalysisResults = newAnnotations.get(j).getResults();
+                        List<AnalysisResult> oldAnalysisResults = annotations
+                                .get(i).getResults();
+                        List<AnalysisResult> newAnalysisResults = newAnnotations
+                                .get(j).getResults();
                         Set<AnalysisResult> set = new LinkedHashSet<>(oldAnalysisResults);
                         set.addAll(newAnalysisResults);
 
@@ -117,30 +119,38 @@ public class MongoResultsDAO {
      * @param annotationGroupResults the annotation group results
      * @throws IllegalArgumentException if it doesn't pass validation
      */
-    public void validateAnnotationGroupResults(AnnotationGroupResults annotationGroupResults) throws IllegalArgumentException {
+    public void validateAnnotationGroupResults(AnnotationGroupResults annotationGroupResults)
+            throws IllegalArgumentException {
         List<String> validationsList = new ArrayList<String>();
-       Set<ConstraintViolation<AnnotationGroupResults>> violations = validator.validate(annotationGroupResults);
-       if(!violations.isEmpty()) {
-           violations.forEach(violation -> {
-               validationsList.add(violation.getMessage());
-           });
-           throw new IllegalArgumentException(String.join("Something went wrong with validating AnnotationGroupResults: ",validationsList));
-       }
-
+        Set<ConstraintViolation<AnnotationGroupResults>> violations = validator
+                .validate(annotationGroupResults);
+        if (!violations.isEmpty()) {
+            violations.forEach(violation -> {
+                validationsList.add(violation.getMessage());
+            });
+            throw new IllegalArgumentException(
+                    "Something went wrong with validating AnnotationGroupResults: "
+                    + validationsList
+            );
+        }
+        
         AtomicReference<Integer> annotationGroupResultsListIndex = new AtomicReference<>(0);
         annotationGroupResults.getAnnotations().forEach(results -> {
-           Set<ConstraintViolation<Results>> resultsViolations = validator.validate(results);
-           AtomicReference<Integer> resultsIndex = new AtomicReference<>(0);
-           if(!resultsViolations.isEmpty()) {
-               resultsViolations.forEach(violation -> {
-                   validationsList.add("AnnotationGroupResults.Results["+annotationGroupResultsListIndex+"]: "+ violation.getMessage());
-               });
-           }
-           annotationGroupResultsListIndex.getAndSet(annotationGroupResultsListIndex.get() + 1);
-       });
-       if(!validationsList.isEmpty()) {
-           throw new IllegalArgumentException(String.join("Soemthing went wrong with validating: ",validationsList));
-       }
+            Set<ConstraintViolation<Results>> resultsViolations = validator.validate(results);
+            AtomicReference<Integer> resultsIndex = new AtomicReference<>(0);
+            if (!resultsViolations.isEmpty()) {
+                resultsViolations.forEach(violation -> {
+                    validationsList.add("AnnotationGroupResults.Results["
+                            + annotationGroupResultsListIndex + "]: " + violation.getMessage());
+                });
+            }
+            annotationGroupResultsListIndex.getAndSet(annotationGroupResultsListIndex.get() + 1);
+        });
+        if (!validationsList.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Something went wrong with validating: " + validationsList
+            );
+        }
     }
 
     /**
@@ -162,10 +172,10 @@ public class MongoResultsDAO {
      */
     public static AnnotationGroupResults jsonToAnnotationGroupResults(String json)
             throws IllegalArgumentException, NullPointerException {
-        if(json == null) {
+        if (json == null) {
             throw new NullPointerException("AnnotationGroupResults: Json is not set");
         }
-        if(json.isEmpty()) {
+        if (json.isEmpty()) {
             throw new IllegalArgumentException("AnnotationGroupResults: Jsonstring is empty");
         }
 
@@ -174,23 +184,27 @@ public class MongoResultsDAO {
         try {
             annotationGroupResults = gson.fromJson(json, AnnotationGroupResults.class);
         } catch (Exception e) {
-            throw new IllegalArgumentException("AnnotationGroupResults: Can not create AnnotationGroupResults from json string. Input: "+json+". Error: "+e);
+            throw new IllegalArgumentException("AnnotationGroupResults: Can not create"
+                    + " AnnotationGroupResults from json string. Input: " + json
+                    + ". Error: " + e);
         }
 
-        if(annotationGroupResults.getGroupId() == null) {
-            throw new NullPointerException("AnnotationGroupResults: GroupId is empty. Input: "+json);
+        if (annotationGroupResults.getGroupId() == null) {
+            throw new NullPointerException("AnnotationGroupResults: GroupId is empty. Input: "
+                    + json);
         }
 
         return annotationGroupResults;
     }
 
-    public static AnnotationGroupResultsRequestBody jsonToAnnotationGroupResultsRequestBody(String json)
-            throws IllegalArgumentException, NullPointerException {
-        if(json == null) {
+    public static AnnotationGroupResultsRequestBody jsonToAnnotationGroupResultsRequestBody(
+            String json) throws IllegalArgumentException, NullPointerException {
+        if (json == null) {
             throw new NullPointerException("AnnotationGroupResultsRequestBody: Json is not set");
         }
-        if(json.isEmpty()) {
-            throw new IllegalArgumentException("AnnotationGroupResultsRequestBody: Jsonstring is empty");
+        if (json.isEmpty()) {
+            throw new IllegalArgumentException("AnnotationGroupResultsRequestBody:"
+                    + " Jsonstring is empty");
         }
 
         Gson gson = new Gson();
@@ -198,11 +212,15 @@ public class MongoResultsDAO {
         try {
             annotationGroupResults = gson.fromJson(json, AnnotationGroupResultsRequestBody.class);
         } catch (Exception e) {
-            throw new IllegalArgumentException("AnnotationGroupResultsRequestBody: Can not create AnnotationGroupResults from json string. Input: "+json+". Error: "+e);
+            throw new IllegalArgumentException("AnnotationGroupResultsRequestBody:"
+                    + " Can not create AnnotationGroupResults from json string. Input: " + json
+                    + ". Error: " + e);
         }
 
-        if(annotationGroupResults.getAnalysisId() == null) {
-            throw new NullPointerException("AnnotationGroupResultsRequestBody: analysisId is empty. Input: "+json);
+        if (annotationGroupResults.getAnalysisId() == null) {
+            throw new NullPointerException(
+                    "AnnotationGroupResultsRequestBody: analysisId is empty. Input: " + json
+            );
         }
 
         return annotationGroupResults;
@@ -214,7 +232,8 @@ public class MongoResultsDAO {
      * @param annotationGroupResults the annotation group results
      * @return the string
      */
-    public static String annotationGroupResultsToJson(AnnotationGroupResults annotationGroupResults, String annotationGroupName) {
+    public static String annotationGroupResultsToJson(
+            AnnotationGroupResults annotationGroupResults, String annotationGroupName) {
         Gson gson = new Gson();
         String jsonString = gson.toJson(annotationGroupResults);
         JsonElement element = gson.fromJson(jsonString, JsonElement.class);

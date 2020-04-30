@@ -29,14 +29,17 @@ public class AvailableAnalysesServlet extends HttpServlet {
      * 
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         URL baseUrl = (URL) getServletContext().getAttribute("ANALYSIS_URL");
-        HttpURLConnection connection = (HttpURLConnection) new URL(baseUrl, "analysis/available/?format=json").openConnection();
+        HttpURLConnection connection = (HttpURLConnection) new URL(baseUrl,
+                "analysis/available/?format=json").openConnection();
         connection.setRequestProperty("Accept", "application/json");
         connection.connect();
         int responseCode = connection.getResponseCode();
         if (responseCode != 200) {
-            throw new IOException("Expected response code 200 from analysis backend, but got " + responseCode);
+            throw new IOException("Expected response code 200 from analysis backend, but got "
+                    + responseCode);
         }
         JSONObject jsonFromAnalysis;
         try (InputStream inputStream = connection.getInputStream()) {

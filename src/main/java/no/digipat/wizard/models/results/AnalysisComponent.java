@@ -30,9 +30,9 @@ public class AnalysisComponent {
 
     @Override
     public String toString() {
-        return "AnalysisComponent{" +
-                "name='" + name + '\'' +
-                ", components=" + components +
-                '}';
+        return "AnalysisComponent{"
+                + "name='" + name + "'"
+                + ", components=" + components
+                + "}";
     }
 }

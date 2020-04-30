@@ -1,12 +1,10 @@
 package no.digipat.wizard.models.results;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * A representation of a single result. All the setters of
@@ -41,9 +39,9 @@ public class AnalysisResult {
 
     @Override
     public String toString() {
-        return "AnalysisResult{" +
-                "components=" + components +
-                ", name='" + name + '\'' +
-                '}';
+        return "AnalysisResult{"
+                + "components=" + components
+                + ", name='" + name + "'"
+                + "}";
     }
 }

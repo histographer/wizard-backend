@@ -46,8 +46,8 @@ public class MongoAnnotationGroupDAO {
      * is {@code null}
      * @throws IllegalStateException if there is already an annotation group with the same ID
      * as {@code annotationGroup}
-     * @throws IllegalArgumentException if the group's ID is not either {@code null} or a 24-character
-     * hexadecimal string
+     * @throws IllegalArgumentException if the group's ID is not either {@code null}
+     * or a 24-character hexadecimal string
      */
     public String createAnnotationGroup(AnnotationGroup annotationGroup) {
         Document document = annotationGroupToDocument(annotationGroup);

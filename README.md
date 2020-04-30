@@ -1,71 +1,85 @@
 # Wizard Backend
+This is the backend/middleware component of the Wizard application. TODO link to more info
 
-## Endpoints
+## Getting started
+### Prerequisites
+In order to build the application, you need Docker and Docker Compose. For development and testing, you also need Apache Maven 3 and JDK 1.8.
 
-### GET /analysisStatus?analysisId=id
-Gets the status of an analysis.
+### How to set environment variables
+- [Windows](https://www.techjunkie.com/environment-variables-windows-10/)
+- [Mac](https://apple.stackexchange.com/questions/106778)
+- Linux:
+    - Open `/etc/environment` in a text editor
+    - For each variable, add a line of the form `export VARIABLE_NAME=value`
+    - Run `source /etc/environment` in a terminal
+    - The variables should now be set for that terminal session.
+    They will be set globally whenever the system reboots. 
 
-#### Response
+### Installing
+First, copy the contents file `.env.sample` into a file with the name `.env`, modifying the values of the environment variables as necessary. Then run the commands `docker network create wizard` and `docker-compose -f docker-compose.dev.yml up --build -d`. A development container will become available at `http://localhost:8080`, or whatever port you configured in `.env`.
 
-```json
-{
-  "status": "<pending, success, failure>"
-}
+## Testing
+### Preparing to run the integration tests
+Before you can run the integration tests, you have to set some environment variables:
+
+```
+WIZARD_TEST_MONGODB_HOST: localhost
+WIZARD_TEST_MONGODB_PORT: 27019
+WIZARD_TEST_MONGODB_ROOT_USERNAME: admin
+WIZARD_TEST_MONGODB_ROOT_PASSWORD: password123
+WIZARD_TEST_MONGODB_DATABASE: wizard_test
+WIZARD_TEST_TOMCAT_PROTOCOL: http
+WIZARD_TEST_TOMCAT_HOST: localhost
+WIZARD_TEST_TOMCAT_PORT: 8082
 
 ```
 
-### GET /annotationGroup?projectId=id
-Gets an overview of the annotation groups belonging to a project.
+In addition, you need to copy the contents of the file `.analysis_test.env.sample` into a file with the name `.analysis_test.env`.
 
-#### Response
+### Running the tests
+The integration tests will only work if the application is already running. You can start it in a test container
+with the command `./integration_test_setup.sh`, and stop it with the command `./integration_test_teardown.sh`.
+You may need to add the prefix `sudo -E` to these commands.
 
-```json
-{
-  "groups": [
-    {
-      "id": "0123456789abcdef12345678",
-      "name": "name of first group"
-    },
-    {
-      "id": "abcdef0123456789abcdef12",
-      "name": "name of other group"
-    }
-  ]
-}
+To run the unit tests and integration tests:
+
+```console
+mvn verify
 
 ```
 
-### POST /annotationGroup
-Creates a new annotation group.
+To run only the unit tests:
 
-#### Request
-```json
-{
-  "projectId": 12345,
-  "annotations": [42, 1337],
-  "name": "my new group"
-}
+```console
+mvn test
 
 ```
 
-#### Response
-```json
-{
-  "groupId": "0123456789abcdef12345678"
-}
+To run only the integration tests:
+
+```console
+mvn -Dskip.unit.tests=true verify
 
 ```
 
-### Post /startAnalysis
+To run the style tests:
 
-Endpoint: `POST /startAnalysis`
+```console
+mvn checkstyle:check
 
-#### Request
-```JSON
-{
-    "groupId": "0123456789abcdef12345678",
-    "analysis": ["he", "rgb"]
-}
 ```
 
-#### Response: 202 Accepted
+## Deployment
+TODO
+
+## Documentation
+The API is described in [API.md](API.md).
+
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+TODO
+
+## Acknowledgements
+TODO

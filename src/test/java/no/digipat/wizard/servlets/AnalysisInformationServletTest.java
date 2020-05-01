@@ -39,6 +39,7 @@ public class AnalysisInformationServletTest {
     private MongoAnalysisInformationDAO infoDao;
     private MongoAnnotationGroupDAO groupDao;
     private WebConversation conversation;
+    private static final String groupName = "Test";
     private String annotationGroupId;
     
     @BeforeClass
@@ -54,7 +55,7 @@ public class AnalysisInformationServletTest {
         groupDao = new MongoAnnotationGroupDAO(client, databaseName);
         conversation = new WebConversation();
         AnnotationGroup annotationGroup = new AnnotationGroup()
-                .setName("Test")
+                .setName(groupName)
                 .setAnnotationIds(new ArrayList<Long>() {
                     {
                         add(1L);
@@ -75,20 +76,22 @@ public class AnalysisInformationServletTest {
     public void testGetInformationForOneAnalysis(Status status) throws Exception {
         AnalysisInformation info = new AnalysisInformation()
                 .setAnnotationGroupId(annotationGroupId)
-                .setStatus(status)
-                .setGroupName("Test");
-
-
+                .setStatus(status);
         String analysisId = infoDao.createAnalysisInformation(info);
+        
         WebRequest request = new GetMethodWebRequest(baseUrl,
                 "analysisInformation?analysisId=" + analysisId);
-        
         WebResponse response = conversation.getResponse(request);
         
         assertEquals(response.getText(), 200, response.getResponseCode());
         assertEquals("application/json", response.getContentType());
         AnalysisInformation retrievedInfo = AnalysisInformation.fromJson(response.getText());
-        assertEquals(info.setAnalysisId(analysisId), retrievedInfo);
+        assertEquals(
+                info.setAnalysisId(analysisId).setGroupName(groupName),
+                // ^We need to set the ID and group name of the expected info
+                // so that it's equal to the retrieved info
+                retrievedInfo
+        );
     }
     
     private static Status[] getStatusValues() {
@@ -151,7 +154,12 @@ public class AnalysisInformationServletTest {
             retrievedAnalyses.add(AnalysisInformation.fromJson(jsonObject.toString()));
         }
         Collections.sort(retrievedAnalyses, comparing(analysis -> analysis.getAnalysisId()));
-        assertEquals(Arrays.asList(info1, info2), retrievedAnalyses);
+        assertEquals(
+                Arrays.asList(info1.setGroupName(groupName), info2.setGroupName(groupName)),
+                // ^We need to set the group name of the expected info objects
+                // so that they'll be equal to the retrieved ones
+                retrievedAnalyses
+        );
     }
     
 }

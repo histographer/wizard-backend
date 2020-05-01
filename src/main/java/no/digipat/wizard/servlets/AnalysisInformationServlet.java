@@ -51,6 +51,7 @@ public class AnalysisInformationServlet extends HttpServlet {
      * 
      * <pre>
      * {
+     *   "groupName": "name of the group",
      *   "analyses": analyses
      * }
      * </pre>
@@ -70,9 +71,6 @@ public class AnalysisInformationServlet extends HttpServlet {
                 if (analysisInformation == null) {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 } else {
-                    AnnotationGroup annotationGroupObject = groupDao
-                            .getAnnotationGroup(analysisInformation.getAnnotationGroupId());
-                    analysisInformation.setGroupName(annotationGroupObject.getName());
                     response.getWriter().print(analysisInformation.toJson());
                 }
             } else if (annotationGroupId != null) {

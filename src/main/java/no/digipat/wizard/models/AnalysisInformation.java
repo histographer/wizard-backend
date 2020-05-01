@@ -10,6 +10,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import no.digipat.wizard.models.results.AnnotationGroupResults;
 
 /**
@@ -20,6 +21,7 @@ import no.digipat.wizard.models.results.AnnotationGroupResults;
  * @see AnnotationGroupResults
  *
  */
+@ToString
 @EqualsAndHashCode
 public class AnalysisInformation {
     

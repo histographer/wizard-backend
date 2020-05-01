@@ -2,7 +2,9 @@ package no.digipat.wizard.mongodb.dao;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.After;
@@ -17,6 +19,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import no.digipat.wizard.models.AnalysisInformation;
 import no.digipat.wizard.models.AnalysisInformation.Status;
+import no.digipat.wizard.models.AnnotationGroup;
 import no.digipat.wizard.mongodb.DatabaseUnitTests;
 
 @RunWith(JUnitParamsRunner.class)
@@ -25,7 +28,14 @@ public class MongoAnalysisInformationDAOTest {
     private static final String hexId = "0123456789abcdef01234567"; // 24 hexadecimal characters
     private static MongoClient client;
     private static String databaseName;
-    private MongoAnalysisInformationDAO dao;
+    private MongoAnalysisInformationDAO infoDao;
+    private MongoAnnotationGroupDAO groupDao;
+    private static final AnnotationGroup group = new AnnotationGroup()
+            .setAnnotationIds(new ArrayList<Long>())
+            .setCreationDate(new Date())
+            .setGroupId("aaaaaaaaaaaaaaaaaaaaaaaa")
+            .setName("test group")
+            .setProjectId(20L);
     
     @BeforeClass
     public static void setUpClass() {
@@ -35,7 +45,9 @@ public class MongoAnalysisInformationDAOTest {
     
     @Before
     public void setUp() {
-        dao = new MongoAnalysisInformationDAO(client, databaseName);
+        infoDao = new MongoAnalysisInformationDAO(client, databaseName);
+        groupDao = new MongoAnnotationGroupDAO(client, databaseName);
+        groupDao.createAnnotationGroup(group);
     }
     
     @After
@@ -52,12 +64,12 @@ public class MongoAnalysisInformationDAOTest {
     
     @Test(expected = NullPointerException.class)
     public void testCreateAnalysisWithNullStatus() {
-        dao.createAnalysisInformation(createAnalysisInfoWithNonNullFields().setStatus(null));
+        infoDao.createAnalysisInformation(createAnalysisInfoWithNonNullFields().setStatus(null));
     }
     
     @Test(expected = NullPointerException.class)
     public void testCreateAnalysisWithNullGroupId() {
-        dao.createAnalysisInformation(
+        infoDao.createAnalysisInformation(
                 createAnalysisInfoWithNonNullFields().setAnnotationGroupId(null)
         );
     }
@@ -68,27 +80,29 @@ public class MongoAnalysisInformationDAOTest {
         "oooooooooooooooooooooooo"
     })
     public void testCreateAnalysisWithInvalidId(String id) {
-        dao.createAnalysisInformation(createAnalysisInfoWithNonNullFields().setAnalysisId(id));
+        infoDao.createAnalysisInformation(createAnalysisInfoWithNonNullFields().setAnalysisId(id));
     }
     
     @Test(expected = IllegalStateException.class)
     public void testCreateAnalysisWithDuplicateId() {
         AnalysisInformation analysisInformation = createAnalysisInfoWithNonNullFields();
-        dao.createAnalysisInformation(analysisInformation);
-        dao.createAnalysisInformation(analysisInformation);
+        infoDao.createAnalysisInformation(analysisInformation);
+        infoDao.createAnalysisInformation(analysisInformation);
     }
     
     @Test
     public void testCreateAnalysisWithNullId() {
         AnalysisInformation analysis = new AnalysisInformation()
-                .setAnnotationGroupId(hexId)
-                .setStatus(Status.PENDING);
+                .setAnnotationGroupId(group.getGroupId())
+                .setStatus(Status.PENDING)
+                .setGroupName("this group name should be ignored");
         
-        String id = dao.createAnalysisInformation(analysis);
-        AnalysisInformation retrievedAnalysis = dao.getAnalysisInformation(id);
+        String id = infoDao.createAnalysisInformation(analysis);
+        AnalysisInformation retrievedAnalysis = infoDao.getAnalysisInformation(id);
         
         assertNotNull(id);
-        analysis.setAnalysisId(id); // Set ID so we can use equals method
+        // Set ID and group name so we can use equals method:
+        analysis.setAnalysisId(id).setGroupName(group.getName());
         assertEquals(analysis, retrievedAnalysis);
     }
     
@@ -96,12 +110,15 @@ public class MongoAnalysisInformationDAOTest {
     public void testCreateAnalysisWithProvidedId() {
         AnalysisInformation analysis = new AnalysisInformation()
                 .setAnalysisId(hexId)
-                .setAnnotationGroupId("abcdef0123456789abcdef12")
-                .setStatus(Status.SUCCESS);
+                .setAnnotationGroupId(group.getGroupId())
+                .setStatus(Status.SUCCESS)
+                .setGroupName("this group name should be ignored");
         
-        String id = dao.createAnalysisInformation(analysis);
-        AnalysisInformation retrievedAnalysis = dao.getAnalysisInformation(id);
+        String id = infoDao.createAnalysisInformation(analysis);
+        AnalysisInformation retrievedAnalysis = infoDao.getAnalysisInformation(id);
         
+        // Set group name so we can use equals method:
+        analysis.setGroupName(group.getName());
         assertEquals(analysis.getAnalysisId(), id);
         assertEquals(analysis, retrievedAnalysis);
     }
@@ -112,28 +129,28 @@ public class MongoAnalysisInformationDAOTest {
         "oooooooooooooooooooooooo"
     })
     public void testGetAnalysisWithInvalidId(String id) {
-        dao.getAnalysisInformation(id);
+        infoDao.getAnalysisInformation(id);
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testGetAnalysisWithNullId() {
-        dao.getAnalysisInformation(null);
+        infoDao.getAnalysisInformation(null);
     }
     
     @Test
     public void testGetNonexistentAnalysis() {
-        assertNull(dao.getAnalysisInformation(hexId));
+        assertNull(infoDao.getAnalysisInformation(hexId));
     }
     
     @Test(expected = NullPointerException.class)
     public void testUpdateNullStatus() {
-        dao.updateStatus(hexId, null);
+        infoDao.updateStatus(hexId, null);
     }
     
     @Test(expected = IllegalArgumentException.class)
     @Parameters(method = "getInvalidIds")
     public void testUpdateInvalidId(String id) {
-        dao.updateStatus(id, Status.SUCCESS);
+        infoDao.updateStatus(id, Status.SUCCESS);
     }
     
     private static String[] getInvalidIds() {
@@ -146,7 +163,7 @@ public class MongoAnalysisInformationDAOTest {
     
     @Test
     public void testUpdateStatusOfNonexistentAnalysis() {
-        assertFalse(dao.updateStatus(hexId, Status.SUCCESS));
+        assertFalse(infoDao.updateStatus(hexId, Status.SUCCESS));
     }
     
     @Test
@@ -155,46 +172,85 @@ public class MongoAnalysisInformationDAOTest {
                 .setAnalysisId(hexId)
                 .setAnnotationGroupId(hexId)
                 .setStatus(Status.PENDING);
-        dao.createAnalysisInformation(analysis);
+        infoDao.createAnalysisInformation(analysis);
         
-        boolean updated = dao.updateStatus(analysis.getAnalysisId(), Status.FAILURE);
+        boolean updated = infoDao.updateStatus(analysis.getAnalysisId(), Status.FAILURE);
         
         assertTrue(updated);
         assertEquals(
                 Status.FAILURE,
-                dao.getAnalysisInformation(analysis.getAnalysisId()).getStatus()
+                infoDao.getAnalysisInformation(analysis.getAnalysisId()).getStatus()
         );
     }
     
     @Test
     public void testGetAnalysesForGroup() throws Exception {
         AnalysisInformation info1 = new AnalysisInformation()
-                .setAnnotationGroupId("abcdef0123456789abcdef12")
-                .setStatus(Status.PENDING);
-        String id1 = dao.createAnalysisInformation(info1);
+                .setAnnotationGroupId(group.getGroupId())
+                .setStatus(Status.PENDING)
+                .setGroupName("this group name should be ignored");
+        String id1 = infoDao.createAnalysisInformation(info1);
         AnalysisInformation info2 = new AnalysisInformation()
-                .setAnnotationGroupId("abcdef0123456789abcdef12")
-                .setStatus(Status.SUCCESS);
-        String id2 = dao.createAnalysisInformation(info2);
+                .setAnnotationGroupId(group.getGroupId())
+                .setStatus(Status.SUCCESS)
+                .setGroupName("this group name should be ignored");
+        String id2 = infoDao.createAnalysisInformation(info2);
         AnalysisInformation info3 = new AnalysisInformation()
                 .setAnnotationGroupId("0123456789abcdef01234567")
                 .setStatus(Status.FAILURE);
-        dao.createAnalysisInformation(info3);
+        infoDao.createAnalysisInformation(info3);
         
-        List<AnalysisInformation> analyses = dao
-                .getAnalysisInformationForAnnotationGroup("abcdef0123456789abcdef12");
+        List<AnalysisInformation> analyses = infoDao
+                .getAnalysisInformationForAnnotationGroup(group.getGroupId());
         
         assertEquals(
-                Arrays.asList(info1.setAnalysisId(id1), info2.setAnalysisId(id2)),
+                Arrays.asList(
+                        info1.setAnalysisId(id1).setGroupName(group.getName()),
+                        info2.setAnalysisId(id2).setGroupName(group.getName())
+                ),
                 analyses
         );
     }
     
     @Test
     public void testGetAnalysesForNonexistentGroup() throws Exception {
-        List<AnalysisInformation> analyses = dao.getAnalysisInformationForAnnotationGroup(hexId);
+        List<AnalysisInformation> analyses = infoDao
+                .getAnalysisInformationForAnnotationGroup(hexId);
         
         assertEquals("List is not empty.", 0, analyses.size());
+    }
+    
+    @Test
+    public void testGroupNameWhenGettingSingleAnalysisWithNonexistentGroup() throws Exception {
+        AnalysisInformation info = new AnalysisInformation()
+                .setAnalysisId(hexId)
+                .setAnnotationGroupId("aaa")
+                .setStatus(Status.SUCCESS)
+                .setGroupName("this group name should be ignored");
+        
+        infoDao.createAnalysisInformation(info);
+        AnalysisInformation retrievedInfo = infoDao.getAnalysisInformation(info.getAnalysisId());
+        
+        assertNull("Group name should be null when the group does not exist",
+                retrievedInfo.getGroupName());
+        assertEquals(info.setGroupName(null), retrievedInfo);
+    }
+    
+    @Test
+    public void testGroupNameWhenGettingAllAnalysesWithNonexistentGroup() throws Exception {
+        AnalysisInformation info = new AnalysisInformation()
+                .setAnalysisId(hexId)
+                .setAnnotationGroupId("aaa")
+                .setStatus(Status.SUCCESS)
+                .setGroupName("this group name should be ignored");
+        
+        infoDao.createAnalysisInformation(info);
+        List<AnalysisInformation> infoList = infoDao
+                .getAnalysisInformationForAnnotationGroup("aaa");
+        
+        assertNull("Group name should be null when the group does not exist",
+                infoList.get(0).getGroupName());
+        assertEquals(Arrays.asList(info.setGroupName(null)), infoList);
     }
     
 }

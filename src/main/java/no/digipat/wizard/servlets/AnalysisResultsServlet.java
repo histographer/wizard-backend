@@ -22,12 +22,12 @@ import org.apache.commons.io.IOUtils;
 public class AnalysisResultsServlet extends HttpServlet {
     
     /**
-     * Inserts  analysis result into the database
-     * object of the following form:
+     * Inserts an analysis result into the database.
+     * 
+     * The request body must have the following form:
      *
      * <pre>
      * {
-     *   "csvBase64": &lt;string&gt;,
      *   "analysisId": &lt;string&gt;,
      *   "annotations": [
      *     {
@@ -127,13 +127,19 @@ public class AnalysisResultsServlet extends HttpServlet {
         MongoResultsDAO resultsDao = new MongoResultsDAO(getDatabaseClient(), getDatabaseName());
         MongoAnnotationGroupDAO groupDao =
             new MongoAnnotationGroupDAO(getDatabaseClient(), getDatabaseName());
-        String analysisId = request.getParameter("groupId");
-        if (analysisId == null) {
+        String groupId = request.getParameter("groupId");
+        if (groupId == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        AnnotationGroupResults results = resultsDao.getResults(analysisId);
-        AnnotationGroup group = groupDao.getAnnotationGroup(analysisId);
+        AnnotationGroupResults results = resultsDao.getResults(groupId);
+        AnnotationGroup group;
+        try {
+            group = groupDao.getAnnotationGroup(groupId);
+        } catch (IllegalArgumentException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid annotation group ID");
+            return;
+        }
         if (results == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {

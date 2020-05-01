@@ -3,6 +3,7 @@ package no.digipat.wizard.servlets;
 import com.meterware.httpunit.*;
 import com.mongodb.MongoClient;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import no.digipat.wizard.models.AnalysisInformation;
 import no.digipat.wizard.models.AnalysisInformation.Status;
 import no.digipat.wizard.models.AnnotationGroup;
@@ -100,7 +101,7 @@ public class AnalysisResultsServletTest {
     }
 
     @Test
-    public void testStatusCode404OnNonexistentAnalysis() throws Exception {
+    public void testStatusCode404OnPostToNonexistentAnalysis() throws Exception {
         WebRequest request = createPostRequest("analysisResults",
                 analyzeBodyValid, "application/json");
         
@@ -172,17 +173,23 @@ public class AnalysisResultsServletTest {
             // (and similar methods) throw IOException when the response code is 400,
             // even if conversation.getExceptionsThrownOnErrorStatus() is false
             assertTrue(e.getMessage().contains("400"));
-            // ^Kind of a hack, but there's not much else we can do
+            // ^Kind of a hack
+            // TODO replace the hack with something better
         }
     }
     
     @Test
-    public void testStatusCode400OnInvalidGet() throws Exception {
-        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisResults");
+    @Parameters({
+        "",
+        "?groupId=",
+        "?groupId=ooo"
+    })
+    public void testStatusCode400OnInvalidGet(String queryString) throws Exception {
+        WebRequest request = new GetMethodWebRequest(baseUrl, "analysisResults" + queryString);
         
         WebResponse response = conversation.getResponse(request);
         
-        assertEquals(400, response.getResponseCode());
+        assertEquals("\n" + response.getText() + "\n", 400, response.getResponseCode());
     }
     
     @Test
@@ -197,8 +204,15 @@ public class AnalysisResultsServletTest {
     
     @Test
     public void testGetResults() throws Exception {
+        AnnotationGroup group = new AnnotationGroup()
+                .setCreationDate(new Date())
+                .setName("group name")
+                .setProjectId(20L)
+                .setAnnotationIds(new ArrayList<Long>());
+        String groupId = groupDao.createAnnotationGroup(group);
+        groupDao.createAnnotationGroup(group);
         AnnotationGroupResults results = new AnnotationGroupResults()
-                .setGroupId("aaaaaaaaaaaaaaaaaaaaaaaa")
+                .setGroupId(groupId)
                 .setAnnotations(Arrays.asList(
                         createResults("he", 0.44f),
                         createResults("bc", 0.3f)
@@ -206,10 +220,10 @@ public class AnalysisResultsServletTest {
         resultDao.createAnnotationGroupResults(results);
         
         WebRequest request = new GetMethodWebRequest(baseUrl,
-                "analysisResults?groupId=aaaaaaaaaaaaaaaaaaaaaaaa");
+                "analysisResults?groupId=" + groupId);
         WebResponse response = conversation.getResponse(request);
         
-        assertEquals(200, response.getResponseCode());
+        assertEquals("\n" + response.getText() + "\n", 200, response.getResponseCode());
         assertEquals("application/json", response.getContentType());
         AnnotationGroupResults receivedResults = MongoResultsDAO
                 .jsonToAnnotationGroupResults(response.getText());

@@ -7,6 +7,7 @@ import com.meterware.httpunit.WebResponse;
 import com.mongodb.MongoClient;
 import junitparams.JUnitParamsRunner;
 import no.digipat.wizard.models.AnalysisInformation;
+import no.digipat.wizard.models.AnalysisInformation.Status;
 import no.digipat.wizard.models.AnnotationGroup;
 import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
@@ -66,7 +67,8 @@ public class StartAnalysisServletTest {
         WebRequest request = createPostRequest("startAnalysis", analyzeBodyInvalid,
                 "application/json");
         WebResponse response = conversation.getResponse(request);
-        assertEquals("Testing with message body: " + analyzeBodyInvalid + ".",
+        assertEquals("Testing with message body: " + analyzeBodyInvalid + "."
+                + " Got response: \n" + response.getText() + "\n",
                 400, response.getResponseCode());
     }
     
@@ -89,15 +91,18 @@ public class StartAnalysisServletTest {
                 .setName("group 1")
                 .setProjectId(20L);
         dao.createAnnotationGroup(group1);
+        
         WebRequest request = createPostRequest("startAnalysis",
                 analyzeBodyValid, "application/json");
         WebResponse response = conversation.getResponse(request);
+        
         assertEquals("Testing with message body: " + analyzeBodyValid + ".",
                 202, response.getResponseCode());
         JSONObject jsonObject = new JSONObject(response.getText());
         AnalysisInformation info = infoDao.getAnalysisInformation(
                 jsonObject.getString("analysisId"));
         assertNotNull(info);
+        assertEquals(Status.PENDING, info.getStatus());
     }
 
     @After

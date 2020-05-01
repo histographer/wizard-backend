@@ -34,34 +34,22 @@ public class ExportAnalysisResultsServlet extends HttpServlet {
      * </pre>
      * 
      */
-    @Override
+    @Override // TODO update docs
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String groupId = request.getParameter("groupId");
         String analyzeType = request.getParameter("analyzeType");
-        String path = getServletContext().getRealPath("/");
         if (groupId == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
         MongoResultsDAO dao = getDao();
         AnnotationGroupResults results = dao.getResults(groupId);
-        String base64 = null;
-        if (analyzeType == null) {
-            try {
-                base64 = CSVCreator.toCSV(results.getAnnotations(), path, null);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                base64 = CSVCreator.toCSV(results.getAnnotations(), path, analyzeType);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        if (base64 == null) {
+        if (results == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
+            String path = getServletContext().getRealPath("/");
+            String base64 = CSVCreator.toCSV(results.getAnnotations(), path, analyzeType);
             JSONObject responseJson = new JSONObject();
             responseJson.put("data", base64);
             response.getWriter().print(responseJson);

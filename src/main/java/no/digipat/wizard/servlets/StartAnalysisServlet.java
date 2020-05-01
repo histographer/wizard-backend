@@ -9,6 +9,7 @@ import no.digipat.wizard.models.startanalysis.CallbackURLs;
 import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -35,6 +36,7 @@ public class StartAnalysisServlet extends HttpServlet {
         MongoAnalysisInformationDAO analysisInformationDao =
                 new MongoAnalysisInformationDAO(client, databaseName);
         AnalysisPostBody analysisPostBody = null;
+        String analysisId;
         try {
             String requestJson = IOUtils.toString(request.getInputStream(), "UTF8");
             AnalysisPostRequest analysisPostRequest =
@@ -44,15 +46,14 @@ public class StartAnalysisServlet extends HttpServlet {
             AnalysisInformation info = new AnalysisInformation()
                     .setStatus(AnalysisInformation.Status.PENDING)
                     .setAnnotationGroupId(analysisPostRequest.getGroupId());
-            String id = analysisInformationDao.createAnalysisInformation(info);
-            info.setAnalysisId(id);
+            analysisId = analysisInformationDao.createAnalysisInformation(info);
             if (annotationGroup == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
 
             URL wizardURL = (URL) context.getAttribute("WIZARD_BACKEND_URL");
-            analysisPostBody = new AnalysisPostBody().setAnalysisId(id)
+            analysisPostBody = new AnalysisPostBody().setAnalysisId(analysisId)
                     .setProjectId(annotationGroup.getProjectId())
                     .setAnnotations(annotationGroup.getAnnotationIds())
                     .setAnalysis(analysisPostRequest.getAnalysis())
@@ -65,12 +66,16 @@ public class StartAnalysisServlet extends HttpServlet {
         } catch (IllegalArgumentException | NullPointerException | ClassCastException e) {
             context.log(e.toString());
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+            return;
         }
 
         if (analysisPostBody == null) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Something went wrong, the post body is null at StartAnalysisServlet."
                     + " Failure in WIZARD_BACKEND");
+            // TODO Throw an exception instead.
+            // (Or just refactor so that this check is unnecessary)
+            return;
         }
 
         URL analysisURL = (URL) context.getAttribute("ANALYSIS_URL");
@@ -89,10 +94,13 @@ public class StartAnalysisServlet extends HttpServlet {
         }
         connection.connect();
         int responseCode = connection.getResponseCode();
-        if (responseCode != 200) {
-            response.sendError(responseCode, "Expected response code 200 from analysis,"
+        if (responseCode != 202) {
+            response.sendError(responseCode, "Expected response code 202 from analysis,"
                     + " but got " + responseCode);
+            // TODO throw an exception instead
+            return;
         }
         response.setStatus(HttpServletResponse.SC_ACCEPTED);
+        response.getWriter().print(new JSONObject().put("analysisId", analysisId));
     }
 }

@@ -21,7 +21,7 @@ public final class CSVCreator {
     }
     
     public static String toCSV(List<Results> results, String path, String analyzeType)
-            throws Exception {
+            throws RuntimeException, IOException {
         List<Results> curatedResultList;
         if (analyzeType == null) {
             curatedResultList = results;
@@ -46,11 +46,15 @@ public final class CSVCreator {
 
         String jsonstring = CSVCreator.toJsonString(curatedResultList);
         JFlat flat = new JFlat(jsonstring);
-        flat.json2Sheet().headerSeparator("_").getJsonAsSheet();
+        try {
+            flat.json2Sheet().headerSeparator("_").getJsonAsSheet();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         UUID uuid = UUID.randomUUID();
         String filePath = path + "/" + uuid + ".csv";
         flat.write2csv(filePath);
-        File f = new File(filePath);
+        File f = new File(filePath); // TODO just use a temp file
         String base64String = CSVCreator.encodeFileToBase64Binary(f);
         f.delete();
         return base64String;

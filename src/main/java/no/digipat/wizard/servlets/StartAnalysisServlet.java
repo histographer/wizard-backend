@@ -8,6 +8,8 @@ import no.digipat.wizard.models.startanalysis.AnalysisPostRequest;
 import no.digipat.wizard.models.startanalysis.CallbackURLs;
 import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
+import no.digipat.wizard.servlets.util.Analysis;
+
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
@@ -18,89 +20,91 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 @WebServlet(urlPatterns = "/startAnalysis")
 public class StartAnalysisServlet extends HttpServlet {
-
+    
     // TODO DOCS
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        ServletContext context = getServletContext();
-        String databaseName = (String) context.getAttribute("MONGO_DATABASE");
-        MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
-        MongoAnnotationGroupDAO dao = new MongoAnnotationGroupDAO(client, databaseName);
-        MongoAnalysisInformationDAO analysisInformationDao =
-                new MongoAnalysisInformationDAO(client, databaseName);
-        AnalysisPostBody analysisPostBody = null;
-        String analysisId;
+        String requestJson = IOUtils.toString(request.getInputStream(),
+                request.getCharacterEncoding());
+        AnalysisPostRequest analysisPostRequest = AnalysisPostRequest.fromJsonString(requestJson);
+        
+        AnnotationGroup annotationGroup;
         try {
-            String requestJson = IOUtils.toString(request.getInputStream(), "UTF8");
-            AnalysisPostRequest analysisPostRequest =
-                    AnalysisPostRequest.fromJsonString(requestJson);
-            AnnotationGroup annotationGroup = dao.getAnnotationGroup(
-                    analysisPostRequest.getGroupId());
-            AnalysisInformation info = new AnalysisInformation()
-                    .setStatus(AnalysisInformation.Status.PENDING)
-                    .setAnnotationGroupId(analysisPostRequest.getGroupId());
-            analysisId = analysisInformationDao.createAnalysisInformation(info);
-            if (annotationGroup == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
-
-            URL wizardURL = (URL) context.getAttribute("WIZARD_BACKEND_URL");
-            analysisPostBody = new AnalysisPostBody().setAnalysisId(analysisId)
-                    .setProjectId(annotationGroup.getProjectId())
-                    .setAnnotations(annotationGroup.getAnnotationIds())
-                    .setAnalysis(analysisPostRequest.getAnalysis())
-                    .setCallbackURLs(
-                            new CallbackURLs()
-                            .setAnalysisResults(wizardURL + "/analysisResults")
-                            .setUpdateStatus(wizardURL + "/analysisInformation"));
-
+            annotationGroup = getAnnotationGroup(analysisPostRequest);
+        } catch (IllegalArgumentException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid or missing group ID");
+            return;
+        }
+        if (annotationGroup == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        
+        String analysisId = createAndGetAnalysisInformationId(annotationGroup.getGroupId());
+        
+        AnalysisPostBody analysisPostBody = createAnalysisPostBody(analysisId,
+                annotationGroup, analysisPostRequest);
+        try {
             AnalysisPostBody.validate(analysisPostBody);
-        } catch (IllegalArgumentException | NullPointerException | ClassCastException e) {
-            context.log(e.toString());
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+        } catch (IllegalArgumentException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-
-        if (analysisPostBody == null) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Something went wrong, the post body is null at StartAnalysisServlet."
-                    + " Failure in WIZARD_BACKEND");
-            // TODO Throw an exception instead.
-            // (Or just refactor so that this check is unnecessary)
-            return;
-        }
-
-        URL analysisURL = (URL) context.getAttribute("ANALYSIS_URL");
-        analysisURL = new URL(analysisURL, "analysis/analyze/");
-        String requestJsonString = AnalysisPostBody.toJsonString(analysisPostBody);
-        context.log("StartAnalysisServlet tries to connect to: " + analysisURL.toString());
-        context.log("With body: " + requestJsonString);
-        HttpURLConnection connection = (HttpURLConnection) analysisURL.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setRequestProperty("Accept", "application/json");
-        connection.setDoOutput(true);
-        try (PrintWriter writer = new PrintWriter(connection.getOutputStream())) {
-            writer.print(requestJsonString);
-            writer.flush();
-        }
-        connection.connect();
-        int responseCode = connection.getResponseCode();
-        if (responseCode != 202) {
-            response.sendError(responseCode, "Expected response code 202 from analysis,"
-                    + " but got " + responseCode);
-            // TODO throw an exception instead
-            return;
-        }
+        Analysis.getAnalysisPostResponse(
+                (URL) getServletContext().getAttribute("ANALYSIS_URL"),
+                "analysis/analyze/",
+                AnalysisPostBody.toJsonString(analysisPostBody),
+                202
+        );
         response.setStatus(HttpServletResponse.SC_ACCEPTED);
         response.getWriter().print(new JSONObject().put("analysisId", analysisId));
     }
+    
+    private AnnotationGroup getAnnotationGroup(AnalysisPostRequest analysisPostRequest)
+            throws IllegalArgumentException, IOException {
+        ServletContext context = getServletContext();
+        String databaseName = (String) context.getAttribute("MONGO_DATABASE");
+        MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
+        MongoAnnotationGroupDAO groupDao = new MongoAnnotationGroupDAO(client, databaseName);
+        return groupDao.getAnnotationGroup(analysisPostRequest.getGroupId());
+    }
+    
+    private String createAndGetAnalysisInformationId(String groupId) {
+        ServletContext context = getServletContext();
+        String databaseName = (String) context.getAttribute("MONGO_DATABASE");
+        MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");
+        MongoAnalysisInformationDAO analysisInformationDao =
+                new MongoAnalysisInformationDAO(client, databaseName);
+        AnalysisInformation info = new AnalysisInformation()
+                .setStatus(AnalysisInformation.Status.PENDING)
+                .setAnnotationGroupId(groupId);
+        return analysisInformationDao.createAnalysisInformation(info);
+    }
+    
+    private AnalysisPostBody createAnalysisPostBody(String analysisId,
+            AnnotationGroup annotationGroup, AnalysisPostRequest analysisPostRequest)
+                    throws ServletException {
+        URL wizardURL = (URL) getServletContext().getAttribute("WIZARD_BACKEND_URL");
+        try {
+            return new AnalysisPostBody()
+                .setAnalysisId(analysisId)
+                .setProjectId(annotationGroup.getProjectId())
+                .setAnnotations(annotationGroup.getAnnotationIds())
+                .setAnalysis(analysisPostRequest.getAnalysis())
+                .setCallbackURLs(
+                    new CallbackURLs()
+                        .setAnalysisResult(new URL(wizardURL, "analysisResults"))
+                        .setUpdateStatus(new URL(wizardURL, "analysisInformation"))
+                );
+        } catch (MalformedURLException e) {
+            throw new ServletException(e);
+        }
+    }
+    
 }

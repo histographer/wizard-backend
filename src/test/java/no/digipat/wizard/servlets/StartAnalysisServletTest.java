@@ -96,7 +96,8 @@ public class StartAnalysisServletTest {
                 analyzeBodyValid, "application/json");
         WebResponse response = conversation.getResponse(request);
         
-        assertEquals("Testing with message body: " + analyzeBodyValid + ".",
+        assertEquals("Testing with message body: " + analyzeBodyValid + "."
+                + "Got response body: \n" + response.getText() + "\n",
                 202, response.getResponseCode());
         JSONObject jsonObject = new JSONObject(response.getText());
         AnalysisInformation info = infoDao.getAnalysisInformation(

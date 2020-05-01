@@ -5,6 +5,8 @@ import no.digipat.wizard.models.startanalysis.CallbackURLs;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
@@ -14,10 +16,10 @@ public class AnalysisPostBodyTests {
     private AnalysisPostBody analysisPostBody;
 
     @Before
-    public void setUp() {
+    public void setUp() throws MalformedURLException {
         analysisJson = "{\"analysisId\":\"abc\",\"projectId\":4,\"annotations\":[1,2,3],"
                 + "\"analysis\":[\"he\",\"rgb\"], \"callbackURLs\":"
-                + "{\"analysisResults\":\"localhost\", \"updateStatus\":\"localhost\"}}";
+                + "{\"analysisResults\":\"http://localhost\", \"updateStatus\":\"http://localhost\"}}";
         analysisPostBody = new AnalysisPostBody().setAnalysisId("abc")
                 .setAnnotations(new ArrayList<Long>() {
                     {
@@ -35,8 +37,8 @@ public class AnalysisPostBodyTests {
                 .setProjectId(4L)
                 .setCallbackURLs(
                         new CallbackURLs()
-                        .setAnalysisResults("localhost")
-                        .setUpdateStatus("localhost")
+                        .setAnalysisResult(new URL("http://localhost"))
+                        .setUpdateStatus(new URL("http://localhost"))
                 );
     }
 

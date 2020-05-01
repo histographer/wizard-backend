@@ -1,28 +1,30 @@
 package no.digipat.wizard.models.startanalysis;
 
-import javax.validation.constraints.NotBlank;
+import java.net.URL;
+
+import javax.validation.constraints.NotNull;
 
 public class CallbackURLs {
 
-    @NotBlank(message = "analysisResults can not be null or empty")
-    private String analysisResults;
-    @NotBlank(message = "updateStatus can not be null or empty")
-    private String updateStatus;
+    @NotNull
+    private URL analysisResults;
+    @NotNull
+    private URL updateStatus;
 
-    public String getAnalysisResults() {
+    public URL getAnalysisResults() {
         return analysisResults;
     }
 
-    public CallbackURLs setAnalysisResults(String analysisResults) {
+    public CallbackURLs setAnalysisResult(URL analysisResults) {
         this.analysisResults = analysisResults;
         return this;
     }
 
-    public String getUpdateStatus() {
+    public URL getUpdateStatus() {
         return updateStatus;
     }
 
-    public CallbackURLs setUpdateStatus(String updateStatus) {
+    public CallbackURLs setUpdateStatus(URL updateStatus) {
         this.updateStatus = updateStatus;
         return this;
     }
@@ -30,8 +32,8 @@ public class CallbackURLs {
     @Override
     public String toString() {
         return "CallbackURLs{"
-                + "analysisResults='" + analysisResults + '\''
-                + ", updateStatus='" + updateStatus + '\''
-                + '}';
+                + "analysisResults='" + analysisResults + "'"
+                + ", updateStatus='" + updateStatus + "'"
+                + "}";
     }
 }

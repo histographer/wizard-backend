@@ -76,6 +76,8 @@ assertEquals(expectedFoo, actualFoo);
 
 Finally, notice that the id field is declared to be an `Integer`, not the primitive `int`. This is because `0`, which is the default value for primitive ints, does not necessarily make sense as a default value for a model property. The default value `null` of the boxed type is usually a better default in cases like this one.
 
+**NB**: Some of the models are converted to or from JSON objects by using their fields (such as `id` in the `Foo` example). A consequence of this is that changing the name of a field can break compatibility with other components of the application, such as the front end. If you decide to change the name of a model's field, you should make sure that any code that converts that model to or from JSON still gives the same results. Such code is typically found in either the model class itself or in a related DAO class. It is also important to be aware that although some of the unit and integration tests will detect such compatibility breakage, others may not, since they may be using the existing JSON conversion code (that is, the code whose behaviour may change if the name of a field changes) to generate or parse JSON.
+
 Once we have a `Foo` model, we can make a DAO class for it, which is responsible for performing `Foo`-related database actions:
 
 ```java

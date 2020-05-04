@@ -35,11 +35,11 @@ public class IntegrationTests {
         String databaseHost = System.getenv("WIZARD_TEST_MONGODB_HOST");
         String databasePort = System.getenv("WIZARD_TEST_MONGODB_PORT");
         String databaseUsername = URLEncoder.encode(
-                System.getenv("WIZARD_TEST_MONGODB_ROOT_USERNAME"),
+                System.getenv("WIZARD_TEST_MONGODB_USERNAME"),
                 "UTF-8"
         );
         String databasePassword = URLEncoder.encode(
-                System.getenv("WIZARD_TEST_MONGODB_ROOT_PASSWORD"),
+                System.getenv("WIZARD_TEST_MONGODB_PASSWORD"),
                 "UTF-8"
         );
         databaseName = System.getenv("WIZARD_TEST_MONGODB_DATABASE");

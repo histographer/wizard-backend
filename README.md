@@ -25,14 +25,16 @@ Before you can run the integration tests, you have to set some environment varia
 ```
 WIZARD_TEST_MONGODB_HOST: localhost
 WIZARD_TEST_MONGODB_PORT: 27019
-WIZARD_TEST_MONGODB_ROOT_USERNAME: admin
-WIZARD_TEST_MONGODB_ROOT_PASSWORD: password123
+WIZARD_TEST_MONGODB_USERNAME: test_user
+WIZARD_TEST_MONGODB_PASSWORD: test_password
 WIZARD_TEST_MONGODB_DATABASE: wizard_test
 WIZARD_TEST_TOMCAT_PROTOCOL: http
 WIZARD_TEST_TOMCAT_HOST: localhost
 WIZARD_TEST_TOMCAT_PORT: 8082
 
 ```
+
+The port numbers can be changed, but the rest should not be changed.
 
 In addition, you need to copy the contents of the file `.analysis_test.env.sample` into a file with the name `.analysis_test.env`.
 

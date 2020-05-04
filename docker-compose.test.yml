@@ -7,9 +7,9 @@ services:
     container_name: wizard_mongo_test
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${WIZARD_TEST_MONGODB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${WIZARD_TEST_MONGODB_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: wizard
+      MONGO_INITDB_ROOT_USERNAME: ${WIZARD_TEST_MONGODB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${WIZARD_TEST_MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: wizard_test
     volumes:
       - ./init_mongo/init-mongo-test.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - mongodata:/data/db
@@ -29,9 +29,9 @@ services:
     environment:
       WIZARD_MONGODB_HOST: wizard_mongo_test
       WIZARD_MONGODB_PORT: 27017
-      WIZARD_MONGODB_USERNAME: test_user
-      WIZARD_MONGODB_PASSWORD: test_password
-      WIZARD_MONGODB_DATABASE: wizard
+      WIZARD_MONGODB_USERNAME: ${WIZARD_TEST_MONGODB_USERNAME}
+      WIZARD_MONGODB_PASSWORD: ${WIZARD_TEST_MONGODB_PASSWORD}
+      WIZARD_MONGODB_DATABASE: wizard_test
       WIZARD_BACKEND_URL: wizard_backend_test
       WIZARD_BACKEND_PORT: ${WIZARD_TEST_TOMCAT_PORT}
       WIZARD_BACKEND_PROTOCOL: http

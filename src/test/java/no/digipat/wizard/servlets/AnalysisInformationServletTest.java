@@ -162,4 +162,13 @@ public class AnalysisInformationServletTest {
         );
     }
     
+    @Test
+    public void test404OnNonexistentGroup() throws Exception {
+        WebRequest request = new GetMethodWebRequest(baseUrl,
+                "analysisInformation?annotationGroupId=0123456789abcdef01234567");
+        WebResponse response = conversation.getResponse(request);
+        
+        assertEquals(404, response.getResponseCode());
+    }
+    
 }

@@ -82,10 +82,14 @@ public class AnalysisInformationServlet extends HttpServlet {
                 }
                 AnnotationGroup annotationGroupObject = groupDao
                         .getAnnotationGroup(annotationGroupId);
-                JSONObject responseJson = new JSONObject();
-                responseJson.put("groupName", annotationGroupObject.getName());
-                responseJson.put("analyses", array);
-                response.getWriter().print(responseJson);
+                if (annotationGroupObject == null) {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                } else {
+                    JSONObject responseJson = new JSONObject();
+                    responseJson.put("groupName", annotationGroupObject.getName());
+                    responseJson.put("analyses", array);
+                    response.getWriter().print(responseJson);
+                }
             } else {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             }

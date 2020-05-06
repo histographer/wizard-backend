@@ -57,13 +57,13 @@ public class MongoResultsDAO {
     }
 
     /**
-     * Create annotation group results.
+     * Creates annotation group results.
      *
      * @param annotationGroupResults the annotation group results
      * 
      * @throws IllegalArgumentException if the results are invalid
      * @throws IllegalStateException if an instance of {@code AnnotationGroupResults} with the
-     * same analysis ID already exists in the database
+     * same group ID already exists in the database
      */
     public void createAnnotationGroupResults(AnnotationGroupResults annotationGroupResults)
             throws IllegalArgumentException, IllegalStateException {
@@ -79,6 +79,12 @@ public class MongoResultsDAO {
         }
     }
 
+    /**
+     * Creates results for an annotation group, or update the existing
+     * results if they already exist.
+     * 
+     * @param annotationGroupResults the annotation group results
+     */
     public void createAndUpdateResults(AnnotationGroupResults annotationGroupResults) {
         AnnotationGroupResults res = collection.find(
                 eq("_id", annotationGroupResults.getGroupId())
@@ -114,7 +120,7 @@ public class MongoResultsDAO {
 
 
     /**
-     * Validate annotation group results data structure is valid.
+     * Validates annotation group results.
      *
      * @param annotationGroupResults the annotation group results
      * @throws IllegalArgumentException if it doesn't pass validation
@@ -156,7 +162,7 @@ public class MongoResultsDAO {
     /**
      * Gets an instance of {@code AnnotationGroupResults} from the database.
      *
-     * @param groupId the analysisId
+     * @param groupId the annotation group ID
      * @return the results, or {@code null} if the results don't exist
      */
     public AnnotationGroupResults getResults(String groupId) {
@@ -164,11 +170,14 @@ public class MongoResultsDAO {
     }
 
     /**
-     * Json to annotation group results annotation group results.
-     * @throws NullPointerException if {@code json} is null
-     * @throws IllegalArgumentException if {@code json} can not be cast to AnnotationGroupResults
-     * @param json the json string
+     * Converts a JSON string to annotation group results.
+     * 
+     * @param json the JSON string
+     * 
      * @return the annotationGroupResults object
+     * 
+     * @throws NullPointerException if {@code json} is {@code null}
+     * @throws IllegalArgumentException if {@code json} is not valid
      */
     public static AnnotationGroupResults jsonToAnnotationGroupResults(String json)
             throws IllegalArgumentException, NullPointerException {
@@ -197,6 +206,15 @@ public class MongoResultsDAO {
         return annotationGroupResults;
     }
 
+    /**
+     * Converts a JSON string to an {@code AnnotationGroupResultsRequestBody}.
+     * 
+     * @param json the JSON string
+     * @return the {@code AnnotationGroupResultsRequestBody}
+     * @throws IllegalArgumentException if {@code json} is not valid
+     * @throws NullPointerException if {@code json} is {@code null} or is missing
+     * an analysis ID
+     */
     public static AnnotationGroupResultsRequestBody jsonToAnnotationGroupResultsRequestBody(
             String json) throws IllegalArgumentException, NullPointerException {
         if (json == null) {
@@ -227,10 +245,11 @@ public class MongoResultsDAO {
     }
 
     /**
-     * Annotation group results to json string.
+     * Converts annotation group results to a JSON string.
      *
      * @param annotationGroupResults the annotation group results
-     * @return the string
+     * @param annotationGroupName the annotation group name
+     * @return the JSON string
      */
     public static String annotationGroupResultsToJson(
             AnnotationGroupResults annotationGroupResults, String annotationGroupName) {

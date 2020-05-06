@@ -18,8 +18,8 @@ import org.json.JSONTokener;
 public class AvailableAnalysesServlet extends HttpServlet {
     
     /**
-     * Gets the names of the types of analysis that are available,
-     * in the following format:
+     * Gets the names of the types of analysis that are available.
+     * The response body has the following format:
      * 
      * <pre>
      * {

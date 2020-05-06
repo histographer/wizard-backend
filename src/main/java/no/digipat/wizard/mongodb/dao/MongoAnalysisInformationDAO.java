@@ -29,6 +29,12 @@ public class MongoAnalysisInformationDAO {
     private final MongoCollection<Document> collection;
     private final MongoAnnotationGroupDAO groupDao;
     
+    /**
+     * Constructs a DAO.
+     * 
+     * @param client the client with which to connect to the database
+     * @param databaseName the name of the database
+     */
     public MongoAnalysisInformationDAO(MongoClient client, String databaseName) {
         this.collection = client.getDatabase(databaseName).getCollection("AnalysisInformation");
         this.groupDao = new MongoAnnotationGroupDAO(client, databaseName);

@@ -12,8 +12,8 @@ import no.digipat.wizard.models.AnalysisInformation;
 import java.util.List;
 
 /**
- * A representation of a group of annotations. All the setters of
- * this class return the instance on which they are called.
+ * A representation of analysis results for a group of annotations.
+ * All the setters of this class return the instance on which they are called.
  *
  * @author Kent Are Torvik
  * 
@@ -29,6 +29,11 @@ public class AnnotationGroupResults {
     @NotEmpty(message = "AnnotationGroupResults: results can not be null or empty")
     private List<Results> annotations;
 
+    /**
+     * Gets the ID of the annotation group with which the results are associated.
+     * 
+     * @return the group ID
+     */
     public String getGroupId() {
         return groupId;
     }
@@ -38,6 +43,13 @@ public class AnnotationGroupResults {
         return this;
     }
 
+    /**
+     * Gets the list of results associated with the individual
+     * annotations in the group.
+     * 
+     * @return a list of {@code Results} instances, each one
+     * being associated with a single annotation
+     */
     public List<Results> getAnnotations() {
         return annotations;
     }

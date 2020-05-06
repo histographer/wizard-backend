@@ -58,6 +58,7 @@ public class AnalysisInformation {
     
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Status.class, new TypeAdapter<Status>() {
+                // Custom type adapter for handling status values
                 @Override
                 public void write(JsonWriter out, Status value) throws IOException {
                     if (value == null) {

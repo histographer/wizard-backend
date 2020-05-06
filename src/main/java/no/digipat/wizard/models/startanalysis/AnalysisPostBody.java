@@ -14,7 +14,7 @@ import java.util.Set;
 
 /**
  *
- * Represents the POST body that is sent to analysis.
+ * Represents the POST body that is sent to the analysis backend.
  *
  * @author Kent Are Torvik
  *
@@ -40,8 +40,10 @@ public class AnalysisPostBody {
      * Validates that @code{analysisPostBody} is valid.
      *
      * @param analysisPostBody the analysis post body
+     * 
+     * @throws IllegalArgumentException if {@code ananalysisPostBody} is not valid
      */
-    public static void validate(AnalysisPostBody analysisPostBody) {
+    public static void validate(AnalysisPostBody analysisPostBody) throws IllegalArgumentException {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Set<ConstraintViolation<AnalysisPostBody>> violations = factory
                 .getValidator().validate(analysisPostBody);
@@ -57,11 +59,24 @@ public class AnalysisPostBody {
         }
     }
 
+    /**
+     * Converts an {@code AnalysisPostBody} to a JSON string.
+     * 
+     * @param analysisPostBody the {@code AnalysisPostBody}
+     * @return the JSON striing
+     */
     public static String toJsonString(AnalysisPostBody analysisPostBody) {
         Gson gson = new Gson();
         return gson.toJson(analysisPostBody);
     }
 
+    /**
+     * Converts a JSON string to an {@code AnalysisPostBody}.
+     * 
+     * @param json the JSON string
+     * 
+     * @return the {@code AnalysisPostBody}
+     */
     public static AnalysisPostBody fromJsonString(String json) {
         if (json == null) {
             throw new NullPointerException("AnalysisPostBody: Json is not set");

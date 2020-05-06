@@ -27,7 +27,15 @@ public class AnalysisPostRequest {
     private List<String> analysis;
 
 
-    public static void validate(AnalysisPostRequest analysisPostRequest) {
+    /**
+     * Validates an {@code AnalysisPostRequest}.
+     * 
+     * @param analysisPostRequest the {@code AnalysisPostRequest}
+     * 
+     * @throws IllegalArgumentException if {@code analysisPostRequest} is not valid
+     */
+    public static void validate(AnalysisPostRequest analysisPostRequest)
+            throws IllegalArgumentException {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Set<ConstraintViolation<AnalysisPostRequest>> violations = factory
                 .getValidator().validate(analysisPostRequest);
@@ -59,6 +67,13 @@ public class AnalysisPostRequest {
         return this;
     }
 
+    /**
+     * Converts a JSON string to an {@code AnalysisPostRequest}.
+     * 
+     * @param json the JSON string
+     * 
+     * @return the {@code AnalysisPostRequest}
+     */
     public static AnalysisPostRequest fromJsonString(String json) {
         if (json == null) {
             throw new NullPointerException("Analyze: Json is not set");

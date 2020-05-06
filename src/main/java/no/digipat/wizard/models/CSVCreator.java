@@ -14,14 +14,32 @@ import java.util.Base64;
 
 
 
+/**
+ * Utility class for converting analysis results to CSV.
+ * 
+ * @author Kent Are Torvik
+ *
+ */
 public final class CSVCreator {
     
     private CSVCreator() {
         throw new UnsupportedOperationException("This is a utility class.");
     }
     
+    /**
+     * Converts a list of results to a CSV string.
+     * 
+     * @param results the results
+     * @param path the path where the temporary file should be stored
+     * @param analyzeType the type of analysis that should be included. If {@code null},
+     * all analyses will be included.
+     * 
+     * @return the CSV string
+     * 
+     * @throws IOException if an I/O error occurs
+     */
     public static String toCSV(List<Results> results, String path, String analyzeType)
-            throws RuntimeException, IOException {
+            throws IOException {
         List<Results> curatedResultList;
         if (analyzeType == null) {
             curatedResultList = results;
@@ -50,6 +68,7 @@ public final class CSVCreator {
             flat.json2Sheet().headerSeparator("_").getJsonAsSheet();
         } catch (Exception e) {
             throw new RuntimeException(e);
+            // This should never happen
         }
         UUID uuid = UUID.randomUUID();
         String filePath = path + "/" + uuid + ".csv";

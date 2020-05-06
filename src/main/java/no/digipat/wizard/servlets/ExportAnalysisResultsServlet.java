@@ -27,6 +27,10 @@ public class ExportAnalysisResultsServlet extends HttpServlet {
             throws ServletException, IOException {
         String groupId = request.getParameter("groupId");
         String analyzeType = request.getParameter("analyzeType");
+        // If it becomes necessary to support the export of several (but not all)
+        // analysis types simultaneously, we could use request.getParameterValues
+        // to get all the requested types if the query string is something like
+        // ?groupId=123&analyzeType=he&analyzeType=hsv
         if (groupId == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
@@ -37,9 +41,9 @@ public class ExportAnalysisResultsServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
             String path = getServletContext().getRealPath("/");
-            String base64 = CSVCreator.toCSV(results.getAnnotations(), path, analyzeType);
+            String csv = CSVCreator.toCSV(results.getAnnotations(), path, analyzeType);
             JSONObject responseJson = new JSONObject();
-            responseJson.put("data", base64);
+            responseJson.put("data", csv);
             response.getWriter().print(responseJson);
         }
     }

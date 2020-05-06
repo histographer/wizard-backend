@@ -13,7 +13,8 @@ import java.util.List;
  * this class return the instance on which they are called.
  *
  * @author Kent Are Torvik
- *
+ * 
+ * @see AnnotationGroupResults
  */
 @EqualsAndHashCode
 public class Results {
@@ -22,6 +23,11 @@ public class Results {
     @NotEmpty(message = "Results: List can not be null or empty")
     private List<AnalysisResult> results;
 
+    /**
+     * Gets the ID of the annotation with which the results are associated.
+     * 
+     * @return the annotation ID
+     */
     public Long getAnnotationId() {
         return annotationId;
     }
@@ -31,6 +37,11 @@ public class Results {
         return this;
     }
 
+    /**
+     * Gets the annotation's analysis results.
+     * 
+     * @return the results
+     */
     public List<AnalysisResult> getResults() {
         return results;
     }

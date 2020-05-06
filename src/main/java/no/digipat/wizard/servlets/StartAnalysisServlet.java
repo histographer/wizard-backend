@@ -26,7 +26,9 @@ import java.net.URL;
 @WebServlet(urlPatterns = "/startAnalysis")
 public class StartAnalysisServlet extends HttpServlet {
     
-    // TODO DOCS
+    /**
+     * Starts an analysis.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -46,7 +48,7 @@ public class StartAnalysisServlet extends HttpServlet {
             return;
         }
         
-        String analysisId = createAndGetAnalysisInformationId(annotationGroup.getGroupId());
+        String analysisId = createAnalysisInformationAndGetId(annotationGroup.getGroupId());
         
         AnalysisPostBody analysisPostBody = createAnalysisPostBody(analysisId,
                 annotationGroup, analysisPostRequest);
@@ -75,7 +77,7 @@ public class StartAnalysisServlet extends HttpServlet {
         return groupDao.getAnnotationGroup(analysisPostRequest.getGroupId());
     }
     
-    private String createAndGetAnalysisInformationId(String groupId) {
+    private String createAnalysisInformationAndGetId(String groupId) {
         ServletContext context = getServletContext();
         String databaseName = (String) context.getAttribute("MONGO_DATABASE");
         MongoClient client = (MongoClient) context.getAttribute("MONGO_CLIENT");

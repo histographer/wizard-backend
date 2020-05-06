@@ -8,13 +8,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Adds environment variables to context
+ * Adds environment variables to context.
  */
 @WebListener
 public class EnvironmentContextListener implements ServletContextListener {
 
     /**
-     * Adds environment variables to context
+     * Adds environment variables to context.
+     * 
      * @param servletContextEvent
      */
     @Override

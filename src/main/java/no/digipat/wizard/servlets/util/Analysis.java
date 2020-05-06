@@ -23,7 +23,7 @@ public final class Analysis {
     
     /**
      * Sends a POST request to the analysis API with a given
-     * as the body, returning the response.
+     * request body, returning the response.
      * 
      * @param baseUrl the base URL of the analysis API, e.g. {@code http://example.com/api}.
      * @param path the relative path of the request

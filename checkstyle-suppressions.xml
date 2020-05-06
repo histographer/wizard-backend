@@ -6,4 +6,9 @@
   <suppress
   checks="MissingJavadocMethod|MissingJavadocType|JavadocVariable|HideUtilityClassConstructor"
   files="src/test/.*"/>
+  <suppress
+  checks="MissingJavadocMethod|MissingJavadocType"
+  files="src/main/java/no/digipat/wizard/servlets/.*"
+  /> <!-- There's not really a point in requring Javadoc comments for servlets
+          since we're currently documenting the API in API.md. -->
 </suppressions>

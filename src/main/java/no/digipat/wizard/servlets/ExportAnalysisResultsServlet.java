@@ -40,8 +40,7 @@ public class ExportAnalysisResultsServlet extends HttpServlet {
         if (results == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
-            String path = getServletContext().getRealPath("/");
-            String csv = CSVCreator.toCSV(results.getAnnotations(), path, analyzeType);
+            String csv = CSVCreator.toCSV(results.getAnnotations(), analyzeType);
             JSONObject responseJson = new JSONObject();
             responseJson.put("data", csv);
             response.getWriter().print(responseJson);

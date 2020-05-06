@@ -11,9 +11,7 @@ import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 
 import com.meterware.httpunit.GetMethodWebRequest;
@@ -43,10 +41,6 @@ public class ExportAnalysisResultsTest {
     private WebConversation conversation;
     private static final String groupId = "aaaaaaaaaaaaaaaaaaaaaaaa";
     private static AnnotationGroupResults groupResults;
-    
-    @ClassRule
-    public static TemporaryFolder folder = new TemporaryFolder();
-    // TODO remove the folder after CSVCreator has been updated
     
     @BeforeClass
     public static void setUpClass() {
@@ -119,9 +113,9 @@ public class ExportAnalysisResultsTest {
         "bbbbbbbbbbbbbbbbbbbbbbbb",
         "ooo"
     })
-    public void testStatusCode404(String groupId) throws Exception {
+    public void testStatusCode404(String nonexistentGroupId) throws Exception {
         WebRequest request = new GetMethodWebRequest(baseUrl,
-                "exportAnalysisResults?groupId=" + groupId);
+                "exportAnalysisResults?groupId=" + nonexistentGroupId);
         WebResponse response = conversation.getResponse(request);
         
         assertEquals(404, response.getResponseCode());
@@ -149,8 +143,7 @@ public class ExportAnalysisResultsTest {
         assertEquals("application/json", response.getContentType());
         JSONObject json = new JSONObject(response.getText());
         assertEquals(
-            CSVCreator.toCSV(groupResults.getAnnotations(),
-                    folder.getRoot().getAbsolutePath(), analyzeType),
+            CSVCreator.toCSV(groupResults.getAnnotations(), analyzeType),
             json.getString("data")
         );
     }

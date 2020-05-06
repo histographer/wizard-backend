@@ -7,7 +7,6 @@ import no.digipat.wizard.models.results.Results;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.Base64;
@@ -30,7 +29,6 @@ public final class CSVCreator {
      * Converts a list of results to a CSV string.
      * 
      * @param results the results
-     * @param path the path where the temporary file should be stored
      * @param analyzeType the type of analysis that should be included. If {@code null},
      * all analyses will be included.
      * 
@@ -38,8 +36,7 @@ public final class CSVCreator {
      * 
      * @throws IOException if an I/O error occurs
      */
-    public static String toCSV(List<Results> results, String path, String analyzeType)
-            throws IOException {
+    public static String toCSV(List<Results> results, String analyzeType) throws IOException {
         List<Results> curatedResultList;
         if (analyzeType == null) {
             curatedResultList = results;
@@ -70,16 +67,16 @@ public final class CSVCreator {
             throw new RuntimeException(e);
             // This should never happen
         }
-        UUID uuid = UUID.randomUUID();
-        String filePath = path + "/" + uuid + ".csv";
-        flat.write2csv(filePath);
-        File f = new File(filePath); // TODO just use a temp file
-        String base64String = CSVCreator.encodeFileToBase64Binary(f);
-        f.delete();
+        // TODO surely there's a better way to do this than to write
+        // to a temporary file...
+        File file = File.createTempFile("csv-export", ".csv");
+        flat.write2csv(file.getAbsolutePath());
+        String base64String = CSVCreator.encodeFileToBase64Binary(file);
+        file.delete();
         return base64String;
     }
 
-    public static String toJsonString(List<Results> results) {
+    private static String toJsonString(List<Results> results) {
         Gson gson = new Gson();
         return gson.toJson(results, List.class);
     }
@@ -89,20 +86,10 @@ public final class CSVCreator {
      * @param file
      * @return encoded file format
      */
-    public static String encodeFileToBase64Binary(File file) {
-        String encodedfile = null;
-        try {
-            FileInputStream fileInputStreamReader = new FileInputStream(file);
-            byte[] bytes = new byte[(int) file.length()];
-            fileInputStreamReader.read(bytes);
-            encodedfile = Base64.getEncoder().encodeToString(bytes);
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return encodedfile;
+    private static String encodeFileToBase64Binary(File file) throws IOException {
+        FileInputStream fileInputStreamReader = new FileInputStream(file);
+        byte[] bytes = new byte[(int) file.length()];
+        fileInputStreamReader.read(bytes);
+        return Base64.getEncoder().encodeToString(bytes);
     }
 }

@@ -32,16 +32,10 @@ public class MongoDBContextListener implements ServletContextListener {
             String host = System.getenv("WIZARD_MONGODB_HOST");
             String portString = System.getenv("WIZARD_MONGODB_PORT");
             int port = Integer.parseInt(portString);
-            // Username and password need to be percent encoded in case
-            // they contain special characters such as '@' or ':'
-            String username = URLEncoder.encode(
-                    System.getenv("WIZARD_MONGODB_USERNAME"),
-                    "utf8"
-            );
-            String password = URLEncoder.encode(
-                    System.getenv("WIZARD_MONGODB_PASSWORD"),
-                    "utf8"
-            );
+            // Username and password do not need to be percent encoded,
+            // since we're not using a URL
+            String username = System.getenv("WIZARD_MONGODB_USERNAME");
+            String password = System.getenv("WIZARD_MONGODB_PASSWORD");
             String database = System.getenv("WIZARD_MONGODB_DATABASE");
             CodecRegistry pojoCodecRegistry = fromRegistries(
                     MongoClient.getDefaultCodecRegistry(),

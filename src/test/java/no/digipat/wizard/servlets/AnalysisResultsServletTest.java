@@ -11,6 +11,10 @@ import no.digipat.wizard.models.results.*;
 import no.digipat.wizard.mongodb.dao.MongoAnalysisInformationDAO;
 import no.digipat.wizard.mongodb.dao.MongoAnnotationGroupDAO;
 import no.digipat.wizard.mongodb.dao.MongoResultsDAO;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -18,7 +22,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -160,22 +163,17 @@ public class AnalysisResultsServletTest {
                 .setAnnotationGroupId("bbbbbbbbbbbbbbbbbbbbbbbb")
                 .setStatus(Status.PENDING)
         );
-        
         WebRequest request = createPostRequest("analysisResults",
-                analyzeBodyValid, "application/json");
+                analyzeBodyInvalid, "application/json");
         conversation.sendRequest(request);
         
-        try {
-            WebResponse response = conversation.getResponse(request);
-            assertEquals(400, response.getResponseCode());
-        } catch (IOException e) {
-            // Workaround for an annoying bug that sporadically makes conversation.getResponse
-            // (and similar methods) throw IOException when the response code is 400,
-            // even if conversation.getExceptionsThrownOnErrorStatus() is false
-            assertTrue(e.getMessage().contains("400"));
-            // ^Kind of a hack
-            // TODO replace the hack with something better
-        }
+        // Workaround for HttpUnit throwing an exception on status code 400:
+        HttpResponse response = Request.Post(new URL(baseUrl, "analysisResults").toString())
+            .bodyString(analyzeBodyInvalid, ContentType.create("application/json"))
+            .execute()
+            .returnResponse();
+        
+        assertEquals(400, response.getStatusLine().getStatusCode());
     }
     
     @Test

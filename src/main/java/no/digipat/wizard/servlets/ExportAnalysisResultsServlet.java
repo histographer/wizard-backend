@@ -20,21 +20,9 @@ import com.mongodb.MongoClient;
 public class ExportAnalysisResultsServlet extends HttpServlet {
     
     /**
-     * Gets the results of a given analysis (as determined by the query
-     * parameter {@code analysisId}) in CSV format.
-     * Appropriate for downloading results to a file.
-     * <p>
-     * Response:
-     * </p>
-     * 
-     * <pre>
-     * {
-     *   "data": &lt;CSV string&gt;
-     * }
-     * </pre>
-     * 
+     * Gets the analysis results of a given annotation group in CSV format.
      */
-    @Override // TODO update docs
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String groupId = request.getParameter("groupId");

@@ -22,36 +22,7 @@ import org.apache.commons.io.IOUtils;
 public class AnalysisResultsServlet extends HttpServlet {
     
     /**
-     * Inserts an analysis result into the database.
-     * 
-     * The request body must have the following form:
-     *
-     * <pre>
-     * {
-     *   "analysisId": &lt;string&gt;,
-     *   "annotations": [
-     *     {
-     *       "annotationId": &lt;long&gt;,
-     *       "results": [
-     *         {
-     *           &lt;string&gt;: {
-     *                  &lt;string&gt;: {
-     *                   &lt;string&gt;: &lt;float&gt;,
-     *                   &lt;string&gt;: &lt;float&gt;
-     *                   ...
-     *                  }
-     *                  ...
-     *           }
-     *           ...
-     *           }
-     *         }
-     *       ],
-     *       ...
-     *     }
-     *   ]
-     * }
-     * </pre>
-     *
+     * Creates a new analysis result.
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -89,37 +60,8 @@ public class AnalysisResultsServlet extends HttpServlet {
     }
     
     /**
-     * Gets the result of an analysis, as determined by the query
-     * parameter {@code analysisId}. The response will contain a JSON
-     * object of the following form:
-     * 
-     * <pre>
-     * {
-     *   "csvBase64": &lt;string&gt;,
-     *   "analysisId": &lt;string&gt;,
-     *   "annotations": [
-     *     {
-     *       "annotationId": &lt;long&gt;,
-     *       "results": [
-     *         {
-     *           &lt;string&gt;: {
-     *                  &lt;string&gt;: {
-     *                   &lt;string&gt;: &lt;float&gt;,
-     *                   &lt;string&gt;: &lt;float&gt;
-     *                   ...
-     *                  }
-     *                  ...
-     *           }
-     *           ...
-     *           }
-     *         }
-     *       ],
-     *       ...
-     *     }
-     *   ]
-     * }
-     * </pre>
-     * 
+     * Gets the analysis results for an annotation group, as determined by the query
+     * parameter {@code groupId}.
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

@@ -65,6 +65,7 @@ public class AnnotationGroupServlet extends HttpServlet {
         
         JSONObject responseJson = new JSONObject();
         responseJson.put("groupId", groupId);
+        response.setStatus(HttpServletResponse.SC_CREATED);
         response.getWriter().print(responseJson);
     }
     

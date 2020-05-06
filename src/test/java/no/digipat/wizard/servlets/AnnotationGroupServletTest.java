@@ -112,7 +112,7 @@ public class AnnotationGroupServletTest {
                 "application/json");
         WebResponse response = conversation.getResponse(request);
         
-        assertEquals(200, response.getResponseCode());
+        assertEquals(201, response.getResponseCode());
         assertEquals("application/json", response.getContentType());
         JSONObject responseJson = new JSONObject(response.getText());
         String groupId = responseJson.getString("groupId");
@@ -201,7 +201,7 @@ public class AnnotationGroupServletTest {
                 requestJson.toString(), "application/json");
         WebResponse response = conversation.getResponse(request);
         
-        assertEquals(200, response.getResponseCode());
+        assertEquals(201, response.getResponseCode());
         JSONObject responseJson = new JSONObject(response.getText());
         String groupId = responseJson.getString("groupId");
         AnnotationGroup group = dao.getAnnotationGroup(groupId);

@@ -19,7 +19,8 @@ public class AnalysisPostBodyTests {
     public void setUp() throws MalformedURLException {
         analysisJson = "{\"analysisId\":\"abc\",\"projectId\":4,\"annotations\":[1,2,3],"
                 + "\"analysis\":[\"he\",\"rgb\"], \"callbackURLs\":"
-                + "{\"analysisResults\":\"http://localhost\", \"updateStatus\":\"http://localhost\"}}";
+                + "{\"analysisResults\":\"http://localhost\", \"updateStatus\":"
+                + "\"http://localhost\"}}";
         analysisPostBody = new AnalysisPostBody().setAnalysisId("abc")
                 .setAnnotations(new ArrayList<Long>() {
                     {
@@ -37,7 +38,7 @@ public class AnalysisPostBodyTests {
                 .setProjectId(4L)
                 .setCallbackURLs(
                         new CallbackURLs()
-                        .setAnalysisResult(new URL("http://localhost"))
+                        .setAnalysisResults(new URL("http://localhost"))
                         .setUpdateStatus(new URL("http://localhost"))
                 );
     }

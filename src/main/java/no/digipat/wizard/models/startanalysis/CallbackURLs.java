@@ -29,7 +29,7 @@ public class CallbackURLs {
      * 
      * @return this
      */
-    public CallbackURLs setAnalysisResult(URL analysisResults) {
+    public CallbackURLs setAnalysisResults(URL analysisResults) {
         this.analysisResults = analysisResults;
         return this;
     }

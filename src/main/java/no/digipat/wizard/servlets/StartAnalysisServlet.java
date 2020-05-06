@@ -101,7 +101,7 @@ public class StartAnalysisServlet extends HttpServlet {
                 .setAnalysis(analysisPostRequest.getAnalysis())
                 .setCallbackURLs(
                     new CallbackURLs()
-                        .setAnalysisResult(new URL(wizardURL, "analysisResults"))
+                        .setAnalysisResults(new URL(wizardURL, "analysisResults"))
                         .setUpdateStatus(new URL(wizardURL, "analysisInformation"))
                 );
         } catch (MalformedURLException e) {

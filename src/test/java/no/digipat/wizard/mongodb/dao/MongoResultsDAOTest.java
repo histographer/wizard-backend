@@ -182,8 +182,6 @@ public class MongoResultsDAOTest {
         dao.createAndUpdateResults(annotationGroupResults.setAnnotations(annotations));
 
         res = dao.getResults(annotationGroupResults.getGroupId());
-        System.out.println("1");
-        System.out.println(res);
         assertEquals(2, res.getAnnotations().get(0).getResults().size());
     }
     @Test(expected = IllegalArgumentException.class)
@@ -255,7 +253,7 @@ public class MongoResultsDAOTest {
     }
     
     @Test(expected = IllegalStateException.class)
-    public void testCreateResultsWithDuplicateAnalysisId() throws Exception {
+    public void testCreateResultsWithDuplicateGroupId() throws Exception {
         AnnotationGroupResults results = createAnnotationGroupResultsForTests("abc");
         dao.createAnnotationGroupResults(results);
         dao.createAnnotationGroupResults(results);

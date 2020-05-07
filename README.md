@@ -1,5 +1,5 @@
 # Wizard Backend
-This is the backend/middleware component of the Wizard application. TODO link to more info
+This is the backend/middleware component of the Wizard application.
 
 ## Getting started
 ### Prerequisites

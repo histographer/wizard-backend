@@ -15,7 +15,7 @@ In order to build the application, you need Docker and Docker Compose. For devel
     - The variables should now be set for that terminal session.
     They will be set globally whenever the system reboots. 
 
-### Installing
+### Installing for local development
 First, copy the contents file `.env.sample` into a file with the name `.env`, modifying the values of the environment variables as necessary. Then run the commands `docker network create wizard` and `docker-compose -f docker-compose.dev.yml up --build -d`. A development container will become available at `http://localhost:8080`, or whatever port you configured in `.env`.
 
 ## Testing
@@ -72,7 +72,7 @@ mvn checkstyle:check
 ```
 
 ## Deployment
-TODO
+We recommend using [the infrastructure repository](https://github.com/histographer/infrastructure) for deploying to production.
 
 ## Documentation
 The API is described in [API.md](API.md).
